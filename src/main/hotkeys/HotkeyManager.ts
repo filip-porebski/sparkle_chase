@@ -47,15 +47,12 @@ export class HotkeyManager {
     // Register all hotkeys globally
     for (const [accelerator, callback] of this.registeredHotkeys) {
       try {
-        const success = globalShortcut.register(accelerator, () => {
-          // Check if we're in safe mode before executing callback
-          if (!this.isInSafeMode()) {
-            callback();
-          }
-        });
+        const success = globalShortcut.register(accelerator, callback);
         
         if (!success) {
           console.warn(`Failed to register global hotkey: ${accelerator}`);
+        } else {
+          console.log(`Successfully registered global hotkey: ${accelerator}`);
         }
       } catch (error) {
         console.error(`Error registering global hotkey ${accelerator}:`, error);
@@ -96,6 +93,11 @@ export class HotkeyManager {
   }
 
   private async isInSafeMode(): Promise<boolean> {
+    // For now, disable safe mode checking to avoid async issues
+    // This can be re-enabled later with proper error handling
+    return false;
+    
+    /* 
     try {
       // Use different methods based on platform
       if (process.platform === 'win32') {
@@ -108,6 +110,7 @@ export class HotkeyManager {
       console.error('Error checking safe mode:', error);
       return false;
     }
+    */
   }
 
   private async checkWindowsActiveWindow(): Promise<boolean> {

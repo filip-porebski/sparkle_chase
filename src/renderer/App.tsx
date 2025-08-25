@@ -6,7 +6,7 @@ import { PhaseDialog } from './components/PhaseDialog';
 import { SettingsDialog } from './components/SettingsDialog';
 import { StatsPanel } from './components/StatsPanel';
 import { DiagnosticsPanel } from './components/DiagnosticsPanel';
-import './App.css';
+import './styles/sparklechase.css';
 
 function App() {
   const [hunts, setHunts] = useState<Hunt[]>([]);
@@ -16,11 +16,19 @@ function App() {
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [globalHotkeysEnabled, setGlobalHotkeysEnabled] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
     loadInitialData();
     setupHotkeys();
+    
+    // Set theme on document
+    document.documentElement.setAttribute('data-theme', theme);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const loadInitialData = async () => {
     try {
@@ -168,101 +176,110 @@ function App() {
     try {
       const updatedSettings = await window.electronAPI.updateSettings(updates);
       setSettings(updatedSettings);
+      
+      // Update theme if it changed
+      if (updates.theme) {
+        setTheme(updates.theme);
+      }
     } catch (error) {
       console.error('Failed to update settings:', error);
     }
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    handleUpdateSettings({ theme: newTheme });
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-xl">Loading Shiny Counter...</div>
+      <div className="sc-app" style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: 'var(--sc-fs-lg)', color: 'var(--sc-text-muted)' }}>
+          Loading SparkleChase...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${settings?.theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-      <div className="container mx-auto px-4 py-6">
-        {/* Header */}
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Shiny Counter</h1>
-          <div className="flex gap-2 items-center">
-            {/* Global Hotkeys Status */}
-            <div className={`px-3 py-1 rounded text-sm ${
-              globalHotkeysEnabled 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-            }`}>
-              Global Hotkeys: {globalHotkeysEnabled ? 'ON' : 'OFF'}
-            </div>
-            
-            <button
-              onClick={async () => {
-                const enabled = await window.electronAPI.toggleGlobalHotkeys();
-                setGlobalHotkeysEnabled(enabled);
-              }}
-              className={`px-4 py-2 text-white rounded transition-colors ${
-                globalHotkeysEnabled 
-                  ? 'bg-green-600 hover:bg-green-700' 
-                  : 'bg-gray-600 hover:bg-gray-700'
-              }`}
-            >
-              {globalHotkeysEnabled ? 'Disable' : 'Enable'} Global Hotkeys
-            </button>
-            
-            <button
-              onClick={() => window.electronAPI.toggleOverlay()}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Toggle Overlay
-            </button>
-            
-            <button
-              onClick={() => setShowSettingsDialog(true)}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-            >
-              Settings
-            </button>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Hunt Management */}
-          <div className="lg:col-span-1">
-            <HuntManager
-              hunts={hunts}
-              activeHunt={activeHunt}
-              onCreateHunt={handleCreateHunt}
-              onSelectHunt={handleSelectHunt}
-              onDeleteHunt={handleDeleteHunt}
-            />
-          </div>
-
-          {/* Main Counter */}
-          <div className="lg:col-span-1">
-            {activeHunt ? (
-              <Counter
-                hunt={activeHunt}
-                onIncrement={handleIncrement}
-                onDecrement={handleDecrement}
-                onSetCount={handleSetCount}
-                onPhase={() => setShowPhaseDialog(true)}
-              />
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-xl text-gray-500">No active hunt selected</p>
-                <p className="text-sm text-gray-400 mt-2">Create a new hunt to get started</p>
-              </div>
-            )}
-          </div>
-
-          {/* Stats Panel */}
-          <div className="lg:col-span-1">
-            {activeHunt && <StatsPanel hunt={activeHunt} />}
-          </div>
+    <div className="sc-app">
+      {/* Header */}
+      <header className="sc-header">
+        <div className="sc-title">
+          <span className="sparkle">✦</span>SparkleChase
         </div>
-      </div>
+        <div className="actions">
+          {/* Global Hotkeys Status */}
+          <div className={`sc-status ${globalHotkeysEnabled ? 'sc-status--active' : 'sc-status--inactive'}`}>
+            <span>Global Hotkeys: {globalHotkeysEnabled ? 'ON' : 'OFF'}</span>
+          </div>
+          
+          <button
+            onClick={async () => {
+              const enabled = await window.electronAPI.toggleGlobalHotkeys();
+              setGlobalHotkeysEnabled(enabled);
+            }}
+            className={`sc-btn ${globalHotkeysEnabled ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
+          >
+            {globalHotkeysEnabled ? 'Disable' : 'Enable'} Global
+          </button>
+          
+          <button
+            onClick={() => window.electronAPI.toggleOverlay()}
+            className="sc-btn"
+          >
+            Overlay
+          </button>
+          
+          <button
+            onClick={toggleTheme}
+            className="sc-btn sc-btn--ghost"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          
+          <button
+            onClick={() => setShowSettingsDialog(true)}
+            className="sc-btn"
+          >
+            Settings
+          </button>
+        </div>
+      </header>
+
+      <main className="sc-main">
+        {/* Main Content */}
+        <div className="sc-content">
+          {activeHunt ? (
+            <Counter
+              hunt={activeHunt}
+              onIncrement={handleIncrement}
+              onDecrement={handleDecrement}
+              onSetCount={handleSetCount}
+              onPhase={() => setShowPhaseDialog(true)}
+            />
+          ) : (
+            <div className="sc-card" style={{ textAlign: 'center', padding: 'var(--sc-space-8)' }}>
+              <div className="sc-card__title">No Active Hunt</div>
+              <p className="u-muted">Create a new hunt to get started</p>
+            </div>
+          )}
+          
+          {activeHunt && <StatsPanel hunt={activeHunt} />}
+        </div>
+
+        {/* Sidebar */}
+        <aside className="sc-sidebar">
+          <HuntManager
+            hunts={hunts}
+            activeHunt={activeHunt}
+            onCreateHunt={handleCreateHunt}
+            onSelectHunt={handleSelectHunt}
+            onDeleteHunt={handleDeleteHunt}
+          />
+        </aside>
+      </main>
 
       {/* Dialogs */}
       {showPhaseDialog && activeHunt && (

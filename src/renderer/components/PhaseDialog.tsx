@@ -22,63 +22,74 @@ export const PhaseDialog: React.FC<PhaseDialogProps> = ({ onPhase, onClose }) =>
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-        <h2 className="text-xl font-bold mb-4">Log Phase</h2>
+    <div className="sc-modal-backdrop">
+      <div className="sc-modal">
+        <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>✨ Log Phase</div>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="u-col">
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="sc-label">
               Species Found
             </label>
             <input
               type="text"
               value={species}
               onChange={(e) => setSpecies(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              className="sc-input"
               placeholder="e.g., Pidgey"
               autoFocus
               required
             />
           </div>
 
-          <div className="flex items-center">
+          <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
             <input
               type="checkbox"
               id="isTarget"
               checked={isTarget}
               onChange={(e) => setIsTarget(e.target.checked)}
-              className="mr-2"
+              style={{ accentColor: 'var(--sc-shiny)' }}
             />
-            <label htmlFor="isTarget" className="text-sm">
+            <label htmlFor="isTarget" style={{ fontSize: 'var(--sc-fs-sm)' }}>
               This was my target species (hunt complete!)
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="sc-label">
               Notes (Optional)
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              className="sc-input"
               placeholder="Location, method details, etc..."
               rows={3}
+              style={{ resize: 'vertical', minHeight: '80px' }}
             />
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="u-row" style={{ 
+            gap: 'var(--sc-space-3)', 
+            paddingTop: 'var(--sc-space-4)' 
+          }}>
             <button
               type="submit"
-              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded transition-colors"
+              className="sc-btn"
+              style={{ 
+                flex: 1,
+                background: 'var(--sc-warning)',
+                borderColor: 'color-mix(in oklab, var(--sc-warning) 70%, black 30%)',
+                color: '#fff'
+              }}
             >
-              Log Phase
+              ✨ Log Phase
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors"
+              className="sc-btn sc-btn--ghost"
+              style={{ flex: 1 }}
             >
               Cancel
             </button>

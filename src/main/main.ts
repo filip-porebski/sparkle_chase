@@ -76,6 +76,48 @@ class ShinyCounterApp {
     this.mainWindow.on('closed', () => {
       this.mainWindow = null;
     });
+
+    // Setup local hotkeys for when app is focused
+    this.setupLocalHotkeys();
+  }
+
+  private setupLocalHotkeys() {
+    if (!this.mainWindow) return;
+
+    this.mainWindow.webContents.on('before-input-event', (event, input) => {
+      // Only handle when app is focused and global hotkeys are disabled
+      if (!this.hotkeyManager.isGlobalEnabled()) {
+        if (input.type === 'keyDown') {
+          switch (input.key) {
+            case ' ': // Space key
+              if (!input.meta && !input.control && !input.alt && !input.shift) {
+                this.mainWindow?.webContents.send('hotkey:increment');
+                event.preventDefault();
+              }
+              break;
+            case 'z':
+              if ((input.meta || input.control) && !input.alt && !input.shift) {
+                this.mainWindow?.webContents.send('hotkey:decrement');
+                event.preventDefault();
+              }
+              break;
+            case 'p':
+              if ((input.meta || input.control) && !input.alt && !input.shift) {
+                this.mainWindow?.webContents.send('hotkey:phase');
+                event.preventDefault();
+              }
+              break;
+            case 'g':
+              if ((input.meta || input.control) && input.shift && !input.alt) {
+                const enabled = this.hotkeyManager.toggleGlobal();
+                this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
+                event.preventDefault();
+              }
+              break;
+          }
+        }
+      }
+    });
   }
 
   private setupIpcHandlers() {

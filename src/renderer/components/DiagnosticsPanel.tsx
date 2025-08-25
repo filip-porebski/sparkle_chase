@@ -67,7 +67,14 @@ export const DiagnosticsPanel: React.FC = () => {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded text-sm"
+        className="sc-btn sc-btn--ghost"
+        style={{
+          position: 'fixed',
+          bottom: 'var(--sc-space-4)',
+          right: 'var(--sc-space-4)',
+          fontSize: 'var(--sc-fs-sm)',
+          zIndex: 100
+        }}
       >
         🔧 Diagnostics
       </button>
@@ -75,47 +82,86 @@ export const DiagnosticsPanel: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">System Diagnostics</h2>
+    <div className="sc-modal-backdrop">
+      <div className="sc-modal" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+        <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
+          <div className="sc-card__title">🔧 System Diagnostics</div>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
+            className="sc-btn sc-btn--ghost"
+            style={{ padding: 'var(--sc-space-1)' }}
           >
             ✕
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="u-col">
           {/* Data Directory Info */}
           {dataDir && (
-            <div className="bg-gray-100 dark:bg-gray-700 rounded p-3">
-              <h3 className="font-semibold mb-1">Data Directory</h3>
-              <p className="text-sm font-mono break-all">{dataDir}</p>
+            <div style={{ 
+              background: 'var(--sc-bg-elev-2)', 
+              border: '1px solid var(--sc-border)',
+              borderRadius: 'var(--sc-radius-lg)',
+              padding: 'var(--sc-space-3)'
+            }}>
+              <div style={{ 
+                fontSize: 'var(--sc-fs-md)', 
+                fontWeight: 'var(--sc-fw-semibold)', 
+                marginBottom: 'var(--sc-space-1)' 
+              }}>
+                Data Directory
+              </div>
+              <p style={{ 
+                fontSize: 'var(--sc-fs-sm)', 
+                fontVariantNumeric: 'tabular-nums',
+                wordBreak: 'break-all',
+                color: 'var(--sc-text-muted)'
+              }}>
+                {dataDir}
+              </p>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="u-row" style={{ flexWrap: 'wrap' }}>
             <button
               onClick={runDataIntegrityTest}
               disabled={testing}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-2 px-4 rounded transition-colors"
+              className="sc-btn sc-btn--primary"
+              style={{ 
+                flex: 1, 
+                minWidth: '160px',
+                opacity: testing ? 0.6 : 1,
+                pointerEvents: testing ? 'none' : 'auto'
+              }}
             >
               {testing ? 'Testing...' : 'Test Data Integrity'}
             </button>
 
             <button
               onClick={createBackup}
-              className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition-colors"
+              className="sc-btn"
+              style={{ 
+                flex: 1, 
+                minWidth: '160px',
+                background: 'var(--sc-success)',
+                borderColor: 'color-mix(in oklab, var(--sc-success) 70%, black 30%)',
+                color: '#fff'
+              }}
             >
               Create Emergency Backup
             </button>
 
             <button
               onClick={validateOBSFolder}
-              className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded transition-colors"
+              className="sc-btn"
+              style={{ 
+                flex: 1, 
+                minWidth: '160px',
+                background: 'var(--sc-brand)',
+                borderColor: 'var(--sc-brand-strong)',
+                color: '#fff'
+              }}
             >
               Validate OBS Folder
             </button>
@@ -123,22 +169,64 @@ export const DiagnosticsPanel: React.FC = () => {
 
           {/* Test Results */}
           {result && (
-            <div className="border rounded p-4">
-              <h3 className="font-semibold mb-2">Data Integrity Test Results</h3>
+            <div style={{ 
+              border: '1px solid var(--sc-border)', 
+              borderRadius: 'var(--sc-radius-lg)', 
+              padding: 'var(--sc-space-4)' 
+            }}>
+              <div style={{ 
+                fontSize: 'var(--sc-fs-md)', 
+                fontWeight: 'var(--sc-fw-semibold)', 
+                marginBottom: 'var(--sc-space-2)' 
+              }}>
+                Data Integrity Test Results
+              </div>
               
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-green-100 dark:bg-green-900 rounded p-3">
-                  <div className="text-2xl font-bold text-green-800 dark:text-green-200">
+              <div className="u-row" style={{ marginBottom: 'var(--sc-space-4)' }}>
+                <div style={{ 
+                  background: 'var(--sc-bg-good)', 
+                  border: '1px solid color-mix(in oklab, var(--sc-success) 30%, transparent)',
+                  borderRadius: 'var(--sc-radius-lg)',
+                  padding: 'var(--sc-space-3)',
+                  flex: 1,
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    fontSize: 'var(--sc-fs-xl)', 
+                    fontWeight: 'var(--sc-fw-bold)',
+                    color: 'var(--sc-success)'
+                  }}>
                     {result.valid}
                   </div>
-                  <div className="text-sm text-green-600 dark:text-green-400">Valid Files</div>
+                  <div style={{ 
+                    fontSize: 'var(--sc-fs-sm)', 
+                    color: 'var(--sc-success)' 
+                  }}>
+                    Valid Files
+                  </div>
                 </div>
                 
-                <div className="bg-red-100 dark:bg-red-900 rounded p-3">
-                  <div className="text-2xl font-bold text-red-800 dark:text-red-200">
+                <div style={{ 
+                  background: 'var(--sc-bg-danger)', 
+                  border: '1px solid color-mix(in oklab, var(--sc-danger) 30%, transparent)',
+                  borderRadius: 'var(--sc-radius-lg)',
+                  padding: 'var(--sc-space-3)',
+                  flex: 1,
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    fontSize: 'var(--sc-fs-xl)', 
+                    fontWeight: 'var(--sc-fw-bold)',
+                    color: 'var(--sc-danger)'
+                  }}>
                     {result.corrupted}
                   </div>
-                  <div className="text-sm text-red-600 dark:text-red-400">Corrupted Files</div>
+                  <div style={{ 
+                    fontSize: 'var(--sc-fs-sm)', 
+                    color: 'var(--sc-danger)' 
+                  }}>
+                    Corrupted Files
+                  </div>
                 </div>
               </div>
 

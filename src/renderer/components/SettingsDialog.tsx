@@ -32,21 +32,21 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Settings</h2>
+    <div className="sc-modal-backdrop">
+      <div className="sc-modal">
+        <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>Settings</div>
         
-        <div className="space-y-6">
+        <div className="u-col">
           {/* Theme */}
           <div>
-            <label className="block text-sm font-medium mb-2">Theme</label>
+            <label className="sc-label">Theme</label>
             <select
               value={localSettings.theme}
               onChange={(e) => setLocalSettings(prev => ({ 
                 ...prev, 
                 theme: e.target.value as 'light' | 'dark' 
               }))}
-              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              className="sc-input"
             >
               <option value="light">Light</option>
               <option value="dark">Dark</option>
@@ -55,19 +55,19 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
 
           {/* Global Hotkeys */}
           <div>
-            <label className="block text-sm font-medium mb-2">Global Hotkeys</label>
-            <div className="flex items-center gap-2">
+            <label className="sc-label">Global Hotkeys</label>
+            <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
               <button
                 onClick={toggleGlobalHotkeys}
-                className={`px-4 py-2 rounded transition-colors ${
+                className={`sc-btn ${
                   localSettings.globalHotkeysEnabled
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    ? 'sc-btn--primary'
+                    : 'sc-btn--ghost'
                 }`}
               >
                 {localSettings.globalHotkeysEnabled ? 'Enabled' : 'Disabled'}
               </button>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="u-muted" style={{ fontSize: 'var(--sc-fs-sm)' }}>
                 Allow hotkeys to work when app is not focused
               </span>
             </div>
@@ -75,11 +75,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
 
           {/* Hotkey Configuration */}
           <div>
-            <label className="block text-sm font-medium mb-2">Hotkey Bindings</label>
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400">Increment</label>
+            <label className="sc-label">Hotkey Bindings</label>
+            <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
+              <div className="u-row">
+                <div style={{ flex: 1 }}>
+                  <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Increment</label>
                   <input
                     type="text"
                     value={localSettings.hotkeys.increment}
@@ -87,11 +87,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                       ...prev,
                       hotkeys: { ...prev.hotkeys, increment: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                    className="sc-input"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400">Decrement</label>
+                <div style={{ flex: 1 }}>
+                  <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Decrement</label>
                   <input
                     type="text"
                     value={localSettings.hotkeys.decrement}
@@ -99,13 +99,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                       ...prev,
                       hotkeys: { ...prev.hotkeys, decrement: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                    className="sc-input"
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400">Phase</label>
+              <div className="u-row">
+                <div style={{ flex: 1 }}>
+                  <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Phase</label>
                   <input
                     type="text"
                     value={localSettings.hotkeys.phase}
@@ -113,11 +113,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                       ...prev,
                       hotkeys: { ...prev.hotkeys, phase: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                    className="sc-input"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-600 dark:text-gray-400">Toggle Global</label>
+                <div style={{ flex: 1 }}>
+                  <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Toggle Global</label>
                   <input
                     type="text"
                     value={localSettings.hotkeys.toggleGlobal}
@@ -125,7 +125,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                       ...prev,
                       hotkeys: { ...prev.hotkeys, toggleGlobal: e.target.value }
                     }))}
-                    className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                    className="sc-input"
                   />
                 </div>
               </div>
@@ -134,8 +134,8 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
 
           {/* OBS Text Files */}
           <div>
-            <label className="block text-sm font-medium mb-2">OBS Text Files Output</label>
-            <div className="flex gap-2">
+            <label className="sc-label">OBS Text Files Output</label>
+            <div className="u-row">
               <input
                 type="text"
                 value={localSettings.obsTextFolder}
@@ -143,26 +143,27 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                   ...prev, 
                   obsTextFolder: e.target.value 
                 }))}
-                className="flex-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                className="sc-input"
+                style={{ flex: 1 }}
                 placeholder="Select folder for count.txt, target.txt, phase.txt"
               />
               <button
                 onClick={handleSelectFolder}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                className="sc-btn sc-btn--primary"
               >
                 Browse
               </button>
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: 'var(--sc-space-1)' }}>
               Files will be created: count.txt, target.txt, phase.txt
             </p>
           </div>
 
           {/* Overlay Settings */}
           <div>
-            <label className="block text-sm font-medium mb-2">Overlay Settings</label>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
+            <label className="sc-label">Overlay Settings</label>
+            <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
+              <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
                 <input
                   type="checkbox"
                   checked={localSettings.overlay.alwaysOnTop}
@@ -170,11 +171,12 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     ...prev,
                     overlay: { ...prev.overlay, alwaysOnTop: e.target.checked }
                   }))}
+                  style={{ accentColor: 'var(--sc-brand)' }}
                 />
-                <span className="text-sm">Always on top</span>
+                <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Always on top</span>
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
                 <input
                   type="checkbox"
                   checked={localSettings.overlay.clickThrough}
@@ -182,19 +184,20 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     ...prev,
                     overlay: { ...prev.overlay, clickThrough: e.target.checked }
                   }))}
+                  style={{ accentColor: 'var(--sc-brand)' }}
                 />
-                <span className="text-sm">Click through</span>
+                <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Click through</span>
               </div>
               
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400">Variant</label>
+                <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Variant</label>
                 <select
                   value={localSettings.overlay.variant}
                   onChange={(e) => setLocalSettings(prev => ({
                     ...prev,
                     overlay: { ...prev.overlay, variant: e.target.value as any }
                   }))}
-                  className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                  className="sc-input"
                 >
                   <option value="badge">Badge</option>
                   <option value="compact">Compact</option>
@@ -206,33 +209,40 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
 
           {/* Safe Mode Apps */}
           <div>
-            <label className="block text-sm font-medium mb-2">Safe Mode Apps</label>
+            <label className="sc-label">Safe Mode Apps</label>
             <textarea
               value={localSettings.safeModeApps.join('\n')}
               onChange={(e) => setLocalSettings(prev => ({
                 ...prev,
                 safeModeApps: e.target.value.split('\n').filter(app => app.trim())
               }))}
-              className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+              className="sc-input"
               placeholder="Photoshop.exe&#10;Premiere.exe"
               rows={3}
+              style={{ resize: 'vertical', minHeight: '80px' }}
             />
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: 'var(--sc-space-1)' }}>
               Global hotkeys will be disabled when these apps are focused (one per line)
             </p>
           </div>
         </div>
 
-        <div className="flex gap-3 pt-6 border-t">
+        <div className="u-row" style={{ 
+          gap: 'var(--sc-space-3)', 
+          paddingTop: 'var(--sc-space-5)', 
+          borderTop: '1px solid var(--sc-border)' 
+        }}>
           <button
             onClick={handleSave}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition-colors"
+            className="sc-btn sc-btn--primary"
+            style={{ flex: 1 }}
           >
             Save Settings
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors"
+            className="sc-btn sc-btn--ghost"
+            style={{ flex: 1 }}
           >
             Cancel
           </button>

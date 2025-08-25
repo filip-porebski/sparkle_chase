@@ -1,0 +1,467 @@
+# SparkleChase — Layout & Design Spec
+
+> A crisp, streamer-friendly Electron app for shiny hunting counters. This doc defines the **visual language**, **layout**, and **CSS design tokens/components** (vanilla CSS with variables). Tailwind can map to these tokens, but this file stands alone.
+
+---
+
+## 1) Brand & Identity
+
+**Name:** SparkleChase  
+**Voice:** upbeat, encouraging, minimal jargon in UI  
+**Brand motifs:** sparkle ✨, poké-like ball arc shapes, counters/odds
+
+**Logo concept (wordmark + glyph):**  
+- Glyph: a simple 6-point sparkle over a subtle circle (ball) arc.  
+- Wordmark: `Sparkle` (regular) + `Chase` (semi-bold).  
+- Keep it readable at small sizes (overlay).
+
+**Favicon/Icons:**  
+- 16/32/64/128/256 PNG; 1024 app icon.  
+- Colors: primary brand purple with white sparkle cutout.
+
+---
+
+## 2) Color System
+
+We use a brand-forward purple, neon accent for shiny moments, and neutral grays. **Dark mode is default.**
+
+### Core Tokens
+```
+--sc-brand:           #7E5BEF;  /* Primary purple */
+--sc-brand-strong:    #6A48E6;
+--sc-accent:          #22D3EE;  /* Cyan pop for highlights / odds */
+--sc-shiny:           #FDE047;  /* Shiny golden for success */
+--sc-danger:          #EF4444;  /* Destructive */
+--sc-success:         #22C55E;  /* Good states */
+--sc-warning:         #F59E0B;  /* Warnings */
+```
+
+### Neutral & Surfaces (Dark)
+```
+--sc-bg:              #0B0B10;
+--sc-bg-elev-1:       #11111A;
+--sc-bg-elev-2:       #161626;
+--sc-bg-overlay:      rgba(2, 6, 23, 0.75);
+
+--sc-text:            #E6E6F0;
+--sc-text-muted:      #B7B7C8;
+--sc-text-subtle:     #8C8CA1;
+
+--sc-border:          #2A2A3A;
+--sc-border-strong:   #3B3B52;
+--sc-shadow:          0 8px 24px rgba(0,0,0,0.4);
+```
+
+### Neutral & Surfaces (Light)
+```
+--sc-bg:              #FFFFFF;
+--sc-bg-elev-1:       #F7F7FB;
+--sc-bg-elev-2:       #EFEFF6;
+--sc-bg-overlay:      rgba(8, 10, 28, 0.6);
+
+--sc-text:            #12121A;
+--sc-text-muted:      #40405A;
+--sc-text-subtle:     #6B6B86;
+
+--sc-border:          #D9D9E6;
+--sc-border-strong:   #BFBFD4;
+--sc-shadow:          0 8px 24px rgba(10,10,30,0.12);
+```
+
+### Status Backgrounds
+```
+--sc-bg-good:         color-mix(in oklab, var(--sc-success) 12%, transparent);
+--sc-bg-warn:         color-mix(in oklab, var(--sc-warning) 16%, transparent);
+--sc-bg-danger:       color-mix(in oklab, var(--sc-danger) 12%, transparent);
+--sc-bg-shiny:        color-mix(in oklab, var(--sc-shiny) 18%, transparent);
+```
+
+---
+
+## 3) Typography
+
+- **Primary:** Inter (fallbacks: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif)  
+- **Numeric:** use `tabular-nums` for counters.
+
+Scale:
+```
+--sc-fs-2xl: 48px;
+--sc-fs-xl:  32px;
+--sc-fs-lg:  20px;
+--sc-fs-md:  16px;
+--sc-fs-sm:  14px;
+--sc-fs-xs:  12px;
+--sc-lh-tight: 1.1;
+--sc-lh-normal: 1.4;
+```
+
+Weights:
+```
+--sc-fw-regular: 400;
+--sc-fw-medium:  500;
+--sc-fw-semibold:600;
+--sc-fw-bold:    700;
+```
+
+---
+
+## 4) Spacing, Radius, Elevation
+
+```
+--sc-space-0: 0;
+--sc-space-1: 4px;
+--sc-space-2: 8px;
+--sc-space-3: 12px;
+--sc-space-4: 16px;
+--sc-space-5: 24px;
+--sc-space-6: 32px;
+--sc-space-7: 48px;
+--sc-space-8: 64px;
+
+--sc-radius-sm: 10px;
+--sc-radius-md: 14px;
+--sc-radius-lg: 20px;
+--sc-radius-xl: 28px;
+--sc-radius-2xl: 36px;
+```
+
+---
+
+## 5) Layout & Grids
+
+### App Frame
+- **Header (48px):** app title, active hunt selector, global hotkey toggle.  
+- **Main two-column:**  
+  - **Left (Content):** Counter card, Odds, Phase log, Sessions (later).  
+  - **Right (Sidebar):** Hunt meta, Quick Adjusters, Notes.  
+- **Footer (32px):** status (autosave, path), small tips.
+
+### Counter Card Hierarchy (in Content column)
+- Top: Target species + game + method tag.  
+- Center: **Giant count** (2xl) with +1 button.  
+- Bottom: Odds line + Encounters/hour + “Since last shiny”.
+
+### Overlay Window
+- Single-row or stack variant; always-on-top; click-through.  
+- Content: target • count • phase badge • odds.  
+- Padding: `var(--sc-space-3)`; radius `var(--sc-radius-lg)`.
+
+---
+
+## 6) CSS — Design Tokens & Base
+
+```css
+:root {
+  color-scheme: dark;
+  /* colors (dark default) */
+  --sc-brand:#7E5BEF;--sc-brand-strong:#6A48E6;--sc-accent:#22D3EE;
+  --sc-shiny:#FDE047;--sc-danger:#EF4444;--sc-success:#22C55E;--sc-warning:#F59E0B;
+  --sc-bg:#0B0B10;--sc-bg-elev-1:#11111A;--sc-bg-elev-2:#161626;--sc-bg-overlay:rgba(2,6,23,.75);
+  --sc-text:#E6E6F0;--sc-text-muted:#B7B7C8;--sc-text-subtle:#8C8CA1;
+  --sc-border:#2A2A3A;--sc-border-strong:#3B3B52;--sc-shadow:0 8px 24px rgba(0,0,0,.4);
+  --sc-bg-good:color-mix(in oklab, var(--sc-success) 12%, transparent);
+  --sc-bg-warn:color-mix(in oklab, var(--sc-warning) 16%, transparent);
+  --sc-bg-danger:color-mix(in oklab, var(--sc-danger) 12%, transparent);
+  --sc-bg-shiny:color-mix(in oklab, var(--sc-shiny) 18%, transparent);
+
+  /* type */
+  --sc-fs-2xl:48px;--sc-fs-xl:32px;--sc-fs-lg:20px;--sc-fs-md:16px;--sc-fs-sm:14px;--sc-fs-xs:12px;
+  --sc-lh-tight:1.1;--sc-lh-normal:1.4;
+  --sc-fw-regular:400;--sc-fw-medium:500;--sc-fw-semibold:600;--sc-fw-bold:700;
+
+  /* space & radii */
+  --sc-space-0:0;--sc-space-1:4px;--sc-space-2:8px;--sc-space-3:12px;--sc-space-4:16px;--sc-space-5:24px;--sc-space-6:32px;--sc-space-7:48px;--sc-space-8:64px;
+  --sc-radius-sm:10px;--sc-radius-md:14px;--sc-radius-lg:20px;--sc-radius-xl:28px;--sc-radius-2xl:36px;
+}
+
+/* Light theme */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --sc-bg:#FFFFFF;--sc-bg-elev-1:#F7F7FB;--sc-bg-elev-2:#EFEFF6;--sc-bg-overlay:rgba(8,10,28,.6);
+  --sc-text:#12121A;--sc-text-muted:#40405A;--sc-text-subtle:#6B6B86;
+  --sc-border:#D9D9E6;--sc-border-strong:#BFBFD4;--sc-shadow:0 8px 24px rgba(10,10,30,.12);
+}
+
+/* Reset-ish */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--sc-bg);
+  color: var(--sc-text);
+  font: var(--sc-fw-regular) var(--sc-fs-md)/var(--sc-lh-normal) Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: 0.1px;
+}
+a { color: var(--sc-accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+hr { border: none; border-top: 1px solid var(--sc-border); }
+
+/* Utilities */
+.u-muted{ color: var(--sc-text-muted); }
+.u-subtle{ color: var(--sc-text-subtle); }
+.u-shadow{ box-shadow: var(--sc-shadow); }
+.u-card{ background: var(--sc-bg-elev-1); border:1px solid var(--sc-border); border-radius:var(--sc-radius-xl); padding:var(--sc-space-5); }
+.u-row{ display:flex; gap:var(--sc-space-4); align-items:center; }
+.u-col{ display:flex; flex-direction:column; gap:var(--sc-space-4); }
+.u-badge{ display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:999px; border:1px solid var(--sc-border); background:var(--sc-bg-elev-2); font-size: var(--sc-fs-sm); }
+```
+
+---
+
+## 7) Components
+
+### Header
+```css
+.sc-header {
+  height: 48px; display:flex; align-items:center; justify-content:space-between;
+  padding: 0 var(--sc-space-5); border-bottom:1px solid var(--sc-border); background:var(--sc-bg-elev-1);
+}
+.sc-title { font-weight: var(--sc-fw-semibold); letter-spacing: 0.2px; }
+.sc-title .sparkle { color: var(--sc-brand); margin-right: 8px; }
+.sc-header .actions { display:flex; gap: var(--sc-space-3); }
+```
+
+### Buttons
+```css
+.sc-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:40px; padding:0 16px; border-radius: var(--sc-radius-lg);
+  border:1px solid var(--sc-border); background:var(--sc-bg-elev-2);
+  color: var(--sc-text); cursor:pointer; user-select:none;
+  transition: transform .04s ease, background .15s ease, border-color .15s ease;
+}
+.sc-btn:hover { background: color-mix(in oklab, var(--sc-bg-elev-2) 70%, var(--sc-brand) 30%); border-color: var(--sc-border-strong); }
+.sc-btn:active { transform: translateY(1px) scale(0.998); }
+.sc-btn[aria-disabled="true"] { opacity:.6; pointer-events:none; }
+
+.sc-btn--primary { background: var(--sc-brand); border-color: var(--sc-brand-strong); color:#fff; }
+.sc-btn--ghost { background: transparent; }
+.sc-btn--danger { background: var(--sc-danger); color:#fff; border-color: color-mix(in oklab, var(--sc-danger) 70%, black 30%); }
+
+/* Huge action (+1) */
+.sc-btn--giant {
+  height: 72px; padding:0 28px; font-size: var(--sc-fs-xl);
+  border-radius: var(--sc-radius-2xl); font-weight: var(--sc-fw-bold);
+}
+```
+
+### Input
+```css
+.sc-input {
+  height:40px; padding:0 12px; border-radius: var(--sc-radius-md);
+  border:1px solid var(--sc-border); background: var(--sc-bg-elev-2); color: var(--sc-text);
+  outline: none; width: 100%;
+}
+.sc-input:focus { border-color: var(--sc-brand); box-shadow: 0 0 0 3px color-mix(in oklab, var(--sc-brand) 32%, transparent); }
+.sc-label { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); margin-bottom: 6px; }
+```
+
+### Select/Tabs/Tags (short)
+```css
+.sc-tag { /* matches .u-badge */ display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:999px; border:1px solid var(--sc-border); background:var(--sc-bg-elev-2); font-size: var(--sc-fs-sm); }
+.sc-tabs { display:flex; gap: 6px; background:var(--sc-bg-elev-2); padding:6px; border-radius:999px; border:1px solid var(--sc-border); }
+.sc-tab { padding:8px 12px; border-radius:999px; cursor:pointer; }
+.sc-tab[aria-selected="true"] { background: var(--sc-brand); color: #fff; }
+```
+
+### Cards
+```css
+.sc-card { background: var(--sc-bg-elev-1); border:1px solid var(--sc-border); border-radius:var(--sc-radius-xl); padding:var(--sc-space-5); box-shadow: var(--sc-shadow); }
+.sc-card__title { font-size: var(--sc-fs-lg); font-weight: var(--sc-fw-semibold); margin-bottom: var(--sc-space-3); }
+.sc-card__meta { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); }
+```
+
+### Counter Display
+```css
+.sc-counter {
+  display:flex; align-items:center; justify-content:space-between; gap: var(--sc-space-5);
+}
+.sc-count {
+  font-size: var(--sc-fs-2xl); font-weight: var(--sc-fw-bold); line-height: var(--sc-lh-tight);
+  font-variant-numeric: tabular-nums; letter-spacing: 0.5px;
+}
+.sc-odds { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); }
+.sc-since { font-size: var(--sc-fs-sm); color: var(--sc-text-subtle); }
+```
+
+### Phase Log
+```css
+.sc-phases { display:flex; flex-direction:column; gap: var(--sc-space-2); }
+.sc-phase {
+  display:grid; grid-template-columns: 1fr auto; gap: var(--sc-space-2);
+  background: var(--sc-bg-elev-1); border:1px solid var(--sc-border); border-radius: var(--sc-radius-lg);
+  padding: var(--sc-space-3) var(--sc-space-4);
+}
+.sc-phase__title { font-weight: var(--sc-fw-medium); }
+.sc-phase__meta { font-size: var(--sc-fs-xs); color: var(--sc-text-muted); }
+.sc-phase--target { border-color: color-mix(in oklab, var(--sc-shiny) 60%, var(--sc-border)); background: var(--sc-bg-shiny); }
+```
+
+### Overlay (click-through)
+```css
+.sc-overlay {
+  position: fixed; inset: auto 16px 16px auto; /* bottom-right default */
+  background: color-mix(in oklab, var(--sc-bg-elev-2) 85%, black 15%);
+  border: 1px solid var(--sc-border-strong); border-radius: var(--sc-radius-xl);
+  padding: 10px 14px; display:flex; align-items:center; gap: 12px;
+  box-shadow: var(--sc-shadow); pointer-events:none;
+}
+.sc-overlay__count { font-size: 28px; font-variant-numeric: tabular-nums; font-weight: var(--sc-fw-bold); }
+.sc-overlay__badge { display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:999px; border:1px solid var(--sc-border); background:var(--sc-bg-elev-2); font-size: var(--sc-fs-sm); }
+```
+
+### Toast/Confetti Hint
+```css
+.sc-toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: 28px; padding: 10px 14px; border-radius: var(--sc-radius-lg);
+  background: var(--sc-bg-shiny); color: #1b1b1b; border: 1px solid var(--sc-border-strong);
+  box-shadow: var(--sc-shadow);
+}
+```
+
+### Modals
+```css
+.sc-modal-backdrop{ position:fixed; inset:0; background:var(--sc-bg-overlay); }
+.sc-modal {
+  position: fixed; inset: 50% auto auto 50%; transform: translate(-50%,-50%);
+  width: min(560px, calc(100% - 32px));
+  background: var(--sc-bg-elev-1); border:1px solid var(--sc-border); border-radius: var(--sc-radius-xl);
+  padding: var(--sc-space-6); box-shadow: var(--sc-shadow);
+}
+```
+
+---
+
+## 8) Sample Layout Structure (HTML-ish)
+
+```html
+<div class="sc-header">
+  <div class="sc-title"><span class="sparkle">✦</span>SparkleChase</div>
+  <div class="actions">
+    <button class="sc-btn sc-btn--ghost" id="hotkey-toggle">Global Hotkey</button>
+    <button class="sc-btn" id="theme-toggle">Theme</button>
+  </div>
+</div>
+
+<main style="display:grid;grid-template-columns:1.6fr .9fr;gap:24px;padding:24px;">
+  <section class="sc-card">
+    <div class="u-row" style="justify-content:space-between;">
+      <div>
+        <div class="sc-card__title">Ralts</div>
+        <div class="sc-card__meta">SV • Encounters</div>
+      </div>
+      <div class="sc-tag">Phase #2</div>
+    </div>
+
+    <div class="sc-counter" style="margin-top:16px;">
+      <div class="sc-count">3,217</div>
+      <div class="u-row">
+        <button class="sc-btn sc-btn--giant sc-btn--primary">+1</button>
+        <button class="sc-btn" aria-label="undo">−1</button>
+      </div>
+    </div>
+
+    <div class="u-row" style="margin-top:16px;justify-content:space-between;">
+      <div class="sc-odds">No shiny after N: 49.2% • Past odds: 0.78×</div>
+      <div class="sc-since">Since last shiny: 1,377</div>
+    </div>
+  </section>
+
+  <aside class="u-col">
+    <section class="sc-card">
+      <div class="sc-card__title">Hunt</div>
+      <label class="sc-label">Target</label>
+      <input class="sc-input" value="Ralts" />
+      <label class="sc-label">Game</label>
+      <input class="sc-input" value="SV" />
+      <label class="sc-label">Method</label>
+      <div class="sc-tabs" role="tablist">
+        <div class="sc-tab" role="tab" aria-selected="true">Encounter</div>
+        <div class="sc-tab" role="tab">Eggs</div>
+        <div class="sc-tab" role="tab">SR</div>
+      </div>
+    </section>
+
+    <section class="sc-card">
+      <div class="sc-card__title">Phases</div>
+      <div class="sc-phases">
+        <div class="sc-phase sc-phase--target">
+          <div>
+            <div class="sc-phase__title">Hoppip (off-target)</div>
+            <div class="sc-phase__meta">at 1,840 • 2025‑08‑20</div>
+          </div>
+          <button class="sc-btn sc-btn--ghost">View</button>
+        </div>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<div class="sc-overlay">
+  <span>Ralts</span>
+  <span class="sc-overlay__count">3217</span>
+  <span class="sc-overlay__badge">Phase 2</span>
+  <span class="u-muted">49% no-shiny</span>
+</div>
+```
+
+---
+
+## 9) States & Interaction
+
+- **Focus rings:** brand-colored 3px shadow on focusable controls.  
+- **Hover:** slight brand tint on neutral surfaces.  
+- **Active:** 1px translateY + tiny scale.  
+- **Disabled:** 60% opacity, pointer-events none.  
+- **Success (shiny):** use `--sc-bg-shiny` background tint + confetti; text switches to dark for contrast when needed.  
+- **Danger:** destructive buttons in danger palette with confirm dialog.
+
+**Motion:**  
+- Use 100–150ms ease for hover/press, 180–220ms for modals. Avoid parallax; keep it snappy for overlays.
+
+**Density settings:**  
+- Comfortable (default) vs Compact (−2px on paddings, smaller line-height).
+
+---
+
+## 10) Accessibility
+
+- Contrast ratio ≥ 4.5:1 for body text; ≥ 3:1 for large text.  
+- Never use color alone: badges include text/icons.  
+- Keyboard-first: all actions reachable, visible focus indicators.  
+- Provide “Large Counter Mode” (full-screen, centered, 2xl font).
+
+---
+
+## 11) OBS Overlay & Text Labels
+
+- Overlay window is **click-through** and **always-on-top**; padding 10–14px; border 1px.  
+- Fonts: same as app; ensure tabular-nums.  
+- Text files (`count.txt`, `target.txt`, `phase.txt`) are **monospace optional**; recommend `ui-monospace` in OBS Browser Source if desired.
+
+---
+
+## 12) Theming API (JS hook idea)
+
+Add/remove `data-theme="light"` on `<html>` to switch themes. Persist in settings.  
+User accent override allowed via CSS variables: `--sc-brand`, `--sc-accent`.
+
+---
+
+## 13) Future Extensions
+
+- Per-hunt theme accents (type-themed accent colors).  
+- Seasonal sparkles (subtle particle background toggle).  
+- Shiny-only high-contrast overlay theme for outdoor streaming.
+
+---
+
+## 14) Asset Checklist
+
+- [ ] App icon set (ico/icns + PNGs)  
+- [ ] Wordmark SVG + glyph SVG  
+- [ ] Illustrations (sparkle background, optional)  
+- [ ] Sound SFX: shiny, phase, click  
+- [ ] OBS overlay templates (browser source + text source)
+

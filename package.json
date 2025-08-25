@@ -1,7 +1,7 @@
 {
-  "name": "shiny-counter",
+  "name": "sparklechase",
   "version": "1.0.0",
-  "description": "Single-player shiny hunting counter for Nintendo Pokémon games",
+  "description": "SparkleChase - A crisp, streamer-friendly shiny hunting counter",
   "main": "dist/main/main.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -44,8 +44,8 @@
     "react-dom": "^18.2.0"
   },
   "build": {
-    "appId": "com.shinycounter.app",
-    "productName": "Shiny Counter",
+    "appId": "com.sparklechase.app",
+    "productName": "SparkleChase",
     "directories": {
       "output": "release"
     },

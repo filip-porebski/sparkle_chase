@@ -33,81 +33,151 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt }) => {
   const stats = calculateOdds();
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Statistics</h2>
+    <div className="sc-card">
+      <div className="sc-card__title">Statistics</div>
       
-      <div className="space-y-4">
+      <div className="u-col">
         {/* Basic Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gray-100 dark:bg-gray-700 rounded p-3">
-            <div className="text-2xl font-bold">{hunt.count.toLocaleString()}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Total Encounters</div>
+        <div className="u-row">
+          <div style={{ 
+            background: 'var(--sc-bg-elev-2)', 
+            border: '1px solid var(--sc-border)',
+            borderRadius: 'var(--sc-radius-lg)',
+            padding: 'var(--sc-space-3)',
+            flex: 1,
+            textAlign: 'center'
+          }}>
+            <div style={{ 
+              fontSize: 'var(--sc-fs-xl)', 
+              fontWeight: 'var(--sc-fw-bold)',
+              fontVariantNumeric: 'tabular-nums'
+            }}>
+              {hunt.count.toLocaleString()}
+            </div>
+            <div className="u-muted" style={{ fontSize: 'var(--sc-fs-sm)' }}>
+              Total Encounters
+            </div>
           </div>
           
-          <div className="bg-gray-100 dark:bg-gray-700 rounded p-3">
-            <div className="text-2xl font-bold">{hunt.phases.length}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Phases</div>
+          <div style={{ 
+            background: 'var(--sc-bg-elev-2)', 
+            border: '1px solid var(--sc-border)',
+            borderRadius: 'var(--sc-radius-lg)',
+            padding: 'var(--sc-space-3)',
+            flex: 1,
+            textAlign: 'center'
+          }}>
+            <div style={{ 
+              fontSize: 'var(--sc-fs-xl)', 
+              fontWeight: 'var(--sc-fw-bold)',
+              fontVariantNumeric: 'tabular-nums'
+            }}>
+              {hunt.phases.length}
+            </div>
+            <div className="u-muted" style={{ fontSize: 'var(--sc-fs-sm)' }}>
+              Phases
+            </div>
           </div>
         </div>
 
         {/* Odds Information */}
-        <div className="border-t pt-4">
-          <h3 className="font-semibold mb-2">Odds Analysis</h3>
+        <div style={{ borderTop: '1px solid var(--sc-border)', paddingTop: 'var(--sc-space-4)' }}>
+          <div style={{ 
+            fontSize: 'var(--sc-fs-md)', 
+            fontWeight: 'var(--sc-fw-semibold)', 
+            marginBottom: 'var(--sc-space-2)' 
+          }}>
+            Odds Analysis
+          </div>
           
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Effective Odds:</span>
-              <span className="font-mono">{stats.effectiveOdds}</span>
+          <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
+            <div className="u-row" style={{ justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Effective Odds:</span>
+              <span style={{ 
+                fontSize: 'var(--sc-fs-sm)', 
+                fontVariantNumeric: 'tabular-nums',
+                color: 'var(--sc-accent)'
+              }}>
+                {stats.effectiveOdds}
+              </span>
             </div>
             
-            <div className="flex justify-between">
-              <span>Chance of no shiny:</span>
-              <span className="font-mono">{stats.noShinyChance}</span>
+            <div className="u-row" style={{ justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Chance of no shiny:</span>
+              <span style={{ 
+                fontSize: 'var(--sc-fs-sm)', 
+                fontVariantNumeric: 'tabular-nums',
+                color: 'var(--sc-warning)'
+              }}>
+                {stats.noShinyChance}
+              </span>
             </div>
             
-            <div className="flex justify-between">
-              <span>Past odds multiple:</span>
-              <span className="font-mono">{stats.pastOddsMultiple}</span>
+            <div className="u-row" style={{ justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Past odds multiple:</span>
+              <span style={{ 
+                fontSize: 'var(--sc-fs-sm)', 
+                fontVariantNumeric: 'tabular-nums',
+                color: stats.pastOddsMultiple.includes('1.') ? 'var(--sc-success)' : 'var(--sc-text)'
+              }}>
+                {stats.pastOddsMultiple}
+              </span>
             </div>
             
             {stats.encountersToOdds > 0 && (
-              <div className="flex justify-between">
-                <span>Encounters to 1× odds:</span>
-                <span className="font-mono">{stats.encountersToOdds.toLocaleString()}</span>
+              <div className="u-row" style={{ justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Encounters to 1× odds:</span>
+                <span style={{ 
+                  fontSize: 'var(--sc-fs-sm)', 
+                  fontVariantNumeric: 'tabular-nums'
+                }}>
+                  {stats.encountersToOdds.toLocaleString()}
+                </span>
               </div>
             )}
           </div>
         </div>
 
         {/* Modifiers */}
-        <div className="border-t pt-4">
-          <h3 className="font-semibold mb-2">Active Modifiers</h3>
+        <div style={{ borderTop: '1px solid var(--sc-border)', paddingTop: 'var(--sc-space-4)' }}>
+          <div style={{ 
+            fontSize: 'var(--sc-fs-md)', 
+            fontWeight: 'var(--sc-fw-semibold)', 
+            marginBottom: 'var(--sc-space-2)' 
+          }}>
+            Active Modifiers
+          </div>
           
-          <div className="space-y-1 text-sm">
-            <div className="flex items-center gap-2">
+          <div className="u-col" style={{ gap: 'var(--sc-space-1)' }}>
+            <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
               <input 
                 type="checkbox" 
                 checked={hunt.modifiers.shinyCharm} 
                 readOnly 
-                className="rounded"
+                style={{ accentColor: 'var(--sc-brand)' }}
               />
-              <span>Shiny Charm</span>
+              <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Shiny Charm</span>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
               <input 
                 type="checkbox" 
                 checked={hunt.modifiers.masuda} 
                 readOnly 
-                className="rounded"
+                style={{ accentColor: 'var(--sc-brand)' }}
               />
-              <span>Masuda Method</span>
+              <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Masuda Method</span>
             </div>
             
             {hunt.modifiers.chainTier > 0 && (
-              <div className="flex justify-between">
-                <span>Chain Tier:</span>
-                <span className="font-mono">{hunt.modifiers.chainTier}</span>
+              <div className="u-row" style={{ justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 'var(--sc-fs-sm)' }}>Chain Tier:</span>
+                <span style={{ 
+                  fontSize: 'var(--sc-fs-sm)', 
+                  fontVariantNumeric: 'tabular-nums'
+                }}>
+                  {hunt.modifiers.chainTier}
+                </span>
               </div>
             )}
           </div>
@@ -115,22 +185,56 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt }) => {
 
         {/* Phase History */}
         {hunt.phases.length > 0 && (
-          <div className="border-t pt-4">
-            <h3 className="font-semibold mb-2">Phase History</h3>
+          <div style={{ borderTop: '1px solid var(--sc-border)', paddingTop: 'var(--sc-space-4)' }}>
+            <div style={{ 
+              fontSize: 'var(--sc-fs-md)', 
+              fontWeight: 'var(--sc-fw-semibold)', 
+              marginBottom: 'var(--sc-space-2)' 
+            }}>
+              Phase History
+            </div>
             
-            <div className="space-y-2 max-h-32 overflow-y-auto">
+            <div className="u-col" style={{ 
+              gap: 'var(--sc-space-2)', 
+              maxHeight: '128px', 
+              overflowY: 'auto' 
+            }}>
               {hunt.phases.slice().reverse().map((phase, index) => (
                 <div 
                   key={phase.id}
-                  className="flex justify-between items-center text-sm bg-gray-100 dark:bg-gray-700 rounded p-2"
+                  className="u-row"
+                  style={{ 
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'var(--sc-bg-elev-2)',
+                    border: '1px solid var(--sc-border)',
+                    borderRadius: 'var(--sc-radius-md)',
+                    padding: 'var(--sc-space-2)'
+                  }}
                 >
                   <div>
-                    <span className="font-medium">{phase.species}</span>
+                    <span style={{ 
+                      fontSize: 'var(--sc-fs-sm)', 
+                      fontWeight: 'var(--sc-fw-medium)' 
+                    }}>
+                      {phase.species}
+                    </span>
                     {phase.isTarget && (
-                      <span className="ml-2 text-green-600 dark:text-green-400">★ Target</span>
+                      <span style={{ 
+                        marginLeft: 'var(--sc-space-2)',
+                        color: 'var(--sc-shiny)',
+                        fontSize: 'var(--sc-fs-sm)'
+                      }}>
+                        ★ Target
+                      </span>
                     )}
                   </div>
-                  <span className="text-gray-500">#{phase.atCount}</span>
+                  <span className="u-subtle" style={{ 
+                    fontSize: 'var(--sc-fs-sm)',
+                    fontVariantNumeric: 'tabular-nums'
+                  }}>
+                    #{phase.atCount}
+                  </span>
                 </div>
               ))}
             </div>
@@ -138,10 +242,21 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt }) => {
         )}
 
         {/* Hunt Info */}
-        <div className="border-t pt-4 text-xs text-gray-600 dark:text-gray-400">
-          <div>Created: {new Date(hunt.createdAt).toLocaleDateString()}</div>
-          <div>Last Updated: {new Date(hunt.updatedAt).toLocaleString()}</div>
-          <div>Base Odds: 1 in {hunt.baseOdds.denominator.toLocaleString()}</div>
+        <div style={{ 
+          borderTop: '1px solid var(--sc-border)', 
+          paddingTop: 'var(--sc-space-4)' 
+        }}>
+          <div className="u-col" style={{ gap: '2px' }}>
+            <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
+              Created: {new Date(hunt.createdAt).toLocaleDateString()}
+            </div>
+            <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
+              Last Updated: {new Date(hunt.updatedAt).toLocaleString()}
+            </div>
+            <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
+              Base Odds: 1 in {hunt.baseOdds.denominator.toLocaleString()}
+            </div>
+          </div>
         </div>
       </div>
     </div>

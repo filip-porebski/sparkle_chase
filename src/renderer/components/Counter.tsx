@@ -33,39 +33,52 @@ export const Counter: React.FC<CounterProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold mb-2">{hunt.name}</h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          {hunt.targetSpecies} in {hunt.game} ({hunt.method})
-        </p>
+    <div className="sc-card">
+      {/* Hunt Header */}
+      <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
+        <div>
+          <div className="sc-card__title">{hunt.targetSpecies}</div>
+          <div className="sc-card__meta">{hunt.game} • {hunt.method}</div>
+        </div>
+        {hunt.phases.length > 0 && (
+          <div className="sc-tag">Phase #{hunt.phases.length}</div>
+        )}
       </div>
 
       {/* Main Counter */}
-      <div className="text-center mb-8">
+      <div className="sc-counter" style={{ marginBottom: 'var(--sc-space-5)' }}>
         {editingCount ? (
-          <div className="flex items-center justify-center gap-2">
+          <div className="u-row" style={{ justifyContent: 'center', flex: 1 }}>
             <input
               type="number"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
-              className="text-6xl font-bold text-center bg-transparent border-b-2 border-blue-500 focus:outline-none w-48"
+              className="sc-input"
+              style={{ 
+                fontSize: 'var(--sc-fs-xl)', 
+                fontWeight: 'var(--sc-fw-bold)',
+                textAlign: 'center',
+                width: '200px',
+                fontVariantNumeric: 'tabular-nums'
+              }}
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleEditSubmit();
                 if (e.key === 'Escape') handleEditCancel();
               }}
             />
-            <div className="flex flex-col gap-1">
+            <div className="u-col" style={{ gap: 'var(--sc-space-1)' }}>
               <button
                 onClick={handleEditSubmit}
-                className="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                className="sc-btn"
+                style={{ height: '32px', padding: '0 8px', fontSize: 'var(--sc-fs-xs)' }}
               >
                 ✓
               </button>
               <button
                 onClick={handleEditCancel}
-                className="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                className="sc-btn sc-btn--danger"
+                style={{ height: '32px', padding: '0 8px', fontSize: 'var(--sc-fs-xs)' }}
               >
                 ✗
               </button>
@@ -73,68 +86,136 @@ export const Counter: React.FC<CounterProps> = ({
           </div>
         ) : (
           <div
-            className="text-8xl font-bold cursor-pointer hover:text-blue-500 transition-colors"
+            className="sc-count"
+            style={{ 
+              cursor: 'pointer', 
+              transition: 'color 0.15s ease',
+              flex: 1,
+              textAlign: 'center'
+            }}
             onClick={() => {
               setEditingCount(true);
               setEditValue(hunt.count.toString());
             }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--sc-brand)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--sc-text)'}
           >
             {hunt.count.toLocaleString()}
           </div>
         )}
+        
+        {!editingCount && (
+          <div className="u-col" style={{ gap: 'var(--sc-space-3)' }}>
+            {/* Main +1 Button */}
+            <button
+              onClick={onIncrement}
+              className="sc-btn sc-btn--giant sc-btn--primary"
+            >
+              +1
+            </button>
+            
+            {/* Quick Actions Row */}
+            <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
+              <button
+                onClick={onDecrement}
+                className="sc-btn"
+                aria-disabled={hunt.count === 0}
+                style={{ 
+                  opacity: hunt.count === 0 ? 0.6 : 1,
+                  flex: 1,
+                  background: 'var(--sc-danger)',
+                  borderColor: 'color-mix(in oklab, var(--sc-danger) 70%, black 30%)',
+                  color: '#fff'
+                }}
+              >
+                −1
+              </button>
+              <button
+                onClick={() => {
+                  onIncrement();
+                  setTimeout(onIncrement, 50);
+                }}
+                className="sc-btn"
+                style={{ 
+                  flex: 1,
+                  background: 'var(--sc-success)',
+                  borderColor: 'color-mix(in oklab, var(--sc-success) 70%, black 30%)',
+                  color: '#fff'
+                }}
+              >
+                +2
+              </button>
+              <button
+                onClick={() => {
+                  for (let i = 0; i < 5; i++) {
+                    setTimeout(onIncrement, i * 50);
+                  }
+                }}
+                className="sc-btn"
+                style={{ 
+                  flex: 1,
+                  background: 'var(--sc-accent)',
+                  borderColor: 'color-mix(in oklab, var(--sc-accent) 70%, black 30%)',
+                  color: '#fff'
+                }}
+              >
+                +5
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Control Buttons */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <button
-          onClick={onIncrement}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg text-xl transition-colors"
-        >
-          +1
-        </button>
-        <button
-          onClick={onDecrement}
-          className="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg text-xl transition-colors"
-          disabled={hunt.count === 0}
-        >
-          -1
-        </button>
+      {/* Odds and Stats Row */}
+      <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
+        <div className="sc-odds">
+          Base odds: 1 in {hunt.baseOdds.denominator.toLocaleString()}
+        </div>
+        <div className="sc-since">
+          Since last shiny: {hunt.encountersSinceLastShiny}
+        </div>
       </div>
 
       {/* Phase Button */}
       <button
         onClick={onPhase}
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+        className="sc-btn"
+        style={{ 
+          width: '100%', 
+          background: 'var(--sc-warning)',
+          borderColor: 'color-mix(in oklab, var(--sc-warning) 70%, black 30%)',
+          color: '#fff',
+          marginBottom: 'var(--sc-space-4)'
+        }}
       >
-        Phase (Off-target Shiny)
+        ✨ Phase (Off-target Shiny)
       </button>
-
-      {/* Encounters Since Last Shiny */}
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Encounters since last shiny: <span className="font-bold">{hunt.encountersSinceLastShiny}</span>
-        </p>
-      </div>
 
       {/* Recent Phases */}
       {hunt.phases.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">Recent Phases</h3>
-          <div className="space-y-2 max-h-32 overflow-y-auto">
+        <div style={{ marginTop: 'var(--sc-space-4)' }}>
+          <div className="sc-card__title" style={{ fontSize: 'var(--sc-fs-md)', marginBottom: 'var(--sc-space-2)' }}>
+            Recent Phases
+          </div>
+          <div className="sc-phases">
             {hunt.phases.slice(-3).reverse().map((phase) => (
               <div
                 key={phase.id}
-                className="bg-gray-100 dark:bg-gray-700 rounded p-2 text-sm"
+                className={`sc-phase ${phase.isTarget ? 'sc-phase--target' : ''}`}
               >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{phase.species}</span>
-                  <span className="text-gray-500">#{phase.atCount}</span>
+                <div>
+                  <div className="sc-phase__title">
+                    {phase.species} {phase.isTarget ? '(Target!)' : '(Off-target)'}
+                  </div>
+                  <div className="sc-phase__meta">
+                    at {phase.atCount.toLocaleString()} • {new Date(phase.createdAt).toLocaleDateString()}
+                  </div>
+                  {phase.notes && (
+                    <div className="sc-phase__meta" style={{ marginTop: '2px' }}>
+                      {phase.notes}
+                    </div>
+                  )}
                 </div>
-                {phase.notes && (
-                  <p className="text-gray-600 dark:text-gray-400 text-xs mt-1">
-                    {phase.notes}
-                  </p>
-                )}
               </div>
             ))}
           </div>
@@ -143,11 +224,20 @@ export const Counter: React.FC<CounterProps> = ({
 
       {/* Notes */}
       {hunt.notes && (
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">Notes</h3>
-          <p className="text-gray-600 dark:text-gray-400 text-sm bg-gray-100 dark:bg-gray-700 rounded p-3">
+        <div style={{ marginTop: 'var(--sc-space-4)' }}>
+          <div className="sc-card__title" style={{ fontSize: 'var(--sc-fs-md)', marginBottom: 'var(--sc-space-2)' }}>
+            Notes
+          </div>
+          <div style={{ 
+            background: 'var(--sc-bg-elev-2)', 
+            border: '1px solid var(--sc-border)',
+            borderRadius: 'var(--sc-radius-lg)',
+            padding: 'var(--sc-space-3)',
+            fontSize: 'var(--sc-fs-sm)',
+            color: 'var(--sc-text-muted)'
+          }}>
             {hunt.notes}
-          </p>
+          </div>
         </div>
       )}
     </div>
