@@ -1,0 +1,100 @@
+/* Custom styles for the Shiny Counter app */
+
+.counter-button {
+  @apply transition-all duration-200 transform;
+}
+
+.counter-button:hover {
+  @apply scale-105;
+}
+
+.counter-button:active {
+  @apply scale-95;
+}
+
+.hunt-card {
+  @apply transition-all duration-200;
+}
+
+.hunt-card:hover {
+  @apply shadow-lg;
+}
+
+.phase-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.phase-badge.target {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+}
+
+.phase-badge.off-target {
+  @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200;
+}
+
+/* Scrollbar styling for dark theme */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Light theme scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-200;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Focus styles for accessibility */
+.focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Animation for counter increment */
+@keyframes pulse-green {
+  0%, 100% {
+    @apply bg-green-600;
+  }
+  50% {
+    @apply bg-green-500;
+  }
+}
+
+.counter-increment {
+  animation: pulse-green 0.3s ease-in-out;
+}
+
+/* Animation for phase logging */
+@keyframes pulse-purple {
+  0%, 100% {
+    @apply bg-purple-600;
+  }
+  50% {
+    @apply bg-purple-500;
+  }
+}
+
+.phase-logged {
+  animation: pulse-purple 0.5s ease-in-out;
+}

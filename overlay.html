@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shiny Counter Overlay</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 10px;
+        font-family: 'Inter', system-ui, sans-serif;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        border-radius: 8px;
+        font-size: 14px;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      
+      .overlay-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      
+      .target {
+        font-weight: bold;
+        color: #60a5fa;
+      }
+      
+      .count {
+        font-size: 24px;
+        font-weight: bold;
+        color: #10b981;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      
+      .phase {
+        font-size: 12px;
+        color: #a78bfa;
+      }
+      
+      .odds {
+        font-size: 11px;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overlay-content">
+      <div class="target" id="target">—</div>
+      <div class="count" id="count">0</div>
+      <div class="phase" id="phase">No phases</div>
+      <div class="odds" id="odds">1 in 4096</div>
+    </div>
+
+    <script>
+      let currentHunt = null;
+      let isDragging = false;
+
+      function updateOverlay(hunt) {
+        currentHunt = hunt;
+        
+        document.getElementById('target').textContent = hunt.targetSpecies || '—';
+        document.getElementById('count').textContent = hunt.count.toLocaleString();
+        
+        const lastPhase = hunt.phases[hunt.phases.length - 1];
+        const phaseText = lastPhase 
+          ? `Phase #${hunt.phases.length} — ${lastPhase.species}`
+          : 'No phases yet';
+        document.getElementById('phase').textContent = phaseText;
+        
+        const oddsText = `1 in ${hunt.baseOdds.denominator.toLocaleString()}`;
+        document.getElementById('odds').textContent = oddsText;
+      }
+
+      // Setup drag functionality
+      function setupDragHandlers() {
+        const overlay = document.querySelector('.overlay-content');
+        
+        overlay.addEventListener('mousedown', (e) => {
+          if (window.overlayAPI) {
+            isDragging = true;
+            window.overlayAPI.startDrag();
+          }
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isDragging && window.overlayAPI) {
+            isDragging = false;
+            window.overlayAPI.stopDrag();
+          }
+        });
+
+        // Double-click to toggle click-through
+        overlay.addEventListener('dblclick', () => {
+          if (window.overlayAPI) {
+            window.overlayAPI.toggleClickThrough();
+          }
+        });
+      }
+
+      // Initialize when DOM is ready
+      document.addEventListener('DOMContentLoaded', () => {
+        setupDragHandlers();
+        
+        // Listen for updates from main process
+        if (window.overlayAPI) {
+          window.overlayAPI.onUpdate(updateOverlay);
+        }
+      });
+    </script>
+  </body>
+</html>
