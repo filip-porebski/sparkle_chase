@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Hunt } from '../../shared/types';
+import { ShinyPokemonImage } from './ShinyPokemonImage';
 
 interface CounterProps {
   hunt: Hunt;
@@ -36,12 +37,24 @@ export const Counter: React.FC<CounterProps> = ({
     <div className="sc-card">
       {/* Hunt Header */}
       <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
-        <div>
+        <div style={{ flex: 1 }}>
           <div className="sc-card__title">{hunt.targetSpecies}</div>
           <div className="sc-card__meta">{hunt.game} • {hunt.method}</div>
         </div>
+        
+        {/* Shiny Pokemon Image */}
+        <div style={{ marginLeft: 'var(--sc-space-4)' }}>
+          <ShinyPokemonImage 
+            pokemonName={hunt.targetSpecies} 
+            size="medium"
+            showLabel={false}
+          />
+        </div>
+        
         {hunt.phases.length > 0 && (
-          <div className="sc-tag">Phase #{hunt.phases.length}</div>
+          <div className="sc-tag" style={{ alignSelf: 'flex-start' }}>
+            Phase #{hunt.phases.length}
+          </div>
         )}
       </div>
 

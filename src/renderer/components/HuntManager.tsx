@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Hunt, HuntData } from '../../shared/types';
+import { PokemonAutocomplete } from './PokemonAutocomplete';
 
 interface HuntManagerProps {
   hunts: Hunt[];
@@ -170,12 +171,10 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
 
           <div>
             <label className="sc-label">Target Species</label>
-            <input
-              type="text"
+            <PokemonAutocomplete
               value={formData.targetSpecies}
-              onChange={(e) => setFormData(prev => ({ ...prev, targetSpecies: e.target.value }))}
-              className="sc-input"
-              placeholder="e.g., Ralts"
+              onChange={(value) => setFormData(prev => ({ ...prev, targetSpecies: value }))}
+              placeholder="e.g., Pikachu, Charizard, Rayquaza..."
               required
             />
           </div>
