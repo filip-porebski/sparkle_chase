@@ -3,6 +3,7 @@ import * as path from 'path';
 import { DataManager } from './data/DataManager';
 import { HotkeyManager } from './hotkeys/HotkeyManager';
 import { OverlayManager } from './overlay/OverlayManager';
+import { Settings } from '../shared/types';
 
 class ShinyCounterApp {
   private mainWindow: BrowserWindow | null = null;
@@ -172,7 +173,9 @@ class ShinyCounterApp {
     });
 
     ipcMain.handle('settings:update', async (_, updates) => {
-      return await this.dataManager.updateSettings(updates);
+      const updated = await this.dataManager.updateSettings(updates);
+      await this.configureHotkeys(updated);
+      return updated;
     });
 
     // File operations
@@ -241,31 +244,34 @@ class ShinyCounterApp {
   }
 
   private async setupHotkeys() {
-    // Get settings to configure safe mode apps
     const settings = await this.dataManager.getSettings();
+    await this.configureHotkeys(settings);
+  }
+
+  private async configureHotkeys(settings: Settings) {
+    this.hotkeyManager.unregisterAll();
     this.hotkeyManager.setSafeModeApps(settings.safeModeApps);
 
-    // Register default hotkeys
-    this.hotkeyManager.registerHotkey('Space', () => {
+    this.hotkeyManager.registerHotkey(settings.hotkeys.increment || 'Space', () => {
       this.mainWindow?.webContents.send('hotkey:increment');
     });
 
-    this.hotkeyManager.registerHotkey('CommandOrControl+Z', () => {
+    this.hotkeyManager.registerHotkey(settings.hotkeys.decrement || 'CommandOrControl+Z', () => {
       this.mainWindow?.webContents.send('hotkey:decrement');
     });
 
-    this.hotkeyManager.registerHotkey('CommandOrControl+P', () => {
+    this.hotkeyManager.registerHotkey(settings.hotkeys.phase || 'CommandOrControl+P', () => {
       this.mainWindow?.webContents.send('hotkey:phase');
     });
 
-    this.hotkeyManager.registerHotkey('CommandOrControl+Shift+G', () => {
+    this.hotkeyManager.registerHotkey(settings.hotkeys.toggleGlobal || 'CommandOrControl+Shift+G', () => {
       const enabled = this.hotkeyManager.toggleGlobal();
       this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
     });
 
-    // Enable global hotkeys if they were previously enabled
     if (settings.globalHotkeysEnabled) {
-      this.hotkeyManager.toggleGlobal();
+      const enabled = this.hotkeyManager.toggleGlobal();
+      this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
     }
   }
 }

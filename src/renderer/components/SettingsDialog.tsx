@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Settings } from '../../shared/types';
 
 interface SettingsDialogProps {
@@ -13,6 +13,37 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
   onClose
 }) => {
   const [localSettings, setLocalSettings] = useState<Settings>(settings);
+  const [captureTarget, setCaptureTarget] = useState<keyof Settings['hotkeys'] | null>(null);
+
+  useEffect(() => {
+    if (!captureTarget) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+
+      const parts: string[] = [];
+      if (e.metaKey || e.ctrlKey) parts.push('CommandOrControl');
+      if (e.altKey) parts.push('Alt');
+      if (e.shiftKey) parts.push('Shift');
+
+      const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+      parts.push(key);
+
+      const accelerator = parts.join('+');
+      setLocalSettings(prev => ({
+        ...prev,
+        hotkeys: { ...prev.hotkeys, [captureTarget]: accelerator }
+      }));
+
+      setCaptureTarget(null);
+    };
+
+    window.addEventListener('keydown', handleKeyDown, { once: true });
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [captureTarget]);
 
   const handleSave = () => {
     onUpdate(localSettings);
@@ -80,53 +111,97 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
               <div className="u-row">
                 <div style={{ flex: 1 }}>
                   <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Increment</label>
-                  <input
-                    type="text"
-                    value={localSettings.hotkeys.increment}
-                    onChange={(e) => setLocalSettings(prev => ({
-                      ...prev,
-                      hotkeys: { ...prev.hotkeys, increment: e.target.value }
-                    }))}
-                    className="sc-input"
-                  />
+                  <div className="u-row" style={{ gap: 'var(--sc-space-1)' }}>
+                    <input
+                      type="text"
+                      value={
+                        captureTarget === 'increment'
+                          ? 'Press shortcut...'
+                          : localSettings.hotkeys.increment
+                      }
+                      readOnly
+                      className="sc-input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={() => setCaptureTarget('increment')}
+                      className="sc-btn sc-btn--ghost"
+                      title="Register hotkey"
+                    >
+                      ⌨️
+                    </button>
+                  </div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Decrement</label>
-                  <input
-                    type="text"
-                    value={localSettings.hotkeys.decrement}
-                    onChange={(e) => setLocalSettings(prev => ({
-                      ...prev,
-                      hotkeys: { ...prev.hotkeys, decrement: e.target.value }
-                    }))}
-                    className="sc-input"
-                  />
+                  <div className="u-row" style={{ gap: 'var(--sc-space-1)' }}>
+                    <input
+                      type="text"
+                      value={
+                        captureTarget === 'decrement'
+                          ? 'Press shortcut...'
+                          : localSettings.hotkeys.decrement
+                      }
+                      readOnly
+                      className="sc-input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={() => setCaptureTarget('decrement')}
+                      className="sc-btn sc-btn--ghost"
+                      title="Register hotkey"
+                    >
+                      ⌨️
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="u-row">
                 <div style={{ flex: 1 }}>
                   <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Phase</label>
-                  <input
-                    type="text"
-                    value={localSettings.hotkeys.phase}
-                    onChange={(e) => setLocalSettings(prev => ({
-                      ...prev,
-                      hotkeys: { ...prev.hotkeys, phase: e.target.value }
-                    }))}
-                    className="sc-input"
-                  />
+                  <div className="u-row" style={{ gap: 'var(--sc-space-1)' }}>
+                    <input
+                      type="text"
+                      value={
+                        captureTarget === 'phase'
+                          ? 'Press shortcut...'
+                          : localSettings.hotkeys.phase
+                      }
+                      readOnly
+                      className="sc-input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={() => setCaptureTarget('phase')}
+                      className="sc-btn sc-btn--ghost"
+                      title="Register hotkey"
+                    >
+                      ⌨️
+                    </button>
+                  </div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Toggle Global</label>
-                  <input
-                    type="text"
-                    value={localSettings.hotkeys.toggleGlobal}
-                    onChange={(e) => setLocalSettings(prev => ({
-                      ...prev,
-                      hotkeys: { ...prev.hotkeys, toggleGlobal: e.target.value }
-                    }))}
-                    className="sc-input"
-                  />
+                  <div className="u-row" style={{ gap: 'var(--sc-space-1)' }}>
+                    <input
+                      type="text"
+                      value={
+                        captureTarget === 'toggleGlobal'
+                          ? 'Press shortcut...'
+                          : localSettings.hotkeys.toggleGlobal
+                      }
+                      readOnly
+                      className="sc-input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={() => setCaptureTarget('toggleGlobal')}
+                      className="sc-btn sc-btn--ghost"
+                      title="Register hotkey"
+                    >
+                      ⌨️
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
