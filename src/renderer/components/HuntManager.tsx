@@ -26,6 +26,17 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     notes: ''
   });
 
+  const handleGameChange = (gameName: string) => {
+    const selectedGame = pokemonGames.find(game => game.name === gameName);
+    const newOdds = selectedGame ? selectedGame.odds : 4096;
+    
+    setFormData(prev => ({
+      ...prev,
+      game: gameName,
+      baseOdds: { numerator: 1, denominator: newOdds }
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.name && formData.targetSpecies && formData.game && formData.method) {
@@ -48,8 +59,84 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     }
   };
 
-  const commonGames = ['SV', 'BDSP', 'SwSh', 'LGPE', 'USUM', 'SM', 'ORAS', 'XY'];
-  const commonMethods = ['Random Encounters', 'Masuda Method', 'Soft Reset', 'Chain Fishing', 'DexNav', 'SOS Chaining', 'Dynamax Adventures'];
+  const pokemonGames = [
+    // Generation 9
+    { name: 'Scarlet', odds: 4096 },
+    { name: 'Violet', odds: 4096 },
+    
+    // Generation 8
+    { name: 'Brilliant Diamond', odds: 4096 },
+    { name: 'Shining Pearl', odds: 4096 },
+    { name: 'Legends: Arceus', odds: 4096 },
+    { name: 'Sword', odds: 4096 },
+    { name: 'Shield', odds: 4096 },
+    
+    // Generation 7
+    { name: "Let's Go, Pikachu!", odds: 4096 },
+    { name: "Let's Go, Eevee!", odds: 4096 },
+    { name: 'Ultra Sun', odds: 4096 },
+    { name: 'Ultra Moon', odds: 4096 },
+    { name: 'Sun', odds: 4096 },
+    { name: 'Moon', odds: 4096 },
+    
+    // Generation 6
+    { name: 'Omega Ruby', odds: 4096 },
+    { name: 'Alpha Sapphire', odds: 4096 },
+    { name: 'X', odds: 4096 },
+    { name: 'Y', odds: 4096 },
+    
+    // Generation 5
+    { name: 'Black 2', odds: 8192 },
+    { name: 'White 2', odds: 8192 },
+    { name: 'Black', odds: 8192 },
+    { name: 'White', odds: 8192 },
+    
+    // Generation 4
+    { name: 'HeartGold', odds: 8192 },
+    { name: 'SoulSilver', odds: 8192 },
+    { name: 'Platinum', odds: 8192 },
+    { name: 'Diamond', odds: 8192 },
+    { name: 'Pearl', odds: 8192 },
+    
+    // Generation 3
+    { name: 'Emerald', odds: 8192 },
+    { name: 'Fire Red', odds: 8192 },
+    { name: 'Leaf Green', odds: 8192 },
+    { name: 'Ruby', odds: 8192 },
+    { name: 'Sapphire', odds: 8192 },
+    
+    // Generation 2
+    { name: 'Crystal', odds: 8192 },
+    { name: 'Gold', odds: 8192 },
+    { name: 'Silver', odds: 8192 },
+    
+    // Generation 1 (no shinies originally, but for ROM hacks)
+    { name: 'Yellow', odds: 8192 },
+    { name: 'Blue', odds: 8192 },
+    { name: 'Red', odds: 8192 }
+  ];
+
+  const huntingMethods = [
+    'Random Encounters',
+    'Masuda Method',
+    'Soft Reset',
+    'Chain Fishing',
+    'DexNav',
+    'SOS Chaining',
+    'Dynamax Adventures',
+    'Max Raid Battles',
+    'Poke Radar',
+    'Friend Safari',
+    'Horde Encounters',
+    'Breeding',
+    'Fossil Reviving',
+    'Gift Pokemon',
+    'Static Encounters',
+    'Legendary Hunting',
+    'Outbreak Hunting',
+    'Mass Outbreaks',
+    'Sandwich Method'
+  ];
 
   return (
     <div className="sc-card">
@@ -98,14 +185,66 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
               <label className="sc-label">Game</label>
               <select
                 value={formData.game}
-                onChange={(e) => setFormData(prev => ({ ...prev, game: e.target.value }))}
+                onChange={(e) => handleGameChange(e.target.value)}
                 className="sc-input"
                 required
               >
                 <option value="">Select Game</option>
-                {commonGames.map(game => (
-                  <option key={game} value={game}>{game}</option>
-                ))}
+                <optgroup label="Generation 9">
+                  <option value="Scarlet">Scarlet</option>
+                  <option value="Violet">Violet</option>
+                </optgroup>
+                <optgroup label="Generation 8">
+                  <option value="Brilliant Diamond">Brilliant Diamond</option>
+                  <option value="Shining Pearl">Shining Pearl</option>
+                  <option value="Legends: Arceus">Legends: Arceus</option>
+                  <option value="Sword">Sword</option>
+                  <option value="Shield">Shield</option>
+                </optgroup>
+                <optgroup label="Generation 7">
+                  <option value="Let's Go, Pikachu!">Let's Go, Pikachu!</option>
+                  <option value="Let's Go, Eevee!">Let's Go, Eevee!</option>
+                  <option value="Ultra Sun">Ultra Sun</option>
+                  <option value="Ultra Moon">Ultra Moon</option>
+                  <option value="Sun">Sun</option>
+                  <option value="Moon">Moon</option>
+                </optgroup>
+                <optgroup label="Generation 6">
+                  <option value="Omega Ruby">Omega Ruby</option>
+                  <option value="Alpha Sapphire">Alpha Sapphire</option>
+                  <option value="X">X</option>
+                  <option value="Y">Y</option>
+                </optgroup>
+                <optgroup label="Generation 5">
+                  <option value="Black 2">Black 2</option>
+                  <option value="White 2">White 2</option>
+                  <option value="Black">Black</option>
+                  <option value="White">White</option>
+                </optgroup>
+                <optgroup label="Generation 4">
+                  <option value="HeartGold">HeartGold</option>
+                  <option value="SoulSilver">SoulSilver</option>
+                  <option value="Platinum">Platinum</option>
+                  <option value="Diamond">Diamond</option>
+                  <option value="Pearl">Pearl</option>
+                </optgroup>
+                <optgroup label="Generation 3">
+                  <option value="Emerald">Emerald</option>
+                  <option value="Fire Red">Fire Red</option>
+                  <option value="Leaf Green">Leaf Green</option>
+                  <option value="Ruby">Ruby</option>
+                  <option value="Sapphire">Sapphire</option>
+                </optgroup>
+                <optgroup label="Generation 2">
+                  <option value="Crystal">Crystal</option>
+                  <option value="Gold">Gold</option>
+                  <option value="Silver">Silver</option>
+                </optgroup>
+                <optgroup label="Generation 1">
+                  <option value="Yellow">Yellow</option>
+                  <option value="Blue">Blue</option>
+                  <option value="Red">Red</option>
+                </optgroup>
               </select>
             </div>
 
@@ -118,7 +257,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                 required
               >
                 <option value="">Select Method</option>
-                {commonMethods.map(method => (
+                {huntingMethods.map(method => (
                   <option key={method} value={method}>{method}</option>
                 ))}
               </select>
@@ -135,9 +274,18 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                 baseOdds: { numerator: 1, denominator: parseInt(e.target.value) || 4096 }
               }))}
               className="sc-input"
-              placeholder="4096"
+              placeholder={formData.game ? 
+                pokemonGames.find(g => g.name === formData.game)?.odds.toString() || "4096" 
+                : "4096"
+              }
               min="1"
             />
+            <p className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: 'var(--sc-space-1)' }}>
+              {formData.game && (
+                <>Auto-set to {pokemonGames.find(g => g.name === formData.game)?.odds || 4096} for {formData.game}</>
+              )}
+              {!formData.game && <>Select a game to auto-fill base odds</>}
+            </p>
           </div>
 
           <div>
