@@ -97,7 +97,8 @@ pids
 *.pid.lock
 
 # App data (user data will be stored in OS-specific app data directory)
-data/
+data/*
+!data/DataManager.ts
 userData/
 
 # Test files
