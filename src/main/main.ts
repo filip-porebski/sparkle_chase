@@ -10,6 +10,7 @@ class ShinyCounterApp {
   private dataManager: DataManager;
   private hotkeyManager: HotkeyManager;
   private overlayManager: OverlayManager;
+  private typingActive: boolean = false;
 
   constructor() {
     this.dataManager = new DataManager();
@@ -94,6 +95,8 @@ class ShinyCounterApp {
 
         // Only handle local hotkeys when global hotkeys are disabled
         if (!globalEnabled) {
+          // If user is typing in an input/textarea/contentEditable, do not intercept
+          if (this.typingActive) return;
           switch (input.key) {
             case ' ': // Space key (single space character)
             case 'Space': // Some systems might use 'Space'
@@ -147,6 +150,11 @@ class ShinyCounterApp {
 
     ipcMain.handle('hunt:list', async () => {
       return await this.dataManager.listHunts();
+    });
+
+    // Typing state from renderer to avoid intercepting text input
+    ipcMain.on('ui:typing', (_, active: boolean) => {
+      this.typingActive = !!active;
     });
 
     // Counter operations
@@ -258,16 +266,20 @@ class ShinyCounterApp {
     this.hotkeyManager.unregisterAll();
     this.hotkeyManager.setSafeModeApps(settings.safeModeApps);
 
-    // Register hotkeys with the hotkey manager
+    // Register hotkeys with guards to avoid interfering while typing in the app
     this.hotkeyManager.registerHotkey(settings.hotkeys.increment || 'Space', () => {
+      // If the app window is focused and the user is typing, ignore
+      if (this.mainWindow?.isFocused() && this.typingActive) return;
       this.mainWindow?.webContents.send('hotkey:increment');
     });
 
     this.hotkeyManager.registerHotkey(settings.hotkeys.decrement || 'CommandOrControl+Z', () => {
+      if (this.mainWindow?.isFocused() && this.typingActive) return;
       this.mainWindow?.webContents.send('hotkey:decrement');
     });
 
     this.hotkeyManager.registerHotkey(settings.hotkeys.phase || 'CommandOrControl+P', () => {
+      if (this.mainWindow?.isFocused() && this.typingActive) return;
       this.mainWindow?.webContents.send('hotkey:phase');
     });
 

@@ -35,6 +35,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Hotkey management
   toggleGlobalHotkeys: () => ipcRenderer.invoke('hotkey:toggleGlobal'),
 
+  // UI typing state (to suppress local hotkeys while typing)
+  setTypingActive: (active: boolean) => ipcRenderer.send('ui:typing', active),
+
   // Diagnostic and testing
   testDataIntegrity: () => ipcRenderer.invoke('diagnostic:testDataIntegrity'),
   createEmergencyBackup: () => ipcRenderer.invoke('diagnostic:createBackup'),
@@ -80,6 +83,7 @@ export interface ElectronAPI {
   showOverlay: () => Promise<void>;
   hideOverlay: () => Promise<void>;
   toggleGlobalHotkeys: () => Promise<boolean>;
+  setTypingActive: (active: boolean) => void;
   onHotkeyIncrement: (callback: () => void) => () => void;
   onHotkeyDecrement: (callback: () => void) => () => void;
   onHotkeyPhase: (callback: () => void) => () => void;

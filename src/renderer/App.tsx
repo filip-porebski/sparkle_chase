@@ -37,6 +37,28 @@ function App() {
     
     // Set theme on document
     document.documentElement.setAttribute('data-theme', theme);
+
+    // Typing focus detection: disable local hotkeys while typing in inputs/textareas/contentEditable
+    const isTypingElement = (el: Element | null) => {
+      if (!el) return false;
+      const tag = el.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+      return (el as HTMLElement).isContentEditable === true;
+    };
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as Element | null;
+      window.electronAPI.setTypingActive(isTypingElement(target));
+    };
+    const handleFocusOut = () => {
+      const el = document.activeElement as Element | null;
+      window.electronAPI.setTypingActive(isTypingElement(el));
+    };
+    document.addEventListener('focusin', handleFocusIn, true);
+    document.addEventListener('focusout', handleFocusOut, true);
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn, true);
+      document.removeEventListener('focusout', handleFocusOut, true);
+    };
   }, []);
 
   useEffect(() => {
