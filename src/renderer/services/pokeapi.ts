@@ -25,6 +25,12 @@ export interface PokemonListItem {
   url: string;
 }
 
+export interface PokemonSearchResult {
+  name: string;
+  id: number;
+  sprite: string;
+}
+
 class PokeAPIService {
   private pokemonListCache: PokemonListItem[] | null = null;
   private pokemonCache = new Map<string, Pokemon>();
@@ -104,6 +110,25 @@ class PokeAPIService {
     return displayName.toLowerCase().replace(/\s+/g, '-');
   }
 
+  // Get Pokemon sprite URL by ID (more efficient than full Pokemon data)
+  getPokemonSpriteUrl(id: number): string {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+  }
+
+  // Get Pokemon ID from the cached list
+  private getPokemonIdFromName(name: string): number | null {
+    if (!this.pokemonListCache) return null;
+    
+    const apiName = this.formatNameForAPI(name);
+    const pokemon = this.pokemonListCache.find(p => p.name === apiName);
+    if (!pokemon) return null;
+    
+    // Extract ID from URL: https://pokeapi.co/api/v2/pokemon/25/
+    const urlParts = pokemon.url.split('/');
+    const id = parseInt(urlParts[urlParts.length - 2]);
+    return isNaN(id) ? null : id;
+  }
+
   // Search Pokemon names (for autocomplete)
   async searchPokemon(query: string): Promise<string[]> {
     const allNames = await this.getAllPokemonNames();
@@ -112,6 +137,31 @@ class PokeAPIService {
     return allNames
       .filter(name => name.toLowerCase().includes(lowerQuery))
       .slice(0, 10); // Limit to 10 results for performance
+  }
+
+  // Search Pokemon with sprites (for enhanced autocomplete)
+  async searchPokemonWithSprites(query: string): Promise<PokemonSearchResult[]> {
+    const allNames = await this.getAllPokemonNames();
+    const lowerQuery = query.toLowerCase();
+    
+    const matchingNames = allNames
+      .filter(name => name.toLowerCase().includes(lowerQuery))
+      .slice(0, 8); // Limit to 8 results for performance with images
+    
+    const results: PokemonSearchResult[] = [];
+    
+    for (const name of matchingNames) {
+      const id = this.getPokemonIdFromName(name);
+      if (id) {
+        results.push({
+          name,
+          id,
+          sprite: this.getPokemonSpriteUrl(id)
+        });
+      }
+    }
+    
+    return results;
   }
 }
 

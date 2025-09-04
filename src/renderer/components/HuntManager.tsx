@@ -38,10 +38,22 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     }));
   };
 
+  const generateHuntName = (): string => {
+    const huntNumber = hunts.length + 1;
+    if (formData.targetSpecies) {
+      return `${formData.targetSpecies} Hunt`;
+    }
+    return `Hunt ${huntNumber}`;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.targetSpecies && formData.game && formData.method) {
-      onCreateHunt(formData);
+    if (formData.targetSpecies && formData.game && formData.method) {
+      const huntData = {
+        ...formData,
+        name: formData.name.trim() || generateHuntName()
+      };
+      onCreateHunt(huntData);
       setFormData({
         name: '',
         game: '',
@@ -158,15 +170,17 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           borderBottom: '1px solid var(--sc-border)'
         }}>
           <div>
-            <label className="sc-label">Hunt Name</label>
+            <label className="sc-label">Hunt Name (Optional)</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               className="sc-input"
-              placeholder="e.g., Shiny Ralts Hunt"
-              required
+              placeholder={formData.targetSpecies ? `${formData.targetSpecies} Hunt` : "Auto-generated if empty"}
             />
+            <p className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: 'var(--sc-space-1)' }}>
+              Leave empty to auto-generate based on target species
+            </p>
           </div>
 
           <div>

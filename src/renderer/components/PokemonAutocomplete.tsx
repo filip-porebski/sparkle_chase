@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { pokeAPI } from '../services/pokeapi';
+import { pokeAPI, PokemonSearchResult } from '../services/pokeapi';
 
 interface PokemonAutocompleteProps {
   value: string;
@@ -16,9 +16,10 @@ export const PokemonAutocomplete: React.FC<PokemonAutocompleteProps> = ({
   className = "sc-input",
   required = false
 }) => {
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<PokemonSearchResult[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonSearchResult | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -27,18 +28,24 @@ export const PokemonAutocomplete: React.FC<PokemonAutocompleteProps> = ({
       if (value.length < 2) {
         setSuggestions([]);
         setShowSuggestions(false);
+        setSelectedPokemon(null);
         return;
       }
 
       setLoading(true);
       try {
-        const results = await pokeAPI.searchPokemon(value);
+        const results = await pokeAPI.searchPokemonWithSprites(value);
         setSuggestions(results);
         setShowSuggestions(results.length > 0);
+        
+        // Check if current value matches exactly with a Pokemon
+        const exactMatch = results.find(r => r.name.toLowerCase() === value.toLowerCase());
+        setSelectedPokemon(exactMatch || null);
       } catch (error) {
         console.error('Failed to search Pokemon:', error);
         setSuggestions([]);
         setShowSuggestions(false);
+        setSelectedPokemon(null);
       } finally {
         setLoading(false);
       }
@@ -68,8 +75,9 @@ export const PokemonAutocomplete: React.FC<PokemonAutocompleteProps> = ({
     onChange(e.target.value);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    onChange(suggestion);
+  const handleSuggestionClick = (suggestion: PokemonSearchResult) => {
+    onChange(suggestion.name);
+    setSelectedPokemon(suggestion);
     setShowSuggestions(false);
     inputRef.current?.focus();
   };
@@ -82,18 +90,41 @@ export const PokemonAutocomplete: React.FC<PokemonAutocompleteProps> = ({
 
   return (
     <div style={{ position: 'relative' }}>
-      <input
-        ref={inputRef}
-        type="text"
-        value={value}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-        className={className}
-        placeholder={placeholder}
-        required={required}
-        autoComplete="off"
-      />
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        {selectedPokemon && (
+          <img
+            src={selectedPokemon.sprite}
+            alt={selectedPokemon.name}
+            style={{
+              position: 'absolute',
+              left: 'var(--sc-space-2)',
+              width: '20px',
+              height: '20px',
+              zIndex: 1,
+              pointerEvents: 'none'
+            }}
+            onError={(e) => {
+              // Hide image if it fails to load
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+          className={className}
+          placeholder={placeholder}
+          required={required}
+          autoComplete="off"
+          style={{
+            paddingLeft: selectedPokemon ? '32px' : 'var(--sc-space-3)'
+          }}
+        />
+      </div>
       
       {loading && (
         <div style={{
@@ -127,14 +158,17 @@ export const PokemonAutocomplete: React.FC<PokemonAutocompleteProps> = ({
         >
           {suggestions.map((suggestion, index) => (
             <div
-              key={suggestion}
+              key={suggestion.id}
               onClick={() => handleSuggestionClick(suggestion)}
               style={{
                 padding: 'var(--sc-space-2) var(--sc-space-3)',
                 cursor: 'pointer',
                 fontSize: 'var(--sc-fs-sm)',
                 borderBottom: index < suggestions.length - 1 ? '1px solid var(--sc-border)' : 'none',
-                transition: 'background-color 0.15s ease'
+                transition: 'background-color 0.15s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--sc-space-2)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = 'var(--sc-bg-elev-2)';
@@ -143,7 +177,20 @@ export const PokemonAutocomplete: React.FC<PokemonAutocompleteProps> = ({
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
             >
-              {suggestion}
+              <img
+                src={suggestion.sprite}
+                alt={suggestion.name}
+                style={{
+                  width: '20px',
+                  height: '20px',
+                  flexShrink: 0
+                }}
+                onError={(e) => {
+                  // Hide image if it fails to load
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <span>{suggestion.name}</span>
             </div>
           ))}
         </div>
