@@ -126,9 +126,8 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   ];
 
   return (
-    <div className="sc-card">
-      <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
-        <div className="sc-card__title">Hunts</div>
+    <div className="u-col">
+      <div className="u-row" style={{ justifyContent: 'flex-end', marginBottom: 'var(--sc-space-2)' }}>
         <button
           onClick={() => setShowCreateForm(!showCreateForm)}
           className={`sc-btn ${showCreateForm ? 'sc-btn--ghost' : 'sc-btn--primary'}`}
@@ -296,7 +295,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           hunts.map((hunt) => (
             <div
               key={hunt.id}
-              className="sc-card"
+              className="u-card"
               style={{
                 padding: 'var(--sc-space-3)',
                 cursor: 'pointer',

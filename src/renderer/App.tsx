@@ -6,6 +6,8 @@ import { PhaseDialog } from './components/PhaseDialog';
 import { SettingsDialog } from './components/SettingsDialog';
 import { StatsPanel } from './components/StatsPanel';
 import { DiagnosticsPanel } from './components/DiagnosticsPanel';
+import { MovableCard } from './components/MovableCard';
+import { useCardLayout } from './hooks/useCardLayout';
 import './styles/sparklechase.css';
 
 function App() {
@@ -17,6 +19,18 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [globalHotkeysEnabled, setGlobalHotkeysEnabled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
+  const [dragTarget, setDragTarget] = useState<'left' | 'right' | null>(null);
+  const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
+  
+  // Card layout management
+  const { 
+    moveCard, 
+    moveCardToPosition,
+    toggleCardCollapse, 
+    getCardsByPosition, 
+    getCard 
+  } = useCardLayout();
 
   useEffect(() => {
     loadInitialData();
@@ -196,6 +210,85 @@ function App() {
     handleUpdateSettings({ theme: newTheme });
   };
 
+  // Render card content based on card type
+  const renderCardContent = (cardId: string) => {
+    switch (cardId) {
+      case 'hunts':
+        return (
+          <HuntManager
+            hunts={hunts}
+            activeHunt={activeHunt}
+            onCreateHunt={handleCreateHunt}
+            onSelectHunt={handleSelectHunt}
+            onDeleteHunt={handleDeleteHunt}
+          />
+        );
+      case 'statistics':
+        return activeHunt ? <StatsPanel hunt={activeHunt} /> : (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: 'var(--sc-space-4)',
+            color: 'var(--sc-text-muted)'
+          }}>
+            No active hunt selected
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Render cards for a specific side
+  const renderCards = (side: 'left' | 'right') => {
+    const cards = getCardsByPosition(side);
+    const items: React.ReactNode[] = [];
+
+    cards.forEach((cardConfig, index) => {
+      const card = getCard(cardConfig.id);
+      if (!card) return;
+
+      const showBefore = draggingCardId && dragTarget === side && dragInsertIndex === index;
+      if (showBefore) {
+        items.push(<div key={`ph-${index}`} className="sc-insert-placeholder" />);
+      }
+
+      items.push(
+        <div
+          key={cardConfig.id}
+          className="sc-card-dropwrap"
+          onDragOver={(e) => {
+            if (!draggingCardId) return;
+            e.preventDefault();
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            const mid = rect.top + rect.height / 2;
+            const idx = e.clientY < mid ? index : index + 1;
+            if (dragTarget !== side) setDragTarget(side);
+            if (dragInsertIndex !== idx) setDragInsertIndex(idx);
+          }}
+        >
+          <MovableCard
+            id={cardConfig.id}
+            title={cardConfig.title}
+            currentSide={side}
+            isCollapsed={card.isCollapsed}
+            onMove={moveCard}
+            onToggleCollapse={toggleCardCollapse}
+            onDragStartCard={(id) => setDraggingCardId(id)}
+            onDragEndCard={() => { setDraggingCardId(null); setDragTarget(null); setDragInsertIndex(null); }}
+          >
+            {renderCardContent(cardConfig.id)}
+          </MovableCard>
+        </div>
+      );
+    });
+
+    if (draggingCardId && dragTarget === side && dragInsertIndex === getCardsByPosition(side).length) {
+      items.push(<div key={`ph-end`} className="sc-insert-placeholder" />);
+    }
+
+    return items;
+  };
+
   if (loading) {
     return (
       <div className="sc-app" style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -253,8 +346,9 @@ function App() {
       </header>
 
       <main className="sc-main">
-        {/* Main Content */}
+        {/* Left Side - Movable Cards */}
         <div className="sc-content">
+          {/* Counter - Always in center/main area */}
           {activeHunt ? (
             <Counter
               hunt={activeHunt}
@@ -270,18 +364,71 @@ function App() {
             </div>
           )}
           
-          {activeHunt && <StatsPanel hunt={activeHunt} />}
+          {/* Left Side Cards */}
+          <div
+            className="sc-cards-container sc-dropzone"
+            style={{ marginTop: 'var(--sc-space-4)', position: 'relative' }}
+            onDragOver={(e) => {
+              if (!draggingCardId) return;
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+              if (dragTarget !== 'left') setDragTarget('left');
+              if (dragInsertIndex == null) setDragInsertIndex(getCardsByPosition('left').length);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (draggingCardId) {
+                const index = dragInsertIndex ?? getCardsByPosition('left').length;
+                moveCardToPosition(draggingCardId, 'left', index);
+              }
+              setDraggingCardId(null);
+              setDragTarget(null);
+              setDragInsertIndex(null);
+            }}
+            onDragLeave={(e) => {
+              const bounds = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              const { clientX: x, clientY: y } = e as unknown as MouseEvent;
+              if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) {
+                if (dragTarget === 'left') { setDragTarget(null); setDragInsertIndex(null); }
+              }
+            }}
+          >
+            {renderCards('left')}
+          </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Right Side - Movable Cards */}
         <aside className="sc-sidebar">
-          <HuntManager
-            hunts={hunts}
-            activeHunt={activeHunt}
-            onCreateHunt={handleCreateHunt}
-            onSelectHunt={handleSelectHunt}
-            onDeleteHunt={handleDeleteHunt}
-          />
+          <div
+            className="sc-cards-container sc-dropzone"
+            style={{ position: 'relative' }}
+            onDragOver={(e) => {
+              if (!draggingCardId) return;
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+              if (dragTarget !== 'right') setDragTarget('right');
+              if (dragInsertIndex == null) setDragInsertIndex(getCardsByPosition('right').length);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (draggingCardId) {
+                const index = dragInsertIndex ?? getCardsByPosition('right').length;
+                moveCardToPosition(draggingCardId, 'right', index);
+              }
+              setDraggingCardId(null);
+              setDragTarget(null);
+              setDragInsertIndex(null);
+            }}
+            onDragLeave={(e) => {
+              const bounds = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              const { clientX: x, clientY: y } = e as unknown as MouseEvent;
+              if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) {
+                if (dragTarget === 'right') { setDragTarget(null); setDragInsertIndex(null); }
+              }
+            }}
+          >
+            {renderCards('right')}
+          </div>
         </aside>
       </main>
 

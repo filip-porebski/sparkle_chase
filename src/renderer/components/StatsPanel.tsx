@@ -33,10 +33,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt }) => {
   const stats = calculateOdds();
 
   return (
-    <div className="sc-card">
-      <div className="sc-card__title">Statistics</div>
-      
-      <div className="u-col">
+    <div className="u-col">
         {/* Basic Stats */}
         <div className="u-row">
           <div style={{ 
@@ -259,6 +256,5 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt }) => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
