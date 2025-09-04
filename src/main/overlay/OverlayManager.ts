@@ -66,7 +66,9 @@ export class OverlayManager {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        preload: path.join(__dirname, '../preload/overlay-preload.js')
+        preload: path.join(__dirname, '../preload/overlay-preload.js'),
+        devTools: process.env.NODE_ENV === 'development',
+        webSecurity: true
       },
       show: false
     });
