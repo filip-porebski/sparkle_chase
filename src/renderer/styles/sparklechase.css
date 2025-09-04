@@ -107,6 +107,28 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 .sc-card__title { font-size: var(--sc-fs-lg); font-weight: var(--sc-fw-semibold); margin-bottom: var(--sc-space-3); }
 .sc-card__meta { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); }
 
+/* Movable Card (collapsible shell) */
+.movable-card { margin-bottom: var(--sc-space-4); }
+.sc-card__header { /* utility for card header rows */ }
+.sc-btn--xs { height: 20px; padding: 0 6px; font-size: var(--sc-fs-xs); min-width: auto; }
+.sc-btn--icon { background: transparent !important; border: none; color: var(--sc-text-muted); }
+.sc-btn--icon:hover { background: transparent !important; color: var(--sc-text); }
+.sc-btn--chev { font-size: var(--sc-fs-sm); }
+
+/* Pixel-perfect icon buttons for card controls */
+.sc-btn--icon-square {
+  width: 24px; height: 24px; padding: 0; min-width: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent !important; border: none; border-radius: 6px;
+  color: var(--sc-text-muted); font-size: 16px; line-height: 1;
+}
+.sc-btn--icon-square:hover { background: transparent !important; color: var(--sc-text); }
+
+/* Rotation utilities for arrow icons */
+.rot-90 { transform: rotate(90deg); display: inline-block; transition: transform .15s ease; }
+.rot--90 { transform: rotate(-90deg); display: inline-block; transition: transform .15s ease; }
+.rot-180 { transform: rotate(180deg); display: inline-block; transition: transform .15s ease; }
+
 /* Counter Display */
 .sc-counter {
   display:flex; align-items:center; justify-content:space-between; gap: var(--sc-space-5);

@@ -24,120 +24,69 @@ export const MovableCard: React.FC<MovableCardProps> = ({
   const [showMoveButtons, setShowMoveButtons] = useState(false);
 
   return (
-    <div 
-      className={`movable-card-wrapper ${className}`}
+    <div
+      className={`movable-card ${className}`}
       onMouseEnter={() => setShowMoveButtons(true)}
       onMouseLeave={() => setShowMoveButtons(false)}
-      style={{ 
-        position: 'relative',
-        marginBottom: 'var(--sc-space-4)'
-      }}
     >
-      {/* Card Controls Header */}
-      <div 
-        className="movable-card-controls"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 'var(--sc-space-2)',
-          padding: '0 var(--sc-space-2)',
-          background: 'var(--sc-bg-elev-1)',
-          border: '1px solid var(--sc-border)',
-          borderRadius: 'var(--sc-radius-md) var(--sc-radius-md) 0 0',
-          borderBottom: isCollapsed ? '1px solid var(--sc-border)' : 'none'
-        }}
-      >
-        <div style={{ 
-          fontSize: 'var(--sc-fs-sm)', 
-          fontWeight: 'var(--sc-fw-medium)',
-          color: 'var(--sc-text-muted)'
-        }}>
-          {title}
+      <div className="sc-card">
+        <div className="sc-card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--sc-space-3)' }}>
+          <div className="sc-card__title" style={{ margin: 0 }}>{title}</div>
+          <div style={{ display: 'flex', gap: 'var(--sc-space-1)', alignItems: 'center' }}>
+            <button
+              onClick={() => onToggleCollapse(id)}
+              className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"
+              title={isCollapsed ? 'Expand' : 'Collapse'}
+            >
+              <span className={isCollapsed ? 'rot-90' : 'rot--90'}>→</span>
+            </button>
+            {showMoveButtons && (
+              <div style={{ display: 'flex', gap: '2px' }}>
+                <button
+                  onClick={() => onMove(id, 'left')}
+                  className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"
+                  style={{ opacity: currentSide === 'left' ? 0.5 : 1 }}
+                  disabled={currentSide === 'left'}
+                  title="Move to left side"
+                >
+                  <span className="rot-180">→</span>
+                </button>
+                <button
+                  onClick={() => onMove(id, 'right')}
+                  className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"
+                  style={{ opacity: currentSide === 'right' ? 0.5 : 1 }}
+                  disabled={currentSide === 'right'}
+                  title="Move to right side"
+                >
+                  →
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        
-        <div style={{ display: 'flex', gap: 'var(--sc-space-1)', alignItems: 'center' }}>
-          {/* Collapse/Expand Button */}
-          <button
-            onClick={() => onToggleCollapse(id)}
-            className="sc-btn sc-btn--ghost"
-            style={{
-              height: '20px',
-              padding: '0 4px',
-              fontSize: 'var(--sc-fs-xs)',
-              minWidth: 'auto'
-            }}
-            title={isCollapsed ? 'Expand' : 'Collapse'}
-          >
-            {isCollapsed ? '▼' : '▲'}
-          </button>
 
-          {/* Move Buttons */}
-          {showMoveButtons && (
-            <div style={{ display: 'flex', gap: '1px' }}>
-              <button
-                onClick={() => onMove(id, 'left')}
-                className="sc-btn sc-btn--ghost"
-                style={{
-                  height: '20px',
-                  padding: '0 4px',
-                  fontSize: 'var(--sc-fs-xs)',
-                  minWidth: 'auto',
-                  opacity: currentSide === 'left' ? 0.5 : 1
-                }}
-                disabled={currentSide === 'left'}
-                title="Move to left side"
-              >
-                ←
-              </button>
-              <button
-                onClick={() => onMove(id, 'right')}
-                className="sc-btn sc-btn--ghost"
-                style={{
-                  height: '20px',
-                  padding: '0 4px',
-                  fontSize: 'var(--sc-fs-xs)',
-                  minWidth: 'auto',
-                  opacity: currentSide === 'right' ? 0.5 : 1
-                }}
-                disabled={currentSide === 'right'}
-                title="Move to right side"
-              >
-                →
-              </button>
-            </div>
-          )}
-        </div>
+        {!isCollapsed && (
+          <div className="movable-card-content">
+            {children}
+          </div>
+        )}
+
+        {isCollapsed && (
+          <div style={{ 
+            padding: 'var(--sc-space-3)',
+            textAlign: 'center',
+            color: 'var(--sc-text-muted)'
+          }}>
+            <button
+              onClick={() => onToggleCollapse(id)}
+              className="sc-btn sc-btn--ghost"
+              style={{ fontSize: 'var(--sc-fs-sm)' }}
+            >
+              Expand
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* Card Content */}
-      {!isCollapsed && (
-        <div className="movable-card-content">
-          {children}
-        </div>
-      )}
-
-      {/* Collapsed State */}
-      {isCollapsed && (
-        <div style={{ 
-          padding: 'var(--sc-space-3)',
-          textAlign: 'center',
-          background: 'var(--sc-bg-elev-1)',
-          border: '1px solid var(--sc-border)',
-          borderTop: 'none',
-          borderRadius: '0 0 var(--sc-radius-md) var(--sc-radius-md)',
-          color: 'var(--sc-text-muted)',
-          fontSize: 'var(--sc-fs-sm)'
-        }}>
-          <button
-            onClick={() => onToggleCollapse(id)}
-            className="sc-btn sc-btn--ghost"
-            style={{ fontSize: 'var(--sc-fs-sm)' }}
-          >
-            Expand
-          </button>
-        </div>
-      )}
     </div>
   );
 };
