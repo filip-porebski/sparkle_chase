@@ -362,8 +362,8 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
               }}
             >
               <HuntCardBg name={hunt.targetSpecies} />
-              <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
-                <div style={{ flex: 1 }}>
+              <div className="u-row hunt-card-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ 
                     fontWeight: 'var(--sc-fw-medium)',
                     marginBottom: '2px'
@@ -429,7 +429,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   position: 'absolute',
                   left: 'var(--sc-space-3)',
                   bottom: 'var(--sc-space-3)',
-                  fontSize: 'var(--sc-fs-xl)',
+                  
                   fontWeight: 'var(--sc-fw-bold)',
                   lineHeight: 'var(--sc-lh-tight)',
                   fontVariantNumeric: 'tabular-nums',
@@ -437,10 +437,11 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   zIndex: 1
                 }}
                 title={`Count: ${hunt.count.toLocaleString()}`}
+                className="hunt-count"
               >
                 {hunt.count.toLocaleString()}
               </div>
-              <div className="u-col" style={{ alignItems: 'flex-end', gap: '2px', marginTop: '6px' }}>
+              <div className="u-col hunt-meta" style={{ alignItems: 'flex-end', gap: '2px', marginTop: '6px', position: 'relative', zIndex: 1 }}>
                 <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
                   Added: {formatRelativeTime(hunt.createdAt)}
                 </div>

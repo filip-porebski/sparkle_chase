@@ -275,6 +275,15 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   border: 1px solid var(--sc-border);
 }
 
+/* Hunts card responsive helpers */
+.hunt-card-row { gap: var(--sc-space-2); }
+.hunt-count { font-size: var(--sc-fs-xl); }
+.hunt-meta { }
+@media (max-width: 640px) {
+  .hunt-count { font-size: 28px; left: var(--sc-space-3); bottom: var(--sc-space-2); }
+  .hunt-card-row { gap: var(--sc-space-2); }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .sc-main {
