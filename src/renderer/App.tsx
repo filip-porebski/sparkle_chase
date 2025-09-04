@@ -20,11 +20,15 @@ function App() {
 
   useEffect(() => {
     loadInitialData();
-    setupHotkeys();
     
     // Set theme on document
     document.documentElement.setAttribute('data-theme', theme);
   }, []);
+
+  useEffect(() => {
+    const cleanup = setupHotkeys();
+    return cleanup;
+  }, [activeHunt]); // Re-setup hotkeys when activeHunt changes
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);

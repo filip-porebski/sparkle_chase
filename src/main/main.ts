@@ -86,11 +86,17 @@ class ShinyCounterApp {
     if (!this.mainWindow) return;
 
     this.mainWindow.webContents.on('before-input-event', (event, input) => {
-      // Only handle when app is focused and global hotkeys are disabled
-      if (!this.hotkeyManager.isGlobalEnabled()) {
-        if (input.type === 'keyDown') {
+      // Handle local hotkeys when app is focused
+      if (input.type === 'keyDown') {
+        const globalEnabled = this.hotkeyManager.isGlobalEnabled();
+        // Log key presses for debugging (can be removed in production)
+        // console.log(`Key pressed: "${input.key}", global enabled: ${globalEnabled}`);
+
+        // Only handle local hotkeys when global hotkeys are disabled
+        if (!globalEnabled) {
           switch (input.key) {
-            case ' ': // Space key
+            case ' ': // Space key (single space character)
+            case 'Space': // Some systems might use 'Space'
               if (!input.meta && !input.control && !input.alt && !input.shift) {
                 this.mainWindow?.webContents.send('hotkey:increment');
                 event.preventDefault();
@@ -108,14 +114,14 @@ class ShinyCounterApp {
                 event.preventDefault();
               }
               break;
-            case 'g':
-              if ((input.meta || input.control) && input.shift && !input.alt) {
-                const enabled = this.hotkeyManager.toggleGlobal();
-                this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
-                event.preventDefault();
-              }
-              break;
           }
+        }
+        
+        // Global toggle hotkey works regardless of global hotkey state
+        if (input.key === 'g' && (input.meta || input.control) && input.shift && !input.alt) {
+          const enabled = this.hotkeyManager.toggleGlobal();
+          this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
+          event.preventDefault();
         }
       }
     });
@@ -252,6 +258,7 @@ class ShinyCounterApp {
     this.hotkeyManager.unregisterAll();
     this.hotkeyManager.setSafeModeApps(settings.safeModeApps);
 
+    // Register hotkeys with the hotkey manager
     this.hotkeyManager.registerHotkey(settings.hotkeys.increment || 'Space', () => {
       this.mainWindow?.webContents.send('hotkey:increment');
     });
@@ -269,6 +276,7 @@ class ShinyCounterApp {
       this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
     });
 
+    // Enable global hotkeys if setting is enabled
     if (settings.globalHotkeysEnabled) {
       const enabled = this.hotkeyManager.toggleGlobal();
       this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
