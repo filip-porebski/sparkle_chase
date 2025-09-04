@@ -6,6 +6,7 @@ import { PhaseDialog } from './components/PhaseDialog';
 import { SettingsDialog } from './components/SettingsDialog';
 import { StatsPanel } from './components/StatsPanel';
 import { DiagnosticsPanel } from './components/DiagnosticsPanel';
+import { QuickSwitch } from './components/QuickSwitch';
 import { MovableCard } from './components/MovableCard';
 import { useCardLayout } from './hooks/useCardLayout';
 import './styles/sparklechase.css';
@@ -26,6 +27,7 @@ function App() {
   const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
   const [dragTarget, setDragTarget] = useState<'left' | 'right' | null>(null);
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
+  const [showQuickSwitch, setShowQuickSwitch] = useState(false);
   
   // Card layout management
   const { 
@@ -294,6 +296,30 @@ function App() {
     handleUpdateSettings({ theme: newTheme });
   };
 
+  // Local keydown for Quick Switch (matches settings.hotkeys.quickSwitch)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const acc = (settings?.hotkeys?.quickSwitch || 'CommandOrControl+K');
+      const wantCtrl = acc.includes('Control') || acc.includes('Command');
+      const wantShift = acc.includes('Shift');
+      const wantAlt = acc.includes('Alt');
+      const key = acc.split('+').pop()?.toLowerCase();
+      const inInput = (e.target instanceof Element) && ['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName);
+      if (inInput) return;
+      const ctrlOk = wantCtrl ? (e.ctrlKey || e.metaKey) : true;
+      const shiftOk = wantShift ? e.shiftKey : (!e.shiftKey);
+      const altOk = wantAlt ? e.altKey : (!e.altKey);
+      if (ctrlOk && shiftOk && altOk) {
+        if (e.key.toLowerCase() === (key || '').toLowerCase()) {
+          e.preventDefault();
+          setShowQuickSwitch(true);
+        }
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [settings]);
+
   // Render card content based on card type
   const renderCardContent = (cardId: string) => {
     switch (cardId) {
@@ -310,6 +336,7 @@ function App() {
             onUnlockHunt={handleUnlockHunt}
             onLockHunt={handleLockHunt}
             settings={settings || undefined}
+            onOpenQuickSwitch={() => setShowQuickSwitch(true)}
           />
         );
       case 'statistics':
@@ -545,6 +572,15 @@ function App() {
 
       {/* Diagnostics Panel */}
       <DiagnosticsPanel />
+
+      {/* Quick Switch Modal */}
+      {showQuickSwitch && (
+        <QuickSwitch
+          hunts={hunts}
+          onSelect={(h) => handleSelectHunt(h)}
+          onClose={() => setShowQuickSwitch(false)}
+        />
+      )}
     </div>
   );
 }

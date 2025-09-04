@@ -17,6 +17,7 @@ interface HuntManagerProps {
   onUnlockHunt: (huntId: string) => void;
   onLockHunt: (huntId: string) => void;
   settings?: Settings;
+  onOpenQuickSwitch: () => void;
 }
 
 export const HuntManager: React.FC<HuntManagerProps> = ({
@@ -29,7 +30,8 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   onToggleCreate,
   onUnlockHunt,
   onLockHunt,
-  settings
+  settings,
+  onOpenQuickSwitch
 }) => {
   // create form visibility managed by parent
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
@@ -164,6 +166,13 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           title="Filter hunts"
         >
           {showFilter ? 'Close Filter' : 'Filter'}
+        </button>
+        <button
+          onClick={onOpenQuickSwitch}
+          className="sc-btn sc-btn--ghost"
+          title="Search hunts (Quick Switch)"
+        >
+          Search
         </button>
       </div>
 

@@ -267,6 +267,31 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                   </div>
                 </div>
               </div>
+              <div className="u-row">
+                <div style={{ flex: 1 }}>
+                  <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Quick Switch</label>
+                  <div className="u-row" style={{ gap: 'var(--sc-space-1)' }}>
+                    <input
+                      type="text"
+                      value={
+                        captureTarget === 'quickSwitch'
+                          ? 'Press shortcut...'
+                          : (localSettings.hotkeys.quickSwitch || 'CommandOrControl+K')
+                      }
+                      readOnly
+                      className="sc-input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={() => setCaptureTarget('quickSwitch' as any)}
+                      className={`sc-btn ${capturing && captureTarget==='quickSwitch' ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
+                      title="Register hotkey"
+                    >
+                      {capturing && captureTarget==='quickSwitch' ? 'Listening…' : '⌨️'}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

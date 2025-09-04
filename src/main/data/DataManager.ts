@@ -114,7 +114,8 @@ export class DataManager {
         increment: 'Space',
         decrement: 'CommandOrControl+Z',
         phase: 'CommandOrControl+P',
-        toggleGlobal: 'CommandOrControl+Shift+G'
+        toggleGlobal: 'CommandOrControl+Shift+G',
+        quickSwitch: 'CommandOrControl+K'
       },
       obsTextFolder: '',
       safeModeApps: ['Photoshop.exe', 'Premiere.exe'],
