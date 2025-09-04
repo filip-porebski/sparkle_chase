@@ -154,13 +154,51 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           {showCreateForm ? 'Cancel' : 'New Hunt'}
         </button>
         <button
-          onClick={() => setShowFilter(true)}
-          className="sc-btn sc-btn--ghost"
+          onClick={() => setShowFilter(prev => !prev)}
+          className={`sc-btn ${showFilter ? 'sc-btn--ghost' : ''}`}
           title="Filter hunts"
         >
-          Filter
+          {showFilter ? 'Close Filter' : 'Filter'}
         </button>
       </div>
+
+      {showFilter && (
+        <div className="u-col" style={{ 
+          marginBottom: 'var(--sc-space-5)',
+          paddingBottom: 'var(--sc-space-4)',
+          borderBottom: '1px solid var(--sc-border)'
+        }}>
+          <div>
+            <label className="sc-label">Status</label>
+            <div className="u-row">
+              {(['all','active','completed'] as const).map(v => (
+                <label key={v} className="u-row" style={{ gap: '6px' }}>
+                  <input 
+                    type="radio" 
+                    name="hunt-status" 
+                    checked={filter.status===v} 
+                    onChange={() => setFilter(prev => ({...prev, status: v}))} 
+                    style={{ accentColor: 'var(--sc-brand)' }}
+                  />
+                  <span style={{ fontSize: 'var(--sc-fs-sm)' }}>{v[0].toUpperCase()+v.slice(1)}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="sc-label">Search</label>
+            <input
+              className="sc-input"
+              placeholder="Name, species, game, method"
+              value={filter.query}
+              onChange={e => setFilter(prev => ({...prev, query: e.target.value}))}
+            />
+          </div>
+          <div className="u-row" style={{ justifyContent: 'flex-end' }}>
+            <button className="sc-btn sc-btn--ghost" onClick={() => setFilter({ status: 'all', query: '' })}>Clear</button>
+          </div>
+        </div>
+      )}
 
 
       {showCreateForm && (
@@ -322,10 +360,15 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           filteredHunts.map((hunt) => (
             <div
               key={hunt.id}
-              className="u-card"
+              className="u-card hunt-card"
               style={{
                 padding: 'var(--sc-space-3)',
-                paddingBottom: 'calc(var(--sc-space-3) + 28px)',
+                paddingBottom:
+                  (hunt.archived && hunt.phases.length > 0)
+                    ? 'calc(var(--sc-space-3) + 56px)'
+                    : (hunt.archived || hunt.phases.length > 0)
+                      ? 'calc(var(--sc-space-3) + 44px)'
+                      : 'calc(var(--sc-space-3) + 28px)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 border: activeHunt?.id === hunt.id
@@ -336,6 +379,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   : (activeHunt?.id === hunt.id
                       ? 'color-mix(in oklab, var(--sc-brand) 8%, var(--sc-bg-elev-1))'
                       : 'var(--sc-bg-elev-1)'),
+                minHeight: hunt.archived ? (hunt.phases.length > 0 ? '170px' : '140px') : undefined,
                 position: 'relative',
                 overflow: 'hidden'
               }}
@@ -375,7 +419,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   </div>
                   {hunt.phases.length > 0 && (
                     <div className="sc-tag" style={{ 
-                      marginTop: '4px',
+                      marginTop: '8px',
                       background: 'var(--sc-bg-warn)',
                       color: 'var(--sc-warning)',
                       border: '1px solid color-mix(in oklab, var(--sc-warning) 30%, transparent)'
@@ -453,42 +497,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           ))
         )}
       </div>
-      {showFilter && (
-        <div className="sc-modal-backdrop" onClick={() => setShowFilter(false)}>
-          <div className="sc-modal" style={{ maxWidth: '520px' }} onClick={(e) => e.stopPropagation()}>
-            <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-3)' }}>
-              <div className="sc-card__title" style={{ margin: 0 }}>Filter Hunts</div>
-              <button onClick={() => setShowFilter(false)} className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon" aria-label="Close">×</button>
-            </div>
-            <div className="u-col" style={{ gap: 'var(--sc-space-3)' }}>
-              <div>
-                <label className="sc-label">Status</label>
-                <div className="u-row">
-                  {(['all','active','completed'] as const).map(v => (
-                    <label key={v} className="u-row" style={{ gap: '6px' }}>
-                      <input type="radio" name="hunt-status" checked={filter.status===v} onChange={() => setFilter(prev => ({...prev, status: v}))} />
-                      <span style={{ fontSize: 'var(--sc-fs-sm)' }}>{v[0].toUpperCase()+v.slice(1)}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="sc-label">Search</label>
-                <input
-                  className="sc-input"
-                  placeholder="Name, species, game, method"
-                  value={filter.query}
-                  onChange={e => setFilter(prev => ({...prev, query: e.target.value}))}
-                />
-              </div>
-              <div className="u-row" style={{ justifyContent: 'flex-end' }}>
-                <button className="sc-btn sc-btn--ghost" onClick={() => setFilter({ status: 'all', query: '' })}>Clear</button>
-                <button className="sc-btn" onClick={() => setShowFilter(false)}>Apply</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Inline filter replaces modal */}
     </div>
   );
 };
