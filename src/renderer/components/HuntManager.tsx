@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Hunt, HuntData } from '../../shared/types';
 import { PokemonAutocomplete } from './PokemonAutocomplete';
+import { POKEMON_GAMES, isPokemonInGame, isMethodInGame, getGameInfo } from '../data/gameCompatibility';
+import { pokeAPI } from '../services/pokeapi';
 
 interface HuntManagerProps {
   hunts: Hunt[];
@@ -18,6 +20,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   onDeleteHunt
 }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
   const [formData, setFormData] = useState<HuntData>({
     name: '',
     game: '',
@@ -27,8 +30,24 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     notes: ''
   });
 
+  const handlePokemonChange = async (pokemonName: string) => {
+    setFormData(prev => ({ ...prev, targetSpecies: pokemonName }));
+    
+    if (pokemonName) {
+      try {
+        const pokemon = await pokeAPI.getPokemon(pokeAPI.formatNameForAPI(pokemonName));
+        setSelectedPokemonId(pokemon?.id || null);
+      } catch (error) {
+        console.error('Failed to get Pokemon ID:', error);
+        setSelectedPokemonId(null);
+      }
+    } else {
+      setSelectedPokemonId(null);
+    }
+  };
+
   const handleGameChange = (gameName: string) => {
-    const selectedGame = pokemonGames.find(game => game.name === gameName);
+    const selectedGame = getGameInfo(gameName);
     const newOdds = selectedGame ? selectedGame.odds : 4096;
     
     setFormData(prev => ({
@@ -36,6 +55,16 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
       game: gameName,
       baseOdds: { numerator: 1, denominator: newOdds }
     }));
+  };
+
+  const isGameCompatible = (gameName: string): boolean => {
+    if (!selectedPokemonId) return true;
+    return isPokemonInGame(selectedPokemonId, gameName);
+  };
+
+  const isMethodCompatible = (method: string): boolean => {
+    if (!formData.game) return true;
+    return isMethodInGame(method, formData.game);
   };
 
   const generateHuntName = (): string => {
@@ -62,6 +91,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
         baseOdds: { numerator: 1, denominator: 4096 },
         notes: ''
       });
+      setSelectedPokemonId(null);
       setShowCreateForm(false);
     }
   };
@@ -72,62 +102,6 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     }
   };
 
-  const pokemonGames = [
-    // Generation 9
-    { name: 'Scarlet', odds: 4096 },
-    { name: 'Violet', odds: 4096 },
-    
-    // Generation 8
-    { name: 'Brilliant Diamond', odds: 4096 },
-    { name: 'Shining Pearl', odds: 4096 },
-    { name: 'Legends: Arceus', odds: 4096 },
-    { name: 'Sword', odds: 4096 },
-    { name: 'Shield', odds: 4096 },
-    
-    // Generation 7
-    { name: "Let's Go, Pikachu!", odds: 4096 },
-    { name: "Let's Go, Eevee!", odds: 4096 },
-    { name: 'Ultra Sun', odds: 4096 },
-    { name: 'Ultra Moon', odds: 4096 },
-    { name: 'Sun', odds: 4096 },
-    { name: 'Moon', odds: 4096 },
-    
-    // Generation 6
-    { name: 'Omega Ruby', odds: 4096 },
-    { name: 'Alpha Sapphire', odds: 4096 },
-    { name: 'X', odds: 4096 },
-    { name: 'Y', odds: 4096 },
-    
-    // Generation 5
-    { name: 'Black 2', odds: 8192 },
-    { name: 'White 2', odds: 8192 },
-    { name: 'Black', odds: 8192 },
-    { name: 'White', odds: 8192 },
-    
-    // Generation 4
-    { name: 'HeartGold', odds: 8192 },
-    { name: 'SoulSilver', odds: 8192 },
-    { name: 'Platinum', odds: 8192 },
-    { name: 'Diamond', odds: 8192 },
-    { name: 'Pearl', odds: 8192 },
-    
-    // Generation 3
-    { name: 'Emerald', odds: 8192 },
-    { name: 'Fire Red', odds: 8192 },
-    { name: 'Leaf Green', odds: 8192 },
-    { name: 'Ruby', odds: 8192 },
-    { name: 'Sapphire', odds: 8192 },
-    
-    // Generation 2
-    { name: 'Crystal', odds: 8192 },
-    { name: 'Gold', odds: 8192 },
-    { name: 'Silver', odds: 8192 },
-    
-    // Generation 1 (no shinies originally, but for ROM hacks)
-    { name: 'Yellow', odds: 8192 },
-    { name: 'Blue', odds: 8192 },
-    { name: 'Red', odds: 8192 }
-  ];
 
   const huntingMethods = [
     'Random Encounters',
@@ -187,10 +161,15 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
             <label className="sc-label">Target Species</label>
             <PokemonAutocomplete
               value={formData.targetSpecies}
-              onChange={(value) => setFormData(prev => ({ ...prev, targetSpecies: value }))}
+              onChange={handlePokemonChange}
               placeholder="e.g., Pikachu, Charizard, Rayquaza..."
               required
             />
+            {selectedPokemonId && (
+              <p className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: 'var(--sc-space-1)' }}>
+                Incompatible games and methods will be shown in gray
+              </p>
+            )}
           </div>
 
           <div className="u-row">
@@ -203,61 +182,30 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                 required
               >
                 <option value="">Select Game</option>
-                <optgroup label="Generation 9">
-                  <option value="Scarlet">Scarlet</option>
-                  <option value="Violet">Violet</option>
-                </optgroup>
-                <optgroup label="Generation 8">
-                  <option value="Brilliant Diamond">Brilliant Diamond</option>
-                  <option value="Shining Pearl">Shining Pearl</option>
-                  <option value="Legends: Arceus">Legends: Arceus</option>
-                  <option value="Sword">Sword</option>
-                  <option value="Shield">Shield</option>
-                </optgroup>
-                <optgroup label="Generation 7">
-                  <option value="Let's Go, Pikachu!">Let's Go, Pikachu!</option>
-                  <option value="Let's Go, Eevee!">Let's Go, Eevee!</option>
-                  <option value="Ultra Sun">Ultra Sun</option>
-                  <option value="Ultra Moon">Ultra Moon</option>
-                  <option value="Sun">Sun</option>
-                  <option value="Moon">Moon</option>
-                </optgroup>
-                <optgroup label="Generation 6">
-                  <option value="Omega Ruby">Omega Ruby</option>
-                  <option value="Alpha Sapphire">Alpha Sapphire</option>
-                  <option value="X">X</option>
-                  <option value="Y">Y</option>
-                </optgroup>
-                <optgroup label="Generation 5">
-                  <option value="Black 2">Black 2</option>
-                  <option value="White 2">White 2</option>
-                  <option value="Black">Black</option>
-                  <option value="White">White</option>
-                </optgroup>
-                <optgroup label="Generation 4">
-                  <option value="HeartGold">HeartGold</option>
-                  <option value="SoulSilver">SoulSilver</option>
-                  <option value="Platinum">Platinum</option>
-                  <option value="Diamond">Diamond</option>
-                  <option value="Pearl">Pearl</option>
-                </optgroup>
-                <optgroup label="Generation 3">
-                  <option value="Emerald">Emerald</option>
-                  <option value="Fire Red">Fire Red</option>
-                  <option value="Leaf Green">Leaf Green</option>
-                  <option value="Ruby">Ruby</option>
-                  <option value="Sapphire">Sapphire</option>
-                </optgroup>
-                <optgroup label="Generation 2">
-                  <option value="Crystal">Crystal</option>
-                  <option value="Gold">Gold</option>
-                  <option value="Silver">Silver</option>
-                </optgroup>
-                <optgroup label="Generation 1">
-                  <option value="Yellow">Yellow</option>
-                  <option value="Blue">Blue</option>
-                  <option value="Red">Red</option>
-                </optgroup>
+                {[9, 8, 7, 6, 5, 4, 3, 2, 1].map(gen => {
+                  const gamesInGen = POKEMON_GAMES.filter(game => game.generation === gen);
+                  if (gamesInGen.length === 0) return null;
+                  
+                  return (
+                    <optgroup key={gen} label={`Generation ${gen}`}>
+                      {gamesInGen.map(game => {
+                        const isCompatible = isGameCompatible(game.name);
+                        return (
+                          <option 
+                            key={game.name} 
+                            value={game.name}
+                            style={{
+                              color: isCompatible ? 'inherit' : '#888',
+                              fontStyle: isCompatible ? 'normal' : 'italic'
+                            }}
+                          >
+                            {game.name}{!isCompatible ? ' (incompatible)' : ''}
+                          </option>
+                        );
+                      })}
+                    </optgroup>
+                  );
+                })}
               </select>
             </div>
 
@@ -270,9 +218,21 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                 required
               >
                 <option value="">Select Method</option>
-                {huntingMethods.map(method => (
-                  <option key={method} value={method}>{method}</option>
-                ))}
+                {huntingMethods.map(method => {
+                  const isCompatible = isMethodCompatible(method);
+                  return (
+                    <option 
+                      key={method} 
+                      value={method}
+                      style={{
+                        color: isCompatible ? 'inherit' : '#888',
+                        fontStyle: isCompatible ? 'normal' : 'italic'
+                      }}
+                    >
+                      {method}{!isCompatible ? ' (not available in this game)' : ''}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>
@@ -288,14 +248,14 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
               }))}
               className="sc-input"
               placeholder={formData.game ? 
-                pokemonGames.find(g => g.name === formData.game)?.odds.toString() || "4096" 
+                getGameInfo(formData.game)?.odds.toString() || "4096" 
                 : "4096"
               }
               min="1"
             />
             <p className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: 'var(--sc-space-1)' }}>
               {formData.game && (
-                <>Auto-set to {pokemonGames.find(g => g.name === formData.game)?.odds || 4096} for {formData.game}</>
+                <>Auto-set to {getGameInfo(formData.game)?.odds || 4096} for {formData.game}</>
               )}
               {!formData.game && <>Select a game to auto-fill base odds</>}
             </p>
