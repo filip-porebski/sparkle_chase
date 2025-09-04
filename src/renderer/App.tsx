@@ -305,7 +305,7 @@ function App() {
           />
         );
       case 'statistics':
-        return activeHunt ? <StatsPanel hunt={activeHunt} /> : (
+        return activeHunt ? <StatsPanel hunt={activeHunt} settings={settings!} /> : (
           <div style={{ 
             textAlign: 'center', 
             padding: 'var(--sc-space-4)',
@@ -446,6 +446,7 @@ function App() {
               onLogPhase={() => setPhaseDialogMode('phase')}
               onLogShiny={() => setPhaseDialogMode('shiny')}
               onHuntUpdated={(h) => { setActiveHunt(h); updateHuntInList(h); }}
+              settings={settings || undefined}
             />
           ) : (
             <div className="sc-card" style={{ textAlign: 'center', padding: 'var(--sc-space-8)' }}>

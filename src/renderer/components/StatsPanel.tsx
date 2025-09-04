@@ -1,11 +1,14 @@
 import React, { useMemo } from 'react';
+import { Settings } from '../../shared/types';
+import { formatDateTime, formatDate } from '../services/datetime';
 import { Hunt } from '../../shared/types';
 
 interface StatsPanelProps {
   hunt: Hunt;
+  settings?: Settings;
 }
 
-export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt }) => {
+export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
   // Effective probability per encounter
   const effectiveProb = useMemo(() => {
     let p = hunt.baseOdds.numerator / hunt.baseOdds.denominator;
@@ -125,13 +128,13 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt }) => {
 
       {/* Hunt Info */}
       <div style={{ borderTop: '1px solid var(--sc-border)', paddingTop: 'var(--sc-space-4)' }}>
-        <div className="u-col" style={{ gap: '2px' }}>
-          <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
-            Created: {new Date(hunt.createdAt).toLocaleDateString()}
-          </div>
-          <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
-            Last Updated: {new Date(hunt.updatedAt).toLocaleString()}
-          </div>
+          <div className="u-col" style={{ gap: '2px' }}>
+            <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
+              Created: {settings ? formatDate(hunt.createdAt, settings) : new Date(hunt.createdAt).toLocaleDateString()}
+            </div>
+            <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
+              Last Updated: {settings ? formatDateTime(hunt.updatedAt, settings) : new Date(hunt.updatedAt).toLocaleString()}
+            </div>
           <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
             Base Odds: 1 in {hunt.baseOdds.denominator.toLocaleString()}
           </div>

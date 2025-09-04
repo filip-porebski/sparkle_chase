@@ -47,6 +47,8 @@ export interface Session {
 
 export interface Settings {
   theme: 'light' | 'dark';
+  dateFormat: 'DD.MM.YYYY' | 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'DD-MMM-YYYY';
+  timeFormat: '12h' | '24h';
   overlay: {
     variant: 'badge' | 'compact' | 'full';
     clickThrough: boolean;

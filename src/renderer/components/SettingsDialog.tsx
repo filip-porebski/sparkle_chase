@@ -81,6 +81,37 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
         <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>Settings</div>
         
         <div className="u-col" style={{ overflowY: 'auto' }}>
+          {/* Date & Time */}
+          <div>
+            <label className="sc-label">Date & Time</label>
+            <div className="u-row" style={{ gap: 'var(--sc-space-3)' }}>
+              <div style={{ flex: 1 }}>
+                <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Date Format</label>
+                <select
+                  value={localSettings.dateFormat}
+                  onChange={(e) => setLocalSettings(prev => ({ ...prev, dateFormat: e.target.value as any }))}
+                  className="sc-input"
+                >
+                  <option value="DD.MM.YYYY">DD.MM.YYYY</option>
+                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                  <option value="DD-MMM-YYYY">DD-MMM-YYYY</option>
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Time Format</label>
+                <select
+                  value={localSettings.timeFormat}
+                  onChange={(e) => setLocalSettings(prev => ({ ...prev, timeFormat: e.target.value as any }))}
+                  className="sc-input"
+                >
+                  <option value="24h">24-hour</option>
+                  <option value="12h">12-hour (AM/PM)</option>
+                </select>
+              </div>
+            </div>
+          </div>
           {/* Theme */}
           <div>
             <label className="sc-label">Theme</label>

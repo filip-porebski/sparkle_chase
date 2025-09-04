@@ -62,8 +62,37 @@ export class DataManager {
   }
 
   private getDefaultSettings(): Settings {
+    const inferTime12h = (() => {
+      try {
+        const dtf = new Intl.DateTimeFormat(undefined, { hour: 'numeric' });
+        // @ts-ignore
+        return dtf.resolvedOptions && dtf.resolvedOptions().hour12 !== undefined
+          ? dtf.resolvedOptions().hour12
+          : /[AP]M/i.test(new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).format(new Date()));
+      } catch { return false; }
+    })();
+
+    const inferDate = (() => {
+      try {
+        const d = new Date(2020, 10, 7); // 7 Nov 2020
+        const s = new Intl.DateTimeFormat(undefined).format(d);
+        if (s.includes('-')) return 'YYYY-MM-DD';
+        if (/\d{1,2}\.\d{1,2}\.\d{4}/.test(s)) return 'DD.MM.YYYY';
+        if (/\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) {
+          // detect whether MM/DD or DD/MM
+          const parts = s.split('/').map(p => parseInt(p, 10));
+          // If first part > 12, it's DD/MM
+          return parts[0] > 12 ? 'DD/MM/YYYY' : 'MM/DD/YYYY';
+        }
+        if (/[A-Za-z]{3}/.test(s)) return 'DD-MMM-YYYY';
+      } catch {}
+      return 'YYYY-MM-DD';
+    })();
+
     return {
       theme: 'dark',
+      dateFormat: inferDate as any,
+      timeFormat: inferTime12h ? '12h' : '24h',
       overlay: {
         variant: 'badge',
         clickThrough: true,

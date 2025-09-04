@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Hunt } from '../../shared/types';
+import { Hunt, Settings } from '../../shared/types';
+import { formatDate } from '../services/datetime';
 import { ShinyPokemonImage } from './ShinyPokemonImage';
 
 interface CounterProps {
@@ -10,6 +11,7 @@ interface CounterProps {
   onLogPhase: () => void;
   onLogShiny: () => void;
   onHuntUpdated: (hunt: Hunt) => void;
+  settings?: Settings;
 }
 
 export const Counter: React.FC<CounterProps> = ({
@@ -19,7 +21,8 @@ export const Counter: React.FC<CounterProps> = ({
   onSetCount,
   onLogPhase,
   onLogShiny,
-  onHuntUpdated
+  onHuntUpdated,
+  settings
 }) => {
   const [editingCount, setEditingCount] = useState(false);
   const [editValue, setEditValue] = useState(hunt.count.toString());
@@ -238,7 +241,7 @@ export const Counter: React.FC<CounterProps> = ({
                     {phase.species} {phase.isTarget ? '(Target!)' : '(Off-target)'}
                   </div>
                   <div className="sc-phase__meta">
-                    at {phase.atCount.toLocaleString()} • {new Date(phase.createdAt).toLocaleDateString()}
+                    at {phase.atCount.toLocaleString()} • {settings ? formatDate(phase.createdAt, settings) : new Date(phase.createdAt).toLocaleDateString()}
                   </div>
                   {phase.notes && (
                     <div className="sc-phase__meta" style={{ marginTop: '2px' }}>
