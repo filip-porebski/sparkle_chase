@@ -29,12 +29,39 @@ export const Counter: React.FC<CounterProps> = ({
   const [editingCount, setEditingCount] = useState(false);
   const [editValue, setEditValue] = useState(hunt.count.toString());
   const [flash, setFlash] = useState(false);
+  const [shineLevel, setShineLevel] = useState<0 | 10 | 100 | 1000>(0);
+  const [particles, setParticles] = useState<Array<{ id: string; x: number; y: number; size: number; hue: number; dx: number }>>([]);
 
   // Subtle attention pulse when the count changes
   useEffect(() => {
     setFlash(true);
     const t = setTimeout(() => setFlash(false), 450);
     return () => clearTimeout(t);
+  }, [hunt.count]);
+
+  // Milestone shine when divisible by 10/100/1000
+  useEffect(() => {
+    let level: 0 | 10 | 100 | 1000 = 0;
+    if (hunt.count > 0) {
+      if (hunt.count % 1000 === 0) level = 1000;
+      else if (hunt.count % 100 === 0) level = 100;
+      else if (hunt.count % 10 === 0) level = 10;
+    }
+    setShineLevel(level);
+    if (level > 0) {
+      const n = level === 1000 ? 18 : level === 100 ? 12 : 8;
+      const created = Array.from({ length: n }).map((_, i) => ({
+        id: `${Date.now()}_${i}`,
+        x: Math.random() * 90 + 5,
+        y: Math.random() * 25 + 35,
+        size: Math.random() * 4 + (level === 1000 ? 5 : level === 100 ? 4 : 3),
+        hue: 260 + Math.random() * 60,
+        dx: (Math.random() - 0.5) * 60
+      }));
+      setParticles(created);
+      const clear = setTimeout(() => setParticles([]), 1200);
+      return () => clearTimeout(clear);
+    }
   }, [hunt.count]);
 
   const handleEditSubmit = () => {
@@ -295,6 +322,32 @@ export const Counter: React.FC<CounterProps> = ({
           }}>
             {hunt.notes}
           </div>
+        </div>
+      )}
+      {/* Shine overlay */}
+      {shineLevel > 0 && (
+        <div className={`sc-hero-shine sc-hero-shine--${shineLevel}`} aria-hidden />
+      )}
+
+      {/* Particles */}
+      {particles.length > 0 && (
+        <div className="sc-hero-particles" aria-hidden>
+          {particles.map((p) => (
+            <span
+              key={p.id}
+              className="sc-hero-particle"
+              style={{
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                background: `oklch(65% 0.12 ${p.hue})`,
+                boxShadow: `0 0 ${Math.max(4, p.size * 1.8)}px color-mix(in oklab, var(--sc-brand) 60%, transparent)`,
+                // @ts-ignore: CSS var for animation drift
+                '--dx': `${p.dx}px`
+              } as any}
+            />
+          ))}
         </div>
       )}
     </div>

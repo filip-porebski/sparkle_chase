@@ -143,6 +143,18 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 @keyframes scPulseGlow { 0% { text-shadow: 0 0 0.9em color-mix(in oklab, var(--sc-brand) 42%, transparent); } 100% { text-shadow: 0 0 0.25em color-mix(in oklab, var(--sc-brand) 25%, transparent); } }
 .sc-count--halo.is-flash { animation: scPulseGlow .45s ease-out; }
 
+/* Milestone shine overlays */
+.sc-hero-shine{ position:absolute; inset:-2px; border-radius: var(--sc-radius-xl); pointer-events:none; }
+.sc-hero-shine--10{ background: radial-gradient(60% 30% at 50% 0%, color-mix(in oklab,var(--sc-brand) 14%, transparent) 0%, transparent 70%); animation: heroShine .9s ease-out; }
+.sc-hero-shine--100{ background: radial-gradient(70% 35% at 50% 0%, color-mix(in oklab,var(--sc-brand) 20%, transparent) 0%, transparent 70%); animation: heroShine 1s ease-out; }
+.sc-hero-shine--1000{ background: radial-gradient(80% 40% at 50% 0%, color-mix(in oklab,var(--sc-brand) 26%, transparent) 0%, transparent 70%), radial-gradient(40% 30% at 20% 80%, color-mix(in oklab,var(--sc-accent) 18%, transparent) 0%, transparent 70%); animation: heroShine 1.1s ease-out; }
+@keyframes heroShine { from { opacity:.0; filter: blur(10px);} to { opacity:.9; filter: blur(0);} }
+
+/* Confetti-like tasteful particles */
+.sc-hero-particles{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.sc-hero-particle{ position:absolute; border-radius:999px; animation: particleRise 1.2s ease-out forwards; opacity:.9; }
+@keyframes particleRise { 0%{ transform: translate(0,0) scale(1); opacity:.9;} 100%{ transform: translate(var(--dx, 0), calc(-40px - 20%)) scale(.8); opacity:0; } }
+
 /* Movable Card (collapsible shell) */
 .movable-card { margin-bottom: var(--sc-space-4); }
 .sc-card__header { /* utility for card header rows */ }
