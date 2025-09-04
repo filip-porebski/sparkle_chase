@@ -417,9 +417,12 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   <div className="sc-card__meta">
                     {hunt.targetSpecies} • {hunt.game} • {hunt.method}
                   </div>
+                  {/* Phase tag moved to right column to avoid overlap with big count */}
+                </div>
+                <div className="u-col" style={{ alignItems: 'flex-end', gap: 'var(--sc-space-1)' }}>
                   {hunt.phases.length > 0 && (
                     <div className="sc-tag" style={{ 
-                      marginTop: '8px',
+                      alignSelf: 'flex-end',
                       background: 'var(--sc-bg-warn)',
                       color: 'var(--sc-warning)',
                       border: '1px solid color-mix(in oklab, var(--sc-warning) 30%, transparent)'
@@ -427,8 +430,6 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                       {hunt.phases.length} phase{hunt.phases.length !== 1 ? 's' : ''}
                     </div>
                   )}
-                </div>
-                <div className="u-col" style={{ alignItems: 'flex-end', gap: 'var(--sc-space-1)' }}>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

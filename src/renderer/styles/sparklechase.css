@@ -284,10 +284,10 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   .hunt-card-row { gap: var(--sc-space-2); }
 }
 
-/* Slightly taller hunts cards */
-.hunt-card { min-height: 120px; }
+/* Taller hunts cards (active baseline) */
+.hunt-card { min-height: 140px; }
 @media (max-width: 640px) {
-  .hunt-card { min-height: 110px; }
+  .hunt-card { min-height: 130px; }
 }
 
 /* Responsive */
