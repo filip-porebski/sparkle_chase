@@ -16,6 +16,11 @@ export class OverlayManager {
     ipcMain.handle('overlay:startDrag', () => this.startDrag());
     ipcMain.handle('overlay:stopDrag', () => this.stopDrag());
     ipcMain.handle('overlay:toggleClickThrough', () => this.toggleClickThrough());
+    ipcMain.handle('overlay:updateNow', (_evt, hunt: Hunt) => {
+      this.sendUpdate(hunt);
+      return true;
+    });
+    ipcMain.handle('overlay:isVisible', () => this.isVisible);
   }
 
   show(): void {
@@ -46,9 +51,7 @@ export class OverlayManager {
   }
 
   updateOverlay(hunt: Hunt): void {
-    if (this.overlayWindow && this.isVisible) {
-      this.overlayWindow.webContents.send('overlay:update', hunt);
-    }
+    this.sendUpdate(hunt);
   }
 
   private createOverlayWindow(): void {
@@ -91,6 +94,12 @@ export class OverlayManager {
 
     // Make overlay draggable when not in click-through mode
     this.setupDragHandlers();
+  }
+
+  private sendUpdate(hunt: Hunt): void {
+    if (this.overlayWindow && this.isVisible && hunt) {
+      this.overlayWindow.webContents.send('overlay:update', hunt);
+    }
   }
 
   private setupDragHandlers(): void {

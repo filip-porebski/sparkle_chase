@@ -31,6 +31,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   toggleOverlay: () => ipcRenderer.invoke('overlay:toggle'),
   showOverlay: () => ipcRenderer.invoke('overlay:show'),
   hideOverlay: () => ipcRenderer.invoke('overlay:hide'),
+  isOverlayVisible: () => ipcRenderer.invoke('overlay:isVisible'),
+  updateOverlayNow: (hunt: any) => ipcRenderer.invoke('overlay:updateNow', hunt),
 
   // Hotkey management
   toggleGlobalHotkeys: () => ipcRenderer.invoke('hotkey:toggleGlobal'),

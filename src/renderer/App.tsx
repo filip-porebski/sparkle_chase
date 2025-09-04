@@ -214,6 +214,11 @@ function App() {
 
   const handleSelectHunt = (hunt: Hunt) => {
     setActiveHunt(hunt);
+    // Update overlay if visible
+    window.electronAPI.isOverlayVisible().then((visible) => {
+      setOverlayVisible(visible);
+      if (visible) window.electronAPI.updateOverlayNow(hunt);
+    });
   };
 
   const handleDeleteHunt = async (huntId: string) => {
