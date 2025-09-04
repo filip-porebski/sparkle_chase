@@ -61,6 +61,7 @@ export interface Settings {
     decrement: string;
     phase: string;
     toggleGlobal: string;
+    quickSwitch?: string;
   };
   obsTextFolder: string;
   safeModeApps: string[];
