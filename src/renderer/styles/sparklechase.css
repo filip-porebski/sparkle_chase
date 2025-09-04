@@ -129,6 +129,20 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 .sc-card__title { font-size: var(--sc-fs-lg); font-weight: var(--sc-fw-semibold); margin-bottom: var(--sc-space-3); }
 .sc-card__meta { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); }
 
+/* Hero counter emphasis */
+.sc-card--hero { position: relative; border: 1px solid var(--sc-border-strong); box-shadow: 0 10px 28px rgba(0,0,0,.38); }
+.sc-card--hero::before{
+  content: '';
+  position: absolute; inset: -1px; border-radius: var(--sc-radius-xl);
+  background:
+    radial-gradient(80% 60% at 15% 0%, color-mix(in oklab, var(--sc-brand) 18%, transparent) 0%, transparent 70%),
+    radial-gradient(60% 50% at 85% 20%, color-mix(in oklab, var(--sc-accent) 10%, transparent) 0%, transparent 70%);
+  pointer-events: none; opacity: .6;
+}
+.sc-count--halo { text-shadow: 0 0 0.25em color-mix(in oklab, var(--sc-brand) 25%, transparent); }
+@keyframes scPulseGlow { 0% { text-shadow: 0 0 0.9em color-mix(in oklab, var(--sc-brand) 42%, transparent); } 100% { text-shadow: 0 0 0.25em color-mix(in oklab, var(--sc-brand) 25%, transparent); } }
+.sc-count--halo.is-flash { animation: scPulseGlow .45s ease-out; }
+
 /* Movable Card (collapsible shell) */
 .movable-card { margin-bottom: var(--sc-space-4); }
 .sc-card__header { /* utility for card header rows */ }

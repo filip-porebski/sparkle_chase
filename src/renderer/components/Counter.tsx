@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Hunt, Settings } from '../../shared/types';
 import { formatDate } from '../services/datetime';
 import { formatNumber } from '../services/numbers';
@@ -28,6 +28,14 @@ export const Counter: React.FC<CounterProps> = ({
 }) => {
   const [editingCount, setEditingCount] = useState(false);
   const [editValue, setEditValue] = useState(hunt.count.toString());
+  const [flash, setFlash] = useState(false);
+
+  // Subtle attention pulse when the count changes
+  useEffect(() => {
+    setFlash(true);
+    const t = setTimeout(() => setFlash(false), 450);
+    return () => clearTimeout(t);
+  }, [hunt.count]);
 
   const handleEditSubmit = () => {
     const newCount = parseInt(editValue, 10);
@@ -43,7 +51,7 @@ export const Counter: React.FC<CounterProps> = ({
   };
 
   return (
-    <div className="sc-card" onClick={(e) => e.stopPropagation()}>
+    <div className="sc-card sc-card--hero" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
       {/* Hunt Header */}
       <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--sc-space-4)' }}>
         <div style={{ flex: 1 }}>
@@ -107,7 +115,7 @@ export const Counter: React.FC<CounterProps> = ({
           </div>
         ) : (
           <div
-            className="sc-count"
+            className={`sc-count sc-count--halo ${flash ? 'is-flash' : ''}`}
             style={{ 
               cursor: 'pointer', 
               transition: 'color 0.15s ease',
