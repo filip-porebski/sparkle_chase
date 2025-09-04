@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Hunt, Settings } from '../../shared/types';
 import { formatDate } from '../services/datetime';
 import { ShinyPokemonImage } from './ShinyPokemonImage';
+import { AnimatedCount } from './AnimatedCount';
 
 interface CounterProps {
   hunt: Hunt;
@@ -119,7 +120,7 @@ export const Counter: React.FC<CounterProps> = ({
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--sc-brand)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--sc-text)'}
           >
-            {hunt.count.toLocaleString()}
+            <AnimatedCount value={hunt.count} />
           </div>
         )}
         
