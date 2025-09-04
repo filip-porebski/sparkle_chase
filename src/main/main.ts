@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, dialog, Menu, shell } from 'electron';
 import * as path from 'path';
 import { DataManager } from './data/DataManager';
 import { HotkeyManager } from './hotkeys/HotkeyManager';
@@ -24,6 +24,11 @@ class ShinyCounterApp {
     // Initialize data manager
     await this.dataManager.initialize();
     
+    // Harden app menu in production
+    if (process.env.NODE_ENV !== 'development') {
+      try { Menu.setApplicationMenu(null); } catch {}
+    }
+
     // Create main window
     this.createMainWindow();
     
@@ -57,7 +62,11 @@ class ShinyCounterApp {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        preload: path.join(__dirname, '../preload/preload.js')
+        preload: path.join(__dirname, '../preload/preload.js'),
+        devTools: process.env.NODE_ENV === 'development',
+        webSecurity: true,
+        allowRunningInsecureContent: false,
+        spellcheck: false
       },
       titleBarStyle: 'default',
       show: false
@@ -81,6 +90,18 @@ class ShinyCounterApp {
 
     // Setup local hotkeys for when app is focused
     this.setupLocalHotkeys();
+
+    // Block navigation to external pages and open externally instead
+    this.mainWindow.webContents.on('will-navigate', (e, url) => {
+      if (!url.startsWith('file://') && !url.startsWith('http://localhost')) {
+        e.preventDefault();
+        try { shell.openExternal(url); } catch {}
+      }
+    });
+    this.mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+      try { shell.openExternal(url); } catch {}
+      return { action: 'deny' };
+    });
   }
 
   private setupLocalHotkeys() {
@@ -120,6 +141,18 @@ class ShinyCounterApp {
           }
         }
         
+        // Prevent reload/devtools in production
+        if (process.env.NODE_ENV !== 'development') {
+          if ((input.key === 'F5') || (input.key.toLowerCase() === 'r' && (input.meta || input.control))) {
+            event.preventDefault();
+            return;
+          }
+          if ((input.key === 'F12') || ((input.meta || input.control) && input.shift && input.key.toLowerCase() === 'i')) {
+            event.preventDefault();
+            return;
+          }
+        }
+
         // Global toggle hotkey works regardless of global hotkey state
         if (input.key === 'g' && (input.meta || input.control) && input.shift && !input.alt) {
           const enabled = this.hotkeyManager.toggleGlobal();
