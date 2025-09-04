@@ -38,7 +38,7 @@ export const Counter: React.FC<CounterProps> = ({
   return (
     <div className="sc-card" onClick={(e) => e.stopPropagation()}>
       {/* Hunt Header */}
-      <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
+      <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--sc-space-4)' }}>
         <div style={{ flex: 1 }}>
           <div className="sc-card__title">{hunt.targetSpecies}</div>
           <div className="sc-card__meta">{hunt.game} • {hunt.method}</div>
@@ -46,16 +46,16 @@ export const Counter: React.FC<CounterProps> = ({
         
         {/* Right-side: Phase label above image, image sticks to the right */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'var(--sc-space-4)' }}>
-          {hunt.phases.length > 0 && (
-            <div className="sc-tag" style={{ marginBottom: 'var(--sc-space-1)' }}>
-              Phase #{hunt.phases.length}
-            </div>
-          )}
           <ShinyPokemonImage 
             pokemonName={hunt.targetSpecies} 
             size="medium"
             showLabel={false}
           />
+          {hunt.phases.length > 0 && (
+            <div className="sc-tag" style={{ marginTop: 'var(--sc-space-1)' }}>
+              Phase #{hunt.phases.length}
+            </div>
+          )}
         </div>
       </div>
 
