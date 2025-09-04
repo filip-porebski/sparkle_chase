@@ -3,18 +3,19 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 interface AnimatedCountProps {
   value: number;
   durationMs?: number;
+  separator?: 'comma' | 'dot' | 'thin';
 }
 
 // Formats number with grouping and returns string
-function groupWithSpaces(n: number) {
+function groupWithSpaces(n: number, sep: 'comma'|'dot'|'thin' = 'thin') {
   const neg = n < 0;
-  const thin = '\u2009'; // thin space separator
-  const s = Math.abs(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, thin);
+  const m = sep === 'comma' ? ',' : sep === 'dot' ? '.' : '\u2009';
+  const s = Math.abs(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, m);
   return (neg ? '-' : '') + s;
 }
 
-export const AnimatedCount: React.FC<AnimatedCountProps> = ({ value, durationMs = 300 }) => {
-  const str = groupWithSpaces(value);
+export const AnimatedCount: React.FC<AnimatedCountProps> = ({ value, durationMs = 300, separator = 'thin' }) => {
+  const str = groupWithSpaces(value, separator);
   const digits = str.split('');
 
   return (

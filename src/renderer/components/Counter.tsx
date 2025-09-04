@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Hunt, Settings } from '../../shared/types';
 import { formatDate } from '../services/datetime';
+import { formatNumber } from '../services/numbers';
 import { ShinyPokemonImage } from './ShinyPokemonImage';
 import { AnimatedCount } from './AnimatedCount';
 
@@ -120,7 +121,7 @@ export const Counter: React.FC<CounterProps> = ({
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--sc-brand)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--sc-text)'}
           >
-            <AnimatedCount value={hunt.count} />
+            <AnimatedCount value={hunt.count} separator={settings?.numberSeparator || 'comma'} />
           </div>
         )}
         
@@ -191,7 +192,7 @@ export const Counter: React.FC<CounterProps> = ({
       {/* Odds and Stats Row */}
       <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
         <div className="sc-odds">
-          Base odds: 1 in {hunt.baseOdds.denominator.toLocaleString()}
+          Base odds: 1 in {formatNumber(hunt.baseOdds.denominator, settings)}
         </div>
         <div className="sc-since">
           Since last shiny: {hunt.encountersSinceLastShiny}
@@ -242,7 +243,7 @@ export const Counter: React.FC<CounterProps> = ({
                     {phase.species} {phase.isTarget ? '(Target!)' : '(Off-target)'}
                   </div>
                   <div className="sc-phase__meta">
-                    at {phase.atCount.toLocaleString()} • {settings ? formatDate(phase.createdAt, settings) : new Date(phase.createdAt).toLocaleDateString()}
+                    at {formatNumber(phase.atCount, settings)} • {settings ? formatDate(phase.createdAt, settings) : new Date(phase.createdAt).toLocaleDateString()}
                   </div>
                   {phase.notes && (
                     <div className="sc-phase__meta" style={{ marginTop: '2px' }}>

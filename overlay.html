@@ -58,11 +58,20 @@
       let currentHunt = null;
       let isDragging = false;
 
-      function updateOverlay(hunt) {
+      async function updateOverlay(hunt) {
         currentHunt = hunt;
+        let settings = null;
+        if (window.overlayAPI && window.overlayAPI.getSettings) {
+          try { settings = await window.overlayAPI.getSettings(); } catch {}
+        }
+        const sep = settings?.numberSeparator || ( (1000).toLocaleString().includes(',') ? 'comma' : ((1000).toLocaleString().includes('.') ? 'dot' : 'thin') );
+        const group = (n) => {
+          const s = Math.abs(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep==='comma'?',':(sep==='dot'?'.':'\u2009'));
+          return (n<0?'-':'') + s;
+        };
         
         document.getElementById('target').textContent = hunt.targetSpecies || '—';
-        document.getElementById('count').textContent = hunt.count.toLocaleString();
+        document.getElementById('count').textContent = group(hunt.count);
         
         const lastPhase = hunt.phases[hunt.phases.length - 1];
         const phaseText = lastPhase 
@@ -70,7 +79,7 @@
           : 'No phases yet';
         document.getElementById('phase').textContent = phaseText;
         
-        const oddsText = `1 in ${hunt.baseOdds.denominator.toLocaleString()}`;
+        const oddsText = `1 in ${group(hunt.baseOdds.denominator)}`;
         document.getElementById('odds').textContent = oddsText;
       }
 

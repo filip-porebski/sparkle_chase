@@ -302,6 +302,7 @@ function App() {
             onToggleCreate={() => setShowCreateHunt(prev => !prev)}
             onUnlockHunt={handleUnlockHunt}
             onLockHunt={handleLockHunt}
+            settings={settings || undefined}
           />
         );
       case 'statistics':

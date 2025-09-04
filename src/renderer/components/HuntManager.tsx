@@ -3,6 +3,8 @@ import { Hunt, HuntData } from '../../shared/types';
 import { PokemonAutocomplete } from './PokemonAutocomplete';
 import { POKEMON_GAMES, isPokemonInGame, isMethodInGame, getGameInfo } from '../data/gameCompatibility';
 import { pokeAPI } from '../services/pokeapi';
+import { formatNumber } from '../services/numbers';
+import { Settings } from '../../shared/types';
 
 interface HuntManagerProps {
   hunts: Hunt[];
@@ -14,6 +16,7 @@ interface HuntManagerProps {
   onToggleCreate: () => void;
   onUnlockHunt: (huntId: string) => void;
   onLockHunt: (huntId: string) => void;
+  settings?: Settings;
 }
 
 export const HuntManager: React.FC<HuntManagerProps> = ({
@@ -25,7 +28,8 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   showCreateForm,
   onToggleCreate,
   onUnlockHunt,
-  onLockHunt
+  onLockHunt,
+  settings
 }) => {
   // create form visibility managed by parent
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
@@ -481,10 +485,10 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   letterSpacing: '0.3px',
                   zIndex: 1
                 }}
-                title={`Count: ${hunt.count.toLocaleString()}`}
+                title={`Count: ${formatNumber(hunt.count, settings)}`}
                 className="hunt-count"
               >
-                {hunt.count.toLocaleString()}
+                {formatNumber(hunt.count, settings)}
               </div>
               <div className="u-col hunt-meta" style={{ alignItems: 'flex-end', gap: '2px', marginTop: '6px', position: 'relative', zIndex: 1 }}>
                 <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>

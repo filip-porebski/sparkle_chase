@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Settings } from '../../shared/types';
 import { formatDateTime, formatDate } from '../services/datetime';
+import { formatNumber } from '../services/numbers';
 import { Hunt } from '../../shared/types';
 
 interface StatsPanelProps {
@@ -19,7 +20,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
     return p;
   }, [hunt.baseOdds, hunt.modifiers]);
 
-  const oddsText = useMemo(() => `1 in ${Math.round(1 / effectiveProb).toLocaleString()}`, [effectiveProb]);
+  const oddsText = useMemo(() => `1 in ${formatNumber(Math.round(1 / effectiveProb), settings)}`,[effectiveProb, settings]);
 
   // Probabilities and quantiles
   const probAtLeastOne = useMemo(() => 1 - Math.pow(1 - effectiveProb, hunt.count), [effectiveProb, hunt.count]);
@@ -82,15 +83,15 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
         <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
           <div className="u-row" style={{ justifyContent: 'space-between' }}>
             <span style={{ fontSize: 'var(--sc-fs-sm)' }}>50% chance by</span>
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{q50.toLocaleString()} encounters</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(q50, settings)} encounters</span>
           </div>
           <div className="u-row" style={{ justifyContent: 'space-between' }}>
             <span style={{ fontSize: 'var(--sc-fs-sm)' }}>90% chance by</span>
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{q90.toLocaleString()} encounters</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(q90, settings)} encounters</span>
           </div>
           <div className="u-row" style={{ justifyContent: 'space-between' }}>
             <span style={{ fontSize: 'var(--sc-fs-sm)' }}>99% chance by</span>
-            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{q99.toLocaleString()} encounters</span>
+            <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(q99, settings)} encounters</span>
           </div>
         </div>
       </div>
@@ -110,17 +111,17 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
               <div style={{ position: 'absolute', left: `${(q90 / q99) * 100}%`, top: 0, bottom: 0, width: '2px', background: 'var(--sc-border-strong)' }} />
               <div style={{ position: 'absolute', left: '100%', top: 0, bottom: 0, width: '2px', background: 'var(--sc-border-strong)' }} />
               {/* current count marker */}
-              <div title={`Current: ${hunt.count.toLocaleString()}`} style={{ position: 'absolute', left: `${Math.min(100, (hunt.count / q99) * 100)}%`, top: '-2px', width: '2px', height: '16px', background: 'var(--sc-accent)' }} />
+              <div title={`Current: ${formatNumber(hunt.count, settings)}`} style={{ position: 'absolute', left: `${Math.min(100, (hunt.count / q99) * 100)}%`, top: '-2px', width: '2px', height: '16px', background: 'var(--sc-accent)' }} />
             </div>
             <div className="u-row" style={{ justifyContent: 'space-between', fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>
               <span>0</span>
-              <span>50% ({q50.toLocaleString()})</span>
-              <span>90% ({q90.toLocaleString()})</span>
-              <span>99% ({q99.toLocaleString()})</span>
+              <span>50% ({formatNumber(q50, settings)})</span>
+              <span>90% ({formatNumber(q90, settings)})</span>
+              <span>99% ({formatNumber(q99, settings)})</span>
             </div>
             <div className="u-row" style={{ justifyContent: 'space-between' }}>
-              <span className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>Sim mean (n={sim.trials.toLocaleString()})</span>
-              <span style={{ fontSize: 'var(--sc-fs-xs)', fontVariantNumeric: 'tabular-nums' }}>{Math.round(sim.mean).toLocaleString()} encounters</span>
+            <span className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>Sim mean (n={formatNumber(sim.trials, settings)})</span>
+            <span style={{ fontSize: 'var(--sc-fs-xs)', fontVariantNumeric: 'tabular-nums' }}>{formatNumber(Math.round(sim.mean), settings)} encounters</span>
             </div>
           </div>
         )}
@@ -136,7 +137,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
               Last Updated: {settings ? formatDateTime(hunt.updatedAt, settings) : new Date(hunt.updatedAt).toLocaleString()}
             </div>
           <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
-            Base Odds: 1 in {hunt.baseOdds.denominator.toLocaleString()}
+            Base Odds: 1 in {formatNumber(hunt.baseOdds.denominator, settings)}
           </div>
         </div>
       </div>

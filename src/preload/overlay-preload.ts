@@ -14,6 +14,8 @@ contextBridge.exposeInMainWorld('overlayAPI', {
 
   // Toggle click-through mode
   toggleClickThrough: () => ipcRenderer.invoke('overlay:toggleClickThrough')
+  ,
+  getSettings: () => ipcRenderer.invoke('settings:get')
 });
 
 // Type definitions for the exposed API
@@ -22,6 +24,7 @@ export interface OverlayAPI {
   startDrag: () => Promise<void>;
   stopDrag: () => Promise<void>;
   toggleClickThrough: () => Promise<boolean>;
+  getSettings: () => Promise<any>;
 }
 
 declare global {

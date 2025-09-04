@@ -89,10 +89,21 @@ export class DataManager {
       return 'YYYY-MM-DD';
     })();
 
+    // Infer thousands separator
+    const sep = (() => {
+      try {
+        const s = (1000).toLocaleString();
+        if (s.includes(',')) return 'comma';
+        if (s.includes('.')) return 'dot';
+        return 'thin';
+      } catch { return 'comma'; }
+    })();
+
     return {
       theme: 'dark',
       dateFormat: inferDate as any,
       timeFormat: inferTime12h ? '12h' : '24h',
+      numberSeparator: sep as any,
       overlay: {
         variant: 'badge',
         clickThrough: true,

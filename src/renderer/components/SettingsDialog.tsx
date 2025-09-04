@@ -112,6 +112,25 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Number Formatting */}
+          <div>
+            <label className="sc-label">Number Formatting</label>
+            <div className="u-row" style={{ gap: 'var(--sc-space-3)' }}>
+              <div style={{ flex: 1 }}>
+                <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Thousands Separator</label>
+                <select
+                  value={localSettings.numberSeparator}
+                  onChange={(e) => setLocalSettings(prev => ({ ...prev, numberSeparator: e.target.value as any }))}
+                  className="sc-input"
+                >
+                  <option value="comma">1,234</option>
+                  <option value="dot">1.234</option>
+                  <option value="thin">1 234 (thin space)</option>
+                </select>
+              </div>
+            </div>
+          </div>
           {/* Theme */}
           <div>
             <label className="sc-label">Theme</label>
