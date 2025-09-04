@@ -9,6 +9,7 @@ interface CounterProps {
   onSetCount: (count: number) => void;
   onLogPhase: () => void;
   onLogShiny: () => void;
+  onHuntUpdated: (hunt: Hunt) => void;
 }
 
 export const Counter: React.FC<CounterProps> = ({
@@ -17,7 +18,8 @@ export const Counter: React.FC<CounterProps> = ({
   onDecrement,
   onSetCount,
   onLogPhase,
-  onLogShiny
+  onLogShiny,
+  onHuntUpdated
 }) => {
   const [editingCount, setEditingCount] = useState(false);
   const [editValue, setEditValue] = useState(hunt.count.toString());
@@ -229,6 +231,7 @@ export const Counter: React.FC<CounterProps> = ({
               <div
                 key={phase.id}
                 className={`sc-phase ${phase.isTarget ? 'sc-phase--target' : ''}`}
+                style={{ position: 'relative' }}
               >
                 <div>
                   <div className="sc-phase__title">
@@ -243,6 +246,20 @@ export const Counter: React.FC<CounterProps> = ({
                     </div>
                   )}
                 </div>
+                {!hunt.archived && (
+                  <button
+                    onClick={async () => {
+                      if (!window.confirm('Delete this phase?')) return;
+                      const updated = await window.electronAPI.deletePhase(hunt.id, phase.id);
+                      if (updated) onHuntUpdated(updated);
+                    }}
+                    className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"
+                    style={{ position: 'absolute', right: '6px', top: '6px' }}
+                    title="Delete phase"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             ))}
           </div>

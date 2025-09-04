@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Phase operations
   addPhase: (huntId: string, phaseData: any) => ipcRenderer.invoke('phase:add', huntId, phaseData),
+  deletePhase: (huntId: string, phaseId: string) => ipcRenderer.invoke('phase:delete', huntId, phaseId),
 
   // Settings
   getSettings: () => ipcRenderer.invoke('settings:get'),
@@ -76,6 +77,7 @@ export interface ElectronAPI {
   decrementCounter: (huntId: string) => Promise<any>;
   setCounter: (huntId: string, count: number) => Promise<any>;
   addPhase: (huntId: string, phaseData: any) => Promise<any>;
+  deletePhase: (huntId: string, phaseId: string) => Promise<any>;
   getSettings: () => Promise<any>;
   updateSettings: (updates: any) => Promise<any>;
   selectFolder: () => Promise<string | null>;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PokemonAutocomplete } from './PokemonAutocomplete';
 
 interface PhaseDialogProps {
   mode: 'phase' | 'shiny';
@@ -32,19 +33,22 @@ export const PhaseDialog: React.FC<PhaseDialogProps> = ({ mode, targetSpecies, o
         
         <form onSubmit={handleSubmit} className="u-col">
           <div>
-            <label className="sc-label">
-              Species Found
-            </label>
-            <input
-              type="text"
-              value={species}
-              onChange={(e) => setSpecies(e.target.value)}
-              className="sc-input"
-              placeholder={mode === 'shiny' ? '' : "e.g., Pidgey"}
-              autoFocus
-              required
-              disabled={mode === 'shiny'}
-            />
+            <label className="sc-label">Species Found</label>
+            {mode === 'shiny' ? (
+              <input
+                type="text"
+                value={species}
+                className="sc-input"
+                disabled
+              />
+            ) : (
+              <PokemonAutocomplete
+                value={species}
+                onChange={setSpecies}
+                placeholder="e.g., Pidgey"
+                required
+              />
+            )}
           </div>
 
           {/* Hunt complete toggle removed: implied by mode */}

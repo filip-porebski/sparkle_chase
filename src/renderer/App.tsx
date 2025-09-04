@@ -445,6 +445,7 @@ function App() {
               onSetCount={handleSetCount}
               onLogPhase={() => setPhaseDialogMode('phase')}
               onLogShiny={() => setPhaseDialogMode('shiny')}
+              onHuntUpdated={(h) => { setActiveHunt(h); updateHuntInList(h); }}
             />
           ) : (
             <div className="sc-card" style={{ textAlign: 'center', padding: 'var(--sc-space-8)' }}>

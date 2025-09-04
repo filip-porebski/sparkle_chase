@@ -248,6 +248,28 @@ export class DataManager {
     return hunt;
   }
 
+  async removePhase(huntId: string, phaseId: string): Promise<Hunt | null> {
+    const hunt = await this.getHunt(huntId);
+    if (!hunt) return null;
+
+    const originalLength = hunt.phases.length;
+    hunt.phases = hunt.phases.filter(p => p.id !== phaseId);
+    if (hunt.phases.length === originalLength) return hunt; // not found
+
+    // Recalculate encountersSinceLastShiny based on latest phase
+    const lastPhase = hunt.phases[hunt.phases.length - 1];
+    if (lastPhase) {
+      hunt.encountersSinceLastShiny = Math.max(0, hunt.count - lastPhase.atCount);
+    } else {
+      hunt.encountersSinceLastShiny = hunt.count; // no shiny yet
+    }
+
+    // If we removed a target shiny phase and hunt was archived, keep archived flag as-is
+    hunt.updatedAt = new Date().toISOString();
+    await this.saveHunt(hunt);
+    return hunt;
+  }
+
   private async saveHunt(hunt: Hunt): Promise<void> {
     const huntPath = path.join(this.huntsDir, `${hunt.id}.json`);
     const tempPath = path.join(this.huntsDir, `${hunt.id}.tmp`);

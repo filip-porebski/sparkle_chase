@@ -180,6 +180,11 @@ class ShinyCounterApp {
     ipcMain.handle('phase:add', async (_, huntId, phaseData) => {
       return await this.dataManager.addPhase(huntId, phaseData);
     });
+    ipcMain.handle('phase:delete', async (_, huntId, phaseId) => {
+      const hunt = await this.dataManager.removePhase(huntId, phaseId);
+      this.overlayManager.updateOverlay(hunt as any);
+      return hunt;
+    });
 
     // Settings
     ipcMain.handle('settings:get', async () => {
