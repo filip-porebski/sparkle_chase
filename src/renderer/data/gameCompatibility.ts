@@ -806,7 +806,8 @@ export function isPokemonInGame(pokemonId: number, gameName: string): boolean {
 export function isMethodInGame(method: string, gameName: string): boolean {
   const game = POKEMON_GAMES.find(g => g.name === gameName);
   if (!game) return false;
-  
+  // Allow RNG Manipulation as a global method (advanced users)
+  if (method === 'RNG Manipulation') return true;
   return game.availableMethods.includes(method);
 }
 

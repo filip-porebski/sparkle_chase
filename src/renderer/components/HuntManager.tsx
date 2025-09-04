@@ -136,7 +136,8 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     'Legendary Hunting',
     'Outbreak Hunting',
     'Mass Outbreaks',
-    'Sandwich Method'
+    'Sandwich Method',
+    'RNG Manipulation'
   ];
 
   const normalizedQuery = filter.query.trim().toLowerCase();
