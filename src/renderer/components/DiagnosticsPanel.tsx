@@ -71,7 +71,7 @@ export const DiagnosticsPanel: React.FC = () => {
         style={{
           position: 'fixed',
           bottom: 'var(--sc-space-4)',
-          right: 'var(--sc-space-4)',
+          right: 'calc(var(--sc-space-4) + 56px)',
           fontSize: 'var(--sc-fs-sm)',
           zIndex: 100
         }}

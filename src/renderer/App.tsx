@@ -92,6 +92,7 @@ function App() {
       
       setHunts(huntsList);
       setSettings(settingsData);
+      setGlobalHotkeysEnabled(!!settingsData?.globalHotkeysEnabled);
       
       // Set the first hunt as active if available
       if (huntsList.length > 0) {
@@ -276,6 +277,12 @@ function App() {
       if (updates.theme) {
         setTheme(updates.theme);
       }
+      // Sync global hotkey status pill when settings change from the dialog
+      if (typeof updates.globalHotkeysEnabled !== 'undefined') {
+        setGlobalHotkeysEnabled(updates.globalHotkeysEnabled);
+      } else if (typeof updatedSettings.globalHotkeysEnabled !== 'undefined') {
+        setGlobalHotkeysEnabled(updatedSettings.globalHotkeysEnabled);
+      }
     } catch (error) {
       console.error('Failed to update settings:', error);
     }
@@ -395,27 +402,10 @@ function App() {
           </div>
           
           <button
-            onClick={async () => {
-              const enabled = await window.electronAPI.toggleGlobalHotkeys();
-              setGlobalHotkeysEnabled(enabled);
-            }}
-            className={`sc-btn ${globalHotkeysEnabled ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
-          >
-            {globalHotkeysEnabled ? 'Disable' : 'Enable'} Global
-          </button>
-          
-          <button
             onClick={() => window.electronAPI.toggleOverlay()}
             className="sc-btn"
           >
             Overlay
-          </button>
-          
-          <button
-            onClick={toggleTheme}
-            className="sc-btn sc-btn--ghost"
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           
           <button
@@ -523,6 +513,17 @@ function App() {
           </div>
         </aside>
       </main>
+
+      {/* Floating theme toggle (bottom-right, to the right of Diagnostics) */}
+      <button
+        onClick={toggleTheme}
+        className="sc-btn sc-btn--ghost"
+        style={{ position: 'fixed', bottom: 'var(--sc-space-4)', right: 'var(--sc-space-4)', zIndex: 101 }}
+        title="Toggle theme"
+        aria-label="Toggle theme"
+      >
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </button>
 
       {/* Dialogs */}
       {phaseDialogMode && activeHunt && (
