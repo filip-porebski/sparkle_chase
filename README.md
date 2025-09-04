@@ -85,14 +85,14 @@ src/
 
 ## Data Storage
 
-Hunt data is stored locally in JSON files:
-- **Windows**: `%APPDATA%/shiny-counter/`
-- **macOS**: `~/Library/Application Support/shiny-counter/`
-- **Linux**: `~/.config/shiny-counter/`
+Hunt data is stored locally in JSON files in the application directory:
+- **All platforms**: `{application-directory}/out/`
+
+This ensures all configuration and output files are kept together with the program, making it portable and self-contained.
 
 ### File Structure
 ```
-shiny-counter/
+out/
 ├── config/
 │   └── settings.json
 ├── hunts/

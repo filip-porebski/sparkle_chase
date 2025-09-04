@@ -13,7 +13,9 @@ export class DataManager {
   private crashRecovery: CrashRecovery;
 
   constructor() {
-    this.dataDir = path.join(app.getPath('userData'), 'sparklechase');
+    // Use 'out' folder in the application directory instead of system user data
+    const appDir = path.dirname(app.getAppPath());
+    this.dataDir = path.join(appDir, 'out');
     this.huntsDir = path.join(this.dataDir, 'hunts');
     this.configDir = path.join(this.dataDir, 'config');
     this.snapshotsDir = path.join(this.dataDir, 'snapshots');
