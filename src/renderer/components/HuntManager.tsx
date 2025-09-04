@@ -12,6 +12,8 @@ interface HuntManagerProps {
   onDeleteHunt: (huntId: string) => void;
   showCreateForm: boolean;
   onToggleCreate: () => void;
+  onUnlockHunt: (huntId: string) => void;
+  onLockHunt: (huntId: string) => void;
 }
 
 export const HuntManager: React.FC<HuntManagerProps> = ({
@@ -21,7 +23,9 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   onSelectHunt,
   onDeleteHunt,
   showCreateForm,
-  onToggleCreate
+  onToggleCreate,
+  onUnlockHunt,
+  onLockHunt
 }) => {
   // create form visibility managed by parent
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
@@ -362,7 +366,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="u-col" style={{ alignItems: 'flex-end' }}>
+                <div className="u-col" style={{ alignItems: 'flex-end', gap: 'var(--sc-space-1)' }}>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -378,6 +382,27 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   >
                     Delete
                   </button>
+                  {hunt.phases.some(p => p.isTarget) && (
+                    hunt.archived ? (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onUnlockHunt(hunt.id); }}
+                        className="sc-btn sc-btn--ghost"
+                        style={{ height: '28px', padding: '0 8px', fontSize: 'var(--sc-fs-xs)' }}
+                        title="Unlock this hunt"
+                      >
+                        Unlock
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onLockHunt(hunt.id); }}
+                        className="sc-btn sc-btn--ghost"
+                        style={{ height: '28px', padding: '0 8px', fontSize: 'var(--sc-fs-xs)' }}
+                        title="Lock this hunt"
+                      >
+                        Lock
+                      </button>
+                    )
+                  )}
                 </div>
               </div>
               {/* Big bottom-left count */}

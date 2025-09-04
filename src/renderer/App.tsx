@@ -136,7 +136,7 @@ function App() {
   };
 
   const handleIncrement = async () => {
-    if (!activeHunt) return;
+    if (!activeHunt || activeHunt.archived) return;
     
     try {
       const updatedHunt = await window.electronAPI.incrementCounter(activeHunt.id);
@@ -150,7 +150,7 @@ function App() {
   };
 
   const handleDecrement = async () => {
-    if (!activeHunt) return;
+    if (!activeHunt || activeHunt.archived) return;
     
     try {
       const updatedHunt = await window.electronAPI.decrementCounter(activeHunt.id);
@@ -164,7 +164,7 @@ function App() {
   };
 
   const handleSetCount = async (count: number) => {
-    if (!activeHunt) return;
+    if (!activeHunt || activeHunt.archived) return;
     
     try {
       const updatedHunt = await window.electronAPI.setCounter(activeHunt.id, count);
@@ -178,7 +178,7 @@ function App() {
   };
 
   const handlePhase = async (phaseData: { species: string; isTarget: boolean; notes?: string }) => {
-    if (!activeHunt) return;
+    if (!activeHunt || activeHunt.archived) return;
     
     try {
       const updatedHunt = await window.electronAPI.addPhase(activeHunt.id, phaseData);
@@ -235,6 +235,30 @@ function App() {
     setHunts(prev => prev.map(h => h.id === updatedHunt.id ? updatedHunt : h));
   };
 
+  const handleUnlockHunt = async (huntId: string) => {
+    try {
+      const updated = await window.electronAPI.updateHunt(huntId, { archived: false });
+      if (updated) {
+        updateHuntInList(updated);
+        if (activeHunt && activeHunt.id === huntId) setActiveHunt(updated);
+      }
+    } catch (e) {
+      console.error('Failed to unlock hunt', e);
+    }
+  };
+
+  const handleLockHunt = async (huntId: string) => {
+    try {
+      const updated = await window.electronAPI.updateHunt(huntId, { archived: true });
+      if (updated) {
+        updateHuntInList(updated);
+        if (activeHunt && activeHunt.id === huntId) setActiveHunt(updated);
+      }
+    } catch (e) {
+      console.error('Failed to lock hunt', e);
+    }
+  };
+
   const handleUpdateSettings = async (updates: Partial<Settings>) => {
     try {
       const updatedSettings = await window.electronAPI.updateSettings(updates);
@@ -268,6 +292,8 @@ function App() {
             onDeleteHunt={handleDeleteHunt}
             showCreateForm={showCreateHunt}
             onToggleCreate={() => setShowCreateHunt(prev => !prev)}
+            onUnlockHunt={handleUnlockHunt}
+            onLockHunt={handleLockHunt}
           />
         );
       case 'statistics':

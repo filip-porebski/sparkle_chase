@@ -122,8 +122,10 @@ export const Counter: React.FC<CounterProps> = ({
           <div className="u-col" style={{ gap: 'var(--sc-space-3)' }}>
             {/* Main +1 Button */}
             <button
-              onClick={onIncrement}
-              className="sc-btn sc-btn--giant sc-btn--primary"
+              onClick={() => !hunt.archived && onIncrement()}
+              className={`sc-btn sc-btn--giant ${hunt.archived ? '' : 'sc-btn--primary'}`}
+              aria-disabled={hunt.archived}
+              style={{ opacity: hunt.archived ? 0.5 : 1, pointerEvents: hunt.archived ? 'none' : 'auto' }}
             >
               +1
             </button>
@@ -131,11 +133,11 @@ export const Counter: React.FC<CounterProps> = ({
             {/* Quick Actions Row */}
             <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
               <button
-                onClick={onDecrement}
+                onClick={() => !hunt.archived && onDecrement()}
                 className="sc-btn"
                 aria-disabled={hunt.count === 0}
                 style={{ 
-                  opacity: hunt.count === 0 ? 0.6 : 1,
+                  opacity: hunt.count === 0 || hunt.archived ? 0.6 : 1,
                   flex: 1,
                   background: 'var(--sc-danger)',
                   borderColor: 'color-mix(in oklab, var(--sc-danger) 70%, black 30%)',
@@ -146,6 +148,7 @@ export const Counter: React.FC<CounterProps> = ({
               </button>
               <button
                 onClick={() => {
+                  if (hunt.archived) return;
                   onIncrement();
                   setTimeout(onIncrement, 50);
                 }}
@@ -161,9 +164,8 @@ export const Counter: React.FC<CounterProps> = ({
               </button>
               <button
                 onClick={() => {
-                  for (let i = 0; i < 5; i++) {
-                    setTimeout(onIncrement, i * 50);
-                  }
+                  if (hunt.archived) return;
+                  for (let i = 0; i < 5; i++) setTimeout(onIncrement, i * 50);
                 }}
                 className="sc-btn"
                 style={{ 
@@ -193,22 +195,28 @@ export const Counter: React.FC<CounterProps> = ({
       {/* Shiny / Phase Buttons */}
       <div className="u-row" style={{ gap: 'var(--sc-space-2)', marginBottom: 'var(--sc-space-4)' }}>
         <button
-          onClick={onLogShiny}
-          className="sc-btn sc-btn--primary"
-          style={{ flex: 1 }}
+          onClick={() => !hunt.archived && onLogShiny()}
+          className={`sc-btn ${hunt.archived ? '' : 'sc-btn--primary'}`}
+          style={{ flex: 1, opacity: hunt.archived ? 0.5 : 1, pointerEvents: hunt.archived ? 'none' : 'auto' }}
           title="Log target shiny (hunt complete)"
         >
           ✨ Shiny
         </button>
         <button
-          onClick={onLogPhase}
+          onClick={() => !hunt.archived && onLogPhase()}
           className="sc-btn"
-          style={{ flex: 1 }}
+          style={{ flex: 1, opacity: hunt.archived ? 0.5 : 1, pointerEvents: hunt.archived ? 'none' : 'auto' }}
           title="Log an off-target phase"
         >
           Phase
         </button>
       </div>
+
+      {hunt.archived && (
+        <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', textAlign: 'center' }}>
+          Hunt is locked. Unlock it from Hunts → Unlock
+        </div>
+      )}
 
       {/* Recent Phases */}
       {hunt.phases.length > 0 && (
