@@ -29,6 +29,8 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
 }) => {
   // create form visibility managed by parent
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [filter, setFilter] = useState<{ status: 'all' | 'active' | 'completed'; query: string }>({ status: 'all', query: '' });
   const [formData, setFormData] = useState<HuntData>({
     name: '',
     game: '',
@@ -133,6 +135,15 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     'Sandwich Method'
   ];
 
+  const normalizedQuery = filter.query.trim().toLowerCase();
+  const filteredHunts = hunts.filter(h => {
+    if (filter.status === 'active' && h.archived) return false;
+    if (filter.status === 'completed' && !h.archived) return false;
+    if (!normalizedQuery) return true;
+    const hay = `${h.name} ${h.targetSpecies} ${h.game} ${h.method}`.toLowerCase();
+    return hay.includes(normalizedQuery);
+  });
+
   return (
     <div className="u-col">
       <div className="u-row" style={{ justifyContent: 'flex-end', marginBottom: 'var(--sc-space-2)' }}>
@@ -141,6 +152,13 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           className={`sc-btn ${showCreateForm ? 'sc-btn--ghost' : 'sc-btn--primary'}`}
         >
           {showCreateForm ? 'Cancel' : 'New Hunt'}
+        </button>
+        <button
+          onClick={() => setShowFilter(true)}
+          className="sc-btn sc-btn--ghost"
+          title="Filter hunts"
+        >
+          Filter
         </button>
       </div>
 
@@ -292,16 +310,16 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
       )}
 
       <div className="u-col" style={{ gap: 'var(--sc-space-2)', maxHeight: '400px', overflowY: 'auto' }}>
-        {hunts.length === 0 ? (
+        {filteredHunts.length === 0 ? (
           <div style={{ 
             textAlign: 'center', 
             padding: 'var(--sc-space-5)',
             color: 'var(--sc-text-muted)'
           }}>
-            No hunts yet. Create your first hunt!
+            {hunts.length === 0 ? 'No hunts yet. Create your first hunt!' : 'No hunts match the current filter.'}
           </div>
         ) : (
-          hunts.map((hunt) => (
+          filteredHunts.map((hunt) => (
             <div
               key={hunt.id}
               className="u-card"
@@ -434,6 +452,42 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
           ))
         )}
       </div>
+      {showFilter && (
+        <div className="sc-modal-backdrop" onClick={() => setShowFilter(false)}>
+          <div className="sc-modal" style={{ maxWidth: '520px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-3)' }}>
+              <div className="sc-card__title" style={{ margin: 0 }}>Filter Hunts</div>
+              <button onClick={() => setShowFilter(false)} className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon" aria-label="Close">×</button>
+            </div>
+            <div className="u-col" style={{ gap: 'var(--sc-space-3)' }}>
+              <div>
+                <label className="sc-label">Status</label>
+                <div className="u-row">
+                  {(['all','active','completed'] as const).map(v => (
+                    <label key={v} className="u-row" style={{ gap: '6px' }}>
+                      <input type="radio" name="hunt-status" checked={filter.status===v} onChange={() => setFilter(prev => ({...prev, status: v}))} />
+                      <span style={{ fontSize: 'var(--sc-fs-sm)' }}>{v[0].toUpperCase()+v.slice(1)}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="sc-label">Search</label>
+                <input
+                  className="sc-input"
+                  placeholder="Name, species, game, method"
+                  value={filter.query}
+                  onChange={e => setFilter(prev => ({...prev, query: e.target.value}))}
+                />
+              </div>
+              <div className="u-row" style={{ justifyContent: 'flex-end' }}>
+                <button className="sc-btn sc-btn--ghost" onClick={() => setFilter({ status: 'all', query: '' })}>Clear</button>
+                <button className="sc-btn" onClick={() => setShowFilter(false)}>Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

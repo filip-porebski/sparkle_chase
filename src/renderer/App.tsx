@@ -232,7 +232,10 @@ function App() {
   };
 
   const updateHuntInList = (updatedHunt: Hunt) => {
-    setHunts(prev => prev.map(h => h.id === updatedHunt.id ? updatedHunt : h));
+    setHunts(prev => [
+      updatedHunt,
+      ...prev.filter(h => h.id !== updatedHunt.id)
+    ]);
   };
 
   const handleUnlockHunt = async (huntId: string) => {
