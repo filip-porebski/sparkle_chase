@@ -44,20 +44,19 @@ export const Counter: React.FC<CounterProps> = ({
           <div className="sc-card__meta">{hunt.game} • {hunt.method}</div>
         </div>
         
-        {/* Shiny Pokemon Image */}
-        <div style={{ marginLeft: 'var(--sc-space-4)' }}>
+        {/* Right-side: Phase label above image, image sticks to the right */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginLeft: 'var(--sc-space-4)' }}>
+          {hunt.phases.length > 0 && (
+            <div className="sc-tag" style={{ marginBottom: 'var(--sc-space-1)' }}>
+              Phase #{hunt.phases.length}
+            </div>
+          )}
           <ShinyPokemonImage 
             pokemonName={hunt.targetSpecies} 
             size="medium"
             showLabel={false}
           />
         </div>
-        
-        {hunt.phases.length > 0 && (
-          <div className="sc-tag" style={{ alignSelf: 'flex-start' }}>
-            Phase #{hunt.phases.length}
-          </div>
-        )}
       </div>
 
       {/* Main Counter */}
