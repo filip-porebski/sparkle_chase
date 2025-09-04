@@ -6,6 +6,8 @@ import { PhaseDialog } from './components/PhaseDialog';
 import { SettingsDialog } from './components/SettingsDialog';
 import { StatsPanel } from './components/StatsPanel';
 import { DiagnosticsPanel } from './components/DiagnosticsPanel';
+import { MovableCard } from './components/MovableCard';
+import { useCardLayout } from './hooks/useCardLayout';
 import './styles/sparklechase.css';
 
 function App() {
@@ -17,6 +19,14 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [globalHotkeysEnabled, setGlobalHotkeysEnabled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  
+  // Card layout management
+  const { 
+    moveCard, 
+    toggleCardCollapse, 
+    getCardsByPosition, 
+    getCard 
+  } = useCardLayout();
 
   useEffect(() => {
     loadInitialData();
@@ -196,6 +206,58 @@ function App() {
     handleUpdateSettings({ theme: newTheme });
   };
 
+  // Render card content based on card type
+  const renderCardContent = (cardId: string) => {
+    switch (cardId) {
+      case 'hunts':
+        return (
+          <HuntManager
+            hunts={hunts}
+            activeHunt={activeHunt}
+            onCreateHunt={handleCreateHunt}
+            onSelectHunt={handleSelectHunt}
+            onDeleteHunt={handleDeleteHunt}
+          />
+        );
+      case 'statistics':
+        return activeHunt ? <StatsPanel hunt={activeHunt} /> : (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: 'var(--sc-space-4)',
+            color: 'var(--sc-text-muted)'
+          }}>
+            No active hunt selected
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Render cards for a specific side
+  const renderCards = (side: 'left' | 'right') => {
+    const cards = getCardsByPosition(side);
+    
+    return cards.map(cardConfig => {
+      const card = getCard(cardConfig.id);
+      if (!card) return null;
+
+      return (
+        <MovableCard
+          key={cardConfig.id}
+          id={cardConfig.id}
+          title={cardConfig.title}
+          currentSide={side}
+          isCollapsed={card.isCollapsed}
+          onMove={moveCard}
+          onToggleCollapse={toggleCardCollapse}
+        >
+          {renderCardContent(cardConfig.id)}
+        </MovableCard>
+      );
+    });
+  };
+
   if (loading) {
     return (
       <div className="sc-app" style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -253,8 +315,9 @@ function App() {
       </header>
 
       <main className="sc-main">
-        {/* Main Content */}
+        {/* Left Side - Movable Cards */}
         <div className="sc-content">
+          {/* Counter - Always in center/main area */}
           {activeHunt ? (
             <Counter
               hunt={activeHunt}
@@ -270,18 +333,17 @@ function App() {
             </div>
           )}
           
-          {activeHunt && <StatsPanel hunt={activeHunt} />}
+          {/* Left Side Cards */}
+          <div className="sc-cards-container" style={{ marginTop: 'var(--sc-space-4)' }}>
+            {renderCards('left')}
+          </div>
         </div>
 
-        {/* Sidebar */}
+        {/* Right Side - Movable Cards */}
         <aside className="sc-sidebar">
-          <HuntManager
-            hunts={hunts}
-            activeHunt={activeHunt}
-            onCreateHunt={handleCreateHunt}
-            onSelectHunt={handleSelectHunt}
-            onDeleteHunt={handleDeleteHunt}
-          />
+          <div className="sc-cards-container">
+            {renderCards('right')}
+          </div>
         </aside>
       </main>
 
