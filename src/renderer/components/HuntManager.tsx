@@ -300,22 +300,28 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                 padding: 'var(--sc-space-3)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
-                border: activeHunt?.id === hunt.id 
-                  ? '2px solid var(--sc-brand)' 
+                border: activeHunt?.id === hunt.id && !hunt.archived
+                  ? '2px solid var(--sc-brand)'
                   : '1px solid var(--sc-border)',
-                background: activeHunt?.id === hunt.id 
-                  ? 'color-mix(in oklab, var(--sc-brand) 8%, var(--sc-bg-elev-1))' 
-                  : 'var(--sc-bg-elev-1)'
+                background: hunt.archived
+                  ? 'linear-gradient(90deg, color-mix(in oklab, var(--sc-success) 10%, transparent) 0%, transparent 60%), var(--sc-bg-elev-1)'
+                  : (activeHunt?.id === hunt.id
+                      ? 'color-mix(in oklab, var(--sc-brand) 8%, var(--sc-bg-elev-1))'
+                      : 'var(--sc-bg-elev-1)')
               }}
               onClick={() => onSelectHunt(hunt)}
               onMouseEnter={(e) => {
-                if (activeHunt?.id !== hunt.id) {
+                if (hunt.archived) {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, color-mix(in oklab, var(--sc-success) 16%, transparent) 0%, transparent 60%), var(--sc-bg-elev-2)';
+                } else if (activeHunt?.id !== hunt.id) {
                   e.currentTarget.style.borderColor = 'var(--sc-border-strong)';
                   e.currentTarget.style.background = 'var(--sc-bg-elev-2)';
                 }
               }}
               onMouseLeave={(e) => {
-                if (activeHunt?.id !== hunt.id) {
+                if (hunt.archived) {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, color-mix(in oklab, var(--sc-success) 10%, transparent) 0%, transparent 60%), var(--sc-bg-elev-1)';
+                } else if (activeHunt?.id !== hunt.id) {
                   e.currentTarget.style.borderColor = 'var(--sc-border)';
                   e.currentTarget.style.background = 'var(--sc-bg-elev-1)';
                 }

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 
 interface PhaseDialogProps {
+  mode: 'phase' | 'shiny';
+  targetSpecies?: string;
   onPhase: (phaseData: { species: string; isTarget: boolean; notes?: string }) => void;
   onClose: () => void;
 }
 
-export const PhaseDialog: React.FC<PhaseDialogProps> = ({ onPhase, onClose }) => {
-  const [species, setSpecies] = useState('');
-  const [isTarget, setIsTarget] = useState(false);
+export const PhaseDialog: React.FC<PhaseDialogProps> = ({ mode, targetSpecies, onPhase, onClose }) => {
+  const [species, setSpecies] = useState(() => mode === 'shiny' ? (targetSpecies || '') : '');
+  const [isTarget, setIsTarget] = useState(mode === 'shiny');
   const [notes, setNotes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,7 +26,9 @@ export const PhaseDialog: React.FC<PhaseDialogProps> = ({ onPhase, onClose }) =>
   return (
     <div className="sc-modal-backdrop">
       <div className="sc-modal">
-        <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>✨ Log Phase</div>
+        <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>
+          {mode === 'shiny' ? '✨ Log Shiny' : '✨ Log Phase'}
+        </div>
         
         <form onSubmit={handleSubmit} className="u-col">
           <div>
@@ -36,24 +40,14 @@ export const PhaseDialog: React.FC<PhaseDialogProps> = ({ onPhase, onClose }) =>
               value={species}
               onChange={(e) => setSpecies(e.target.value)}
               className="sc-input"
-              placeholder="e.g., Pidgey"
+              placeholder={mode === 'shiny' ? '' : "e.g., Pidgey"}
               autoFocus
               required
+              disabled={mode === 'shiny'}
             />
           </div>
 
-          <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
-            <input
-              type="checkbox"
-              id="isTarget"
-              checked={isTarget}
-              onChange={(e) => setIsTarget(e.target.checked)}
-              style={{ accentColor: 'var(--sc-shiny)' }}
-            />
-            <label htmlFor="isTarget" style={{ fontSize: 'var(--sc-fs-sm)' }}>
-              This was my target species (hunt complete!)
-            </label>
-          </div>
+          {/* Hunt complete toggle removed: implied by mode */}
 
           <div>
             <label className="sc-label">
@@ -65,7 +59,7 @@ export const PhaseDialog: React.FC<PhaseDialogProps> = ({ onPhase, onClose }) =>
               className="sc-input"
               placeholder="Location, method details, etc..."
               rows={3}
-              style={{ resize: 'vertical', minHeight: '80px' }}
+              style={{ resize: 'vertical', minHeight: '80px', padding: '12px' }}
             />
           </div>
 
@@ -75,15 +69,10 @@ export const PhaseDialog: React.FC<PhaseDialogProps> = ({ onPhase, onClose }) =>
           }}>
             <button
               type="submit"
-              className="sc-btn"
-              style={{ 
-                flex: 1,
-                background: 'var(--sc-warning)',
-                borderColor: 'color-mix(in oklab, var(--sc-warning) 70%, black 30%)',
-                color: '#fff'
-              }}
+              className={`sc-btn ${mode === 'shiny' ? 'sc-btn--primary' : ''}`}
+              style={{ flex: 1 }}
             >
-              ✨ Log Phase
+              {mode === 'shiny' ? '✨ Log Shiny' : 'Log Phase'}
             </button>
             <button
               type="button"

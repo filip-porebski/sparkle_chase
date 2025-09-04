@@ -7,7 +7,8 @@ interface CounterProps {
   onIncrement: () => void;
   onDecrement: () => void;
   onSetCount: (count: number) => void;
-  onPhase: () => void;
+  onLogPhase: () => void;
+  onLogShiny: () => void;
 }
 
 export const Counter: React.FC<CounterProps> = ({
@@ -15,7 +16,8 @@ export const Counter: React.FC<CounterProps> = ({
   onIncrement,
   onDecrement,
   onSetCount,
-  onPhase
+  onLogPhase,
+  onLogShiny
 }) => {
   const [editingCount, setEditingCount] = useState(false);
   const [editValue, setEditValue] = useState(hunt.count.toString());
@@ -34,7 +36,7 @@ export const Counter: React.FC<CounterProps> = ({
   };
 
   return (
-    <div className="sc-card">
+    <div className="sc-card" onClick={(e) => e.stopPropagation()}>
       {/* Hunt Header */}
       <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
         <div style={{ flex: 1 }}>
@@ -189,20 +191,25 @@ export const Counter: React.FC<CounterProps> = ({
         </div>
       </div>
 
-      {/* Phase Button */}
-      <button
-        onClick={onPhase}
-        className="sc-btn"
-        style={{ 
-          width: '100%', 
-          background: 'var(--sc-warning)',
-          borderColor: 'color-mix(in oklab, var(--sc-warning) 70%, black 30%)',
-          color: '#fff',
-          marginBottom: 'var(--sc-space-4)'
-        }}
-      >
-        ✨ Phase (Off-target Shiny)
-      </button>
+      {/* Shiny / Phase Buttons */}
+      <div className="u-row" style={{ gap: 'var(--sc-space-2)', marginBottom: 'var(--sc-space-4)' }}>
+        <button
+          onClick={onLogShiny}
+          className="sc-btn sc-btn--primary"
+          style={{ flex: 1 }}
+          title="Log target shiny (hunt complete)"
+        >
+          ✨ Shiny
+        </button>
+        <button
+          onClick={onLogPhase}
+          className="sc-btn"
+          style={{ flex: 1 }}
+          title="Log an off-target phase"
+        >
+          Phase
+        </button>
+      </div>
 
       {/* Recent Phases */}
       {hunt.phases.length > 0 && (

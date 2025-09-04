@@ -32,6 +32,7 @@ export const MovableCard: React.FC<MovableCardProps> = ({
       className={`movable-card ${className}`}
       onMouseEnter={() => setShowMoveButtons(true)}
       onMouseLeave={() => setShowMoveButtons(false)}
+      onClick={(e) => e.stopPropagation()}
     >
       <div className="sc-card">
         <div 

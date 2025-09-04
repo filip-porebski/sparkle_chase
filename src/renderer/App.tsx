@@ -14,7 +14,7 @@ function App() {
   const [hunts, setHunts] = useState<Hunt[]>([]);
   const [activeHunt, setActiveHunt] = useState<Hunt | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
-  const [showPhaseDialog, setShowPhaseDialog] = useState(false);
+  const [phaseDialogMode, setPhaseDialogMode] = useState<'phase' | 'shiny' | null>(null);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [globalHotkeysEnabled, setGlobalHotkeysEnabled] = useState(false);
@@ -84,7 +84,7 @@ function App() {
 
     const unsubscribePhase = window.electronAPI.onHotkeyPhase(() => {
       if (activeHunt) {
-        setShowPhaseDialog(true);
+        setPhaseDialogMode('phase');
       }
     });
 
@@ -150,8 +150,18 @@ function App() {
       if (updatedHunt) {
         setActiveHunt(updatedHunt);
         updateHuntInList(updatedHunt);
+        // If logging target shiny, auto-archive the hunt
+        if (phaseDialogMode === 'shiny') {
+          const archived = await window.electronAPI.updateHunt(updatedHunt.id, { archived: true });
+          if (archived) {
+            updateHuntInList(archived);
+            // Select next non-archived hunt if available
+            const next = hunts.find(h => h.id !== archived.id && !h.archived) || null;
+            setActiveHunt(next);
+          }
+        }
       }
-      setShowPhaseDialog(false);
+      setPhaseDialogMode(null);
     } catch (error) {
       console.error('Failed to add phase:', error);
     }
@@ -345,7 +355,14 @@ function App() {
         </div>
       </header>
 
-      <main className="sc-main">
+      <main
+        className="sc-main"
+        onClick={() => {
+          if (!phaseDialogMode) {
+            setActiveHunt(null);
+          }
+        }}
+      >
         {/* Left Side - Movable Cards */}
         <div className="sc-content">
           {/* Counter - Always in center/main area */}
@@ -355,7 +372,8 @@ function App() {
               onIncrement={handleIncrement}
               onDecrement={handleDecrement}
               onSetCount={handleSetCount}
-              onPhase={() => setShowPhaseDialog(true)}
+              onLogPhase={() => setPhaseDialogMode('phase')}
+              onLogShiny={() => setPhaseDialogMode('shiny')}
             />
           ) : (
             <div className="sc-card" style={{ textAlign: 'center', padding: 'var(--sc-space-8)' }}>
@@ -433,10 +451,12 @@ function App() {
       </main>
 
       {/* Dialogs */}
-      {showPhaseDialog && activeHunt && (
+      {phaseDialogMode && activeHunt && (
         <PhaseDialog
+          mode={phaseDialogMode}
+          targetSpecies={activeHunt.targetSpecies}
           onPhase={handlePhase}
-          onClose={() => setShowPhaseDialog(false)}
+          onClose={() => setPhaseDialogMode(null)}
         />
       )}
 
