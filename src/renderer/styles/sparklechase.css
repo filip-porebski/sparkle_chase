@@ -36,7 +36,7 @@
 html, body, #root { height: 100%; }
 body {
   margin: 0;
-  background: var(--sc-bg);
+  background: var(--sc-bg-elev-1);
   color: var(--sc-text);
   font: var(--sc-fw-regular) var(--sc-fs-md)/var(--sc-lh-normal) Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   letter-spacing: 0.1px;
@@ -54,14 +54,33 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 .u-col{ display:flex; flex-direction:column; gap:var(--sc-space-4); }
 .u-badge{ display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:999px; border:1px solid var(--sc-border); background:var(--sc-bg-elev-2); font-size: var(--sc-fs-sm); }
 
-/* Header */
+/* Header (floating, transparent, fixed) */
 .sc-header {
-  height: 48px; display:flex; align-items:center; justify-content:space-between;
-  padding: 0 var(--sc-space-5); border-bottom:1px solid var(--sc-border); background:var(--sc-bg-elev-1);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 var(--sc-space-6);
+  background: transparent !important;
+  border: none; box-shadow: none; backdrop-filter: none;
 }
-.sc-title { font-weight: var(--sc-fw-semibold); letter-spacing: 0.2px; }
-.sc-title .sparkle { color: var(--sc-brand); margin-right: 8px; }
-.sc-header .actions { display:flex; gap: var(--sc-space-3); }
+.sc-header::before { content: none !important; }
+.sc-header--clear,
+.sc-header--solid { background: transparent !important; border: none; box-shadow: none; }
+.sc-header--clear .sc-btn { background: transparent; border-color: transparent; }
+.sc-header--clear .sc-btn:hover { background: color-mix(in oklab, var(--sc-bg-elev-2) 30%, transparent); }
+.sc-header--clear .sc-status { background: transparent; border-color: transparent; color: var(--sc-text-subtle); }
+.sc-header--clear .sc-title .sparkle { opacity: .9; }
+.sc-header--solid .sc-btn { background: var(--sc-bg-elev-2); border-color: var(--sc-border); }
+.sc-header--solid .sc-btn--ghost { background: transparent; }
+.sc-header--solid .sc-status--inactive { background: var(--sc-bg-elev-2); border: 1px solid var(--sc-border); color: var(--sc-text-muted); }
+.sc-title {
+  display:flex; align-items:center; gap: 10px;
+  font-weight: var(--sc-fw-semibold);
+  font-size: var(--sc-fs-lg);
+  letter-spacing: 0.3px;
+}
+.sc-title .sparkle { color: var(--sc-brand); margin-right: 0; font-size: 20px; }
+.sc-header .actions { display:flex; gap: var(--sc-space-4); }
 
 /* Buttons */
 .sc-btn {
@@ -80,6 +99,9 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 .sc-btn--primary { background: var(--sc-brand); border-color: var(--sc-brand-strong); color:#fff; }
 .sc-btn--ghost { background: transparent; }
 .sc-btn--danger { background: var(--sc-danger); color:#fff; border-color: color-mix(in oklab, var(--sc-danger) 70%, black 30%); }
+/* Additional button variants */
+.sc-btn--success { background: var(--sc-success); color:#fff; border-color: color-mix(in oklab, var(--sc-success) 70%, black 30%); }
+.sc-btn--success:hover { background: color-mix(in oklab, var(--sc-success) 85%, black 15%); border-color: color-mix(in oklab, var(--sc-success) 70%, black 30%); }
 
 /* Huge action (+1) */
 .sc-btn--giant {
@@ -203,7 +225,7 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--sc-bg);
+  background: transparent;
 }
 
 .sc-main {
@@ -211,7 +233,7 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   display: grid;
   grid-template-columns: 1.6fr 0.9fr;
   gap: var(--sc-space-5);
-  padding: var(--sc-space-5);
+  padding: calc(var(--sc-space-5) + 64px) var(--sc-space-5) var(--sc-space-5);
   overflow: hidden;
 }
 
@@ -220,6 +242,7 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   flex-direction: column;
   gap: var(--sc-space-5);
   overflow-y: auto;
+  padding-top: var(--sc-space-2);
 }
 
 .sc-sidebar {

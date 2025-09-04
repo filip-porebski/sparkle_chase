@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Settings } from '../../shared/types';
 
 interface SettingsDialogProps {
@@ -14,9 +14,16 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
 }) => {
   const [localSettings, setLocalSettings] = useState<Settings>(settings);
   const [captureTarget, setCaptureTarget] = useState<keyof Settings['hotkeys'] | null>(null);
+  const capturing = useMemo(() => captureTarget !== null, [captureTarget]);
+
+  // Keep local copy in sync if settings prop changes (e.g., theme toggle elsewhere)
+  useEffect(() => setLocalSettings(settings), [settings]);
 
   useEffect(() => {
     if (!captureTarget) return;
+
+    // Suppress app hotkeys while capturing
+    window.electronAPI.setTypingActive(true);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -29,7 +36,9 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
       if (e.altKey) parts.push('Alt');
       if (e.shiftKey) parts.push('Shift');
 
-      const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+      let key = e.key;
+      if (key === ' ') key = 'Space';
+      if (key.length === 1) key = key.toUpperCase();
       parts.push(key);
 
       const accelerator = parts.join('+');
@@ -39,10 +48,14 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
       }));
 
       setCaptureTarget(null);
+      window.electronAPI.setTypingActive(false);
     };
 
     window.addEventListener('keydown', handleKeyDown, { once: true });
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.electronAPI.setTypingActive(false);
+    };
   }, [captureTarget]);
 
   const handleSave = () => {
@@ -64,10 +77,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
 
   return (
     <div className="sc-modal-backdrop">
-      <div className="sc-modal">
+      <div className="sc-modal" style={{ maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
         <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>Settings</div>
         
-        <div className="u-col">
+        <div className="u-col" style={{ overflowY: 'auto' }}>
           {/* Theme */}
           <div>
             <label className="sc-label">Theme</label>
@@ -125,10 +138,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     />
                     <button
                       onClick={() => setCaptureTarget('increment')}
-                      className="sc-btn sc-btn--ghost"
+                      className={`sc-btn ${capturing && captureTarget==='increment' ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
                       title="Register hotkey"
                     >
-                      ⌨️
+                      {capturing && captureTarget==='increment' ? 'Listening…' : '⌨️'}
                     </button>
                   </div>
                 </div>
@@ -148,10 +161,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     />
                     <button
                       onClick={() => setCaptureTarget('decrement')}
-                      className="sc-btn sc-btn--ghost"
+                      className={`sc-btn ${capturing && captureTarget==='decrement' ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
                       title="Register hotkey"
                     >
-                      ⌨️
+                      {capturing && captureTarget==='decrement' ? 'Listening…' : '⌨️'}
                     </button>
                   </div>
                 </div>
@@ -173,10 +186,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     />
                     <button
                       onClick={() => setCaptureTarget('phase')}
-                      className="sc-btn sc-btn--ghost"
+                      className={`sc-btn ${capturing && captureTarget==='phase' ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
                       title="Register hotkey"
                     >
-                      ⌨️
+                      {capturing && captureTarget==='phase' ? 'Listening…' : '⌨️'}
                     </button>
                   </div>
                 </div>
@@ -196,10 +209,10 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     />
                     <button
                       onClick={() => setCaptureTarget('toggleGlobal')}
-                      className="sc-btn sc-btn--ghost"
+                      className={`sc-btn ${capturing && captureTarget==='toggleGlobal' ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
                       title="Register hotkey"
                     >
-                      ⌨️
+                      {capturing && captureTarget==='toggleGlobal' ? 'Listening…' : '⌨️'}
                     </button>
                   </div>
                 </div>

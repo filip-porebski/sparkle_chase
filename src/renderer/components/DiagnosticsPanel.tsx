@@ -76,34 +76,30 @@ export const DiagnosticsPanel: React.FC = () => {
           zIndex: 100
         }}
       >
-        🔧 Diagnostics
+        Diagnostics
       </button>
     );
   }
 
   return (
     <div className="sc-modal-backdrop">
-      <div className="sc-modal" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
-        <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)' }}>
-          <div className="sc-card__title">🔧 System Diagnostics</div>
+      <div className="sc-modal" style={{ maxHeight: '82vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)', alignItems: 'center' }}>
+          <div className="sc-card__title" style={{ margin: 0 }}>System Diagnostics</div>
           <button
             onClick={() => setIsOpen(false)}
-            className="sc-btn sc-btn--ghost"
-            style={{ padding: 'var(--sc-space-1)' }}
+            className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"
+            aria-label="Close"
+            title="Close"
           >
-            ✕
+            ×
           </button>
         </div>
 
-        <div className="u-col">
+        <div className="u-col" style={{ overflowY: 'auto' }}>
           {/* Data Directory Info */}
           {dataDir && (
-            <div style={{ 
-              background: 'var(--sc-bg-elev-2)', 
-              border: '1px solid var(--sc-border)',
-              borderRadius: 'var(--sc-radius-lg)',
-              padding: 'var(--sc-space-3)'
-            }}>
+            <div className="u-card" style={{ padding: 'var(--sc-space-3)' }}>
               <div style={{ 
                 fontSize: 'var(--sc-fs-md)', 
                 fontWeight: 'var(--sc-fw-semibold)', 
@@ -111,12 +107,7 @@ export const DiagnosticsPanel: React.FC = () => {
               }}>
                 Data Directory
               </div>
-              <p style={{ 
-                fontSize: 'var(--sc-fs-sm)', 
-                fontVariantNumeric: 'tabular-nums',
-                wordBreak: 'break-all',
-                color: 'var(--sc-text-muted)'
-              }}>
+              <p className="u-subtle" style={{ fontSize: 'var(--sc-fs-sm)', fontVariantNumeric: 'tabular-nums', wordBreak: 'break-all' }}>
                 {dataDir}
               </p>
             </div>
@@ -140,28 +131,16 @@ export const DiagnosticsPanel: React.FC = () => {
 
             <button
               onClick={createBackup}
-              className="sc-btn"
-              style={{ 
-                flex: 1, 
-                minWidth: '160px',
-                background: 'var(--sc-success)',
-                borderColor: 'color-mix(in oklab, var(--sc-success) 70%, black 30%)',
-                color: '#fff'
-              }}
+              className="sc-btn sc-btn--success"
+              style={{ flex: 1, minWidth: '160px' }}
             >
               Create Emergency Backup
             </button>
 
             <button
               onClick={validateOBSFolder}
-              className="sc-btn"
-              style={{ 
-                flex: 1, 
-                minWidth: '160px',
-                background: 'var(--sc-brand)',
-                borderColor: 'var(--sc-brand-strong)',
-                color: '#fff'
-              }}
+              className="sc-btn sc-btn--primary"
+              style={{ flex: 1, minWidth: '160px' }}
             >
               Validate OBS Folder
             </button>
@@ -169,11 +148,7 @@ export const DiagnosticsPanel: React.FC = () => {
 
           {/* Test Results */}
           {result && (
-            <div style={{ 
-              border: '1px solid var(--sc-border)', 
-              borderRadius: 'var(--sc-radius-lg)', 
-              padding: 'var(--sc-space-4)' 
-            }}>
+            <div className="u-card" style={{ padding: 'var(--sc-space-4)' }}>
               <div style={{ 
                 fontSize: 'var(--sc-fs-md)', 
                 fontWeight: 'var(--sc-fw-semibold)', 
@@ -232,27 +207,12 @@ export const DiagnosticsPanel: React.FC = () => {
 
               {result.details.length > 0 && (
                 <div>
-                  <h4 className="font-medium mb-2">File Details</h4>
-                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                  <div style={{ fontSize: 'var(--sc-fs-sm)', fontWeight: 'var(--sc-fw-medium)', marginBottom: 'var(--sc-space-2)' }}>File Details</div>
+                  <div className="u-col" style={{ gap: '6px', maxHeight: '160px', overflowY: 'auto' }}>
                     {result.details.map((detail, index) => (
-                      <div
-                        key={index}
-                        className={`text-sm p-2 rounded ${
-                          detail.status === 'valid'
-                            ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
-                            : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
-                        }`}
-                      >
-                        <div className="flex justify-between">
-                          <span className="font-mono">{detail.file}</span>
-                          <span className="capitalize">{detail.status.replace('_', ' ')}</span>
-                        </div>
-                        {detail.hunt && (
-                          <div className="text-xs opacity-75">Hunt: {detail.hunt}</div>
-                        )}
-                        {detail.error && (
-                          <div className="text-xs opacity-75">Error: {detail.error}</div>
-                        )}
+                      <div key={index} className="u-row" style={{ justifyContent: 'space-between', background: 'var(--sc-bg-elev-2)', border: '1px solid var(--sc-border)', borderRadius: 'var(--sc-radius-md)', padding: '8px 10px' }}>
+                        <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>{detail.file}</span>
+                        <span style={{ fontSize: 'var(--sc-fs-xs)', color: detail.status === 'valid' ? 'var(--sc-success)' : 'var(--sc-danger)' }}>{detail.status.replace('_',' ')}</span>
                       </div>
                     ))}
                   </div>
@@ -262,13 +222,13 @@ export const DiagnosticsPanel: React.FC = () => {
           )}
 
           {/* Instructions */}
-          <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3">
-            <h4 className="font-medium mb-1">Diagnostic Tools</h4>
-            <ul className="space-y-1 text-xs">
-              <li>• <strong>Data Integrity Test:</strong> Checks all hunt files for corruption</li>
-              <li>• <strong>Emergency Backup:</strong> Creates a backup of all hunt data</li>
-              <li>• <strong>OBS Folder Validation:</strong> Tests if a folder path is writable for text files</li>
-            </ul>
+          <div className="u-card" style={{ padding: 'var(--sc-space-3)' }}>
+            <div style={{ fontSize: 'var(--sc-fs-sm)', fontWeight: 'var(--sc-fw-medium)', marginBottom: '6px' }}>Diagnostic Tools</div>
+            <div className="u-col" style={{ gap: '4px', fontSize: 'var(--sc-fs-xs)' }}>
+              <div>• <b>Data Integrity Test</b>: Checks all hunt files for corruption</div>
+              <div>• <b>Emergency Backup</b>: Creates a backup of all hunt data</div>
+              <div>• <b>OBS Folder Validation</b>: Tests if a folder path is writable for text files</div>
+            </div>
           </div>
         </div>
       </div>

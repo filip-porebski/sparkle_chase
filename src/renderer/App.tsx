@@ -19,6 +19,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [globalHotkeysEnabled, setGlobalHotkeysEnabled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [navScrolled, setNavScrolled] = useState(false);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
   const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
   const [dragTarget, setDragTarget] = useState<'left' | 'right' | null>(null);
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
@@ -55,6 +58,8 @@ function App() {
     };
     document.addEventListener('focusin', handleFocusIn, true);
     document.addEventListener('focusout', handleFocusOut, true);
+    // Initialize header state once refs exist
+    requestAnimationFrame(() => updateNavScrolled());
     return () => {
       document.removeEventListener('focusin', handleFocusIn, true);
       document.removeEventListener('focusout', handleFocusOut, true);
@@ -69,6 +74,13 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // Update header style on scroll inside content or sidebar
+  const updateNavScrolled = () => {
+    const c = contentRef.current?.scrollTop || 0;
+    const s = sidebarRef.current?.scrollTop || 0;
+    setNavScrolled((c + s) > 0);
+  };
 
   const loadInitialData = async () => {
     try {
@@ -334,7 +346,7 @@ function App() {
   return (
     <div className="sc-app">
       {/* Header */}
-      <header className="sc-header">
+      <header className={`sc-header ${navScrolled ? 'sc-header--solid' : 'sc-header--clear'}`}>
         <div className="sc-title">
           <span className="sparkle">✦</span>SparkleChase
         </div>
@@ -386,7 +398,7 @@ function App() {
         }}
       >
         {/* Left Side - Movable Cards */}
-        <div className="sc-content">
+        <div className="sc-content" ref={contentRef} onScroll={updateNavScrolled}>
           {/* Counter - Always in center/main area */}
           {activeHunt ? (
             <Counter
@@ -438,7 +450,7 @@ function App() {
         </div>
 
         {/* Right Side - Movable Cards */}
-        <aside className="sc-sidebar">
+        <aside className="sc-sidebar" ref={sidebarRef} onScroll={updateNavScrolled}>
           <div
             className="sc-cards-container sc-dropzone"
             style={{ position: 'relative' }}

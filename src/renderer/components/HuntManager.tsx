@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Hunt, HuntData } from '../../shared/types';
 import { PokemonAutocomplete } from './PokemonAutocomplete';
 import { POKEMON_GAMES, isPokemonInGame, isMethodInGame, getGameInfo } from '../data/gameCompatibility';
@@ -307,7 +307,9 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   ? 'linear-gradient(90deg, color-mix(in oklab, var(--sc-success) 10%, transparent) 0%, transparent 60%), var(--sc-bg-elev-1)'
                   : (activeHunt?.id === hunt.id
                       ? 'color-mix(in oklab, var(--sc-brand) 8%, var(--sc-bg-elev-1))'
-                      : 'var(--sc-bg-elev-1)')
+                      : 'var(--sc-bg-elev-1)'),
+                position: 'relative',
+                overflow: 'hidden'
               }}
               onClick={() => onSelectHunt(hunt)}
               onMouseEnter={(e) => {
@@ -327,7 +329,8 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                 }
               }}
             >
-              <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <HuntCardBg name={hunt.targetSpecies} />
+              <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ 
                     fontWeight: 'var(--sc-fw-medium)',
@@ -356,21 +359,31 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(hunt.id);
-                  }}
-                  className="sc-btn sc-btn--ghost"
-                  style={{ 
-                    height: '32px',
-                    padding: '0 8px',
-                    fontSize: 'var(--sc-fs-xs)',
-                    color: 'var(--sc-danger)'
-                  }}
-                >
-                  Delete
-                </button>
+                <div className="u-col" style={{ alignItems: 'flex-end' }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(hunt.id);
+                    }}
+                    className="sc-btn sc-btn--ghost"
+                    style={{ 
+                      height: '32px',
+                      padding: '0 8px',
+                      fontSize: 'var(--sc-fs-xs)',
+                      color: 'var(--sc-danger)'
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+              <div className="u-col" style={{ alignItems: 'flex-end', gap: '2px', marginTop: '6px' }}>
+                <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
+                  Added: {formatRelativeTime(hunt.createdAt)}
+                </div>
+                <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
+                  Last: {formatRelativeTime(hunt.updatedAt)}
+                </div>
               </div>
             </div>
           ))
@@ -379,3 +392,54 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     </div>
   );
 };
+
+const HuntCardBg: React.FC<{ name: string }> = ({ name }) => {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const sprite = await pokeAPI.getShinySprite(pokeAPI.formatNameForAPI(name));
+        if (active) setUrl(sprite);
+      } catch {}
+    };
+    load();
+    return () => { active = false; };
+  }, [name]);
+
+  if (!url) return null;
+  return (
+    <img
+      src={url}
+      alt=""
+      aria-hidden
+      style={{
+        position: 'absolute',
+        right: '-8px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        height: '125%',
+        opacity: 0.05,
+        filter: 'saturate(115%) contrast(110%)',
+        pointerEvents: 'none',
+        userSelect: 'none',
+        zIndex: 0
+      }}
+    />
+  );
+};
+
+function formatRelativeTime(iso: string): string {
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return '—';
+  const now = new Date();
+  const ms = now.getTime() - date.getTime();
+  const day = 24 * 60 * 60 * 1000;
+  const days = Math.floor(ms / day);
+  if (days <= 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 14) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 8) return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+  return date.toLocaleDateString();
+}
