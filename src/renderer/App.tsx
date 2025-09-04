@@ -19,10 +19,14 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [globalHotkeysEnabled, setGlobalHotkeysEnabled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [draggingCardId, setDraggingCardId] = useState<string | null>(null);
+  const [dragTarget, setDragTarget] = useState<'left' | 'right' | null>(null);
+  const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
   
   // Card layout management
   const { 
     moveCard, 
+    moveCardToPosition,
     toggleCardCollapse, 
     getCardsByPosition, 
     getCard 
@@ -237,25 +241,52 @@ function App() {
   // Render cards for a specific side
   const renderCards = (side: 'left' | 'right') => {
     const cards = getCardsByPosition(side);
-    
-    return cards.map(cardConfig => {
-      const card = getCard(cardConfig.id);
-      if (!card) return null;
+    const items: React.ReactNode[] = [];
 
-      return (
-        <MovableCard
+    cards.forEach((cardConfig, index) => {
+      const card = getCard(cardConfig.id);
+      if (!card) return;
+
+      const showBefore = draggingCardId && dragTarget === side && dragInsertIndex === index;
+      if (showBefore) {
+        items.push(<div key={`ph-${index}`} className="sc-insert-placeholder" />);
+      }
+
+      items.push(
+        <div
           key={cardConfig.id}
-          id={cardConfig.id}
-          title={cardConfig.title}
-          currentSide={side}
-          isCollapsed={card.isCollapsed}
-          onMove={moveCard}
-          onToggleCollapse={toggleCardCollapse}
+          className="sc-card-dropwrap"
+          onDragOver={(e) => {
+            if (!draggingCardId) return;
+            e.preventDefault();
+            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            const mid = rect.top + rect.height / 2;
+            const idx = e.clientY < mid ? index : index + 1;
+            if (dragTarget !== side) setDragTarget(side);
+            if (dragInsertIndex !== idx) setDragInsertIndex(idx);
+          }}
         >
-          {renderCardContent(cardConfig.id)}
-        </MovableCard>
+          <MovableCard
+            id={cardConfig.id}
+            title={cardConfig.title}
+            currentSide={side}
+            isCollapsed={card.isCollapsed}
+            onMove={moveCard}
+            onToggleCollapse={toggleCardCollapse}
+            onDragStartCard={(id) => setDraggingCardId(id)}
+            onDragEndCard={() => { setDraggingCardId(null); setDragTarget(null); setDragInsertIndex(null); }}
+          >
+            {renderCardContent(cardConfig.id)}
+          </MovableCard>
+        </div>
       );
     });
+
+    if (draggingCardId && dragTarget === side && dragInsertIndex === getCardsByPosition(side).length) {
+      items.push(<div key={`ph-end`} className="sc-insert-placeholder" />);
+    }
+
+    return items;
   };
 
   if (loading) {
@@ -334,14 +365,68 @@ function App() {
           )}
           
           {/* Left Side Cards */}
-          <div className="sc-cards-container" style={{ marginTop: 'var(--sc-space-4)' }}>
+          <div
+            className="sc-cards-container sc-dropzone"
+            style={{ marginTop: 'var(--sc-space-4)', position: 'relative' }}
+            onDragOver={(e) => {
+              if (!draggingCardId) return;
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+              if (dragTarget !== 'left') setDragTarget('left');
+              if (dragInsertIndex == null) setDragInsertIndex(getCardsByPosition('left').length);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (draggingCardId) {
+                const index = dragInsertIndex ?? getCardsByPosition('left').length;
+                moveCardToPosition(draggingCardId, 'left', index);
+              }
+              setDraggingCardId(null);
+              setDragTarget(null);
+              setDragInsertIndex(null);
+            }}
+            onDragLeave={(e) => {
+              const bounds = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              const { clientX: x, clientY: y } = e as unknown as MouseEvent;
+              if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) {
+                if (dragTarget === 'left') { setDragTarget(null); setDragInsertIndex(null); }
+              }
+            }}
+          >
             {renderCards('left')}
           </div>
         </div>
 
         {/* Right Side - Movable Cards */}
         <aside className="sc-sidebar">
-          <div className="sc-cards-container">
+          <div
+            className="sc-cards-container sc-dropzone"
+            style={{ position: 'relative' }}
+            onDragOver={(e) => {
+              if (!draggingCardId) return;
+              e.preventDefault();
+              e.dataTransfer.dropEffect = 'move';
+              if (dragTarget !== 'right') setDragTarget('right');
+              if (dragInsertIndex == null) setDragInsertIndex(getCardsByPosition('right').length);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (draggingCardId) {
+                const index = dragInsertIndex ?? getCardsByPosition('right').length;
+                moveCardToPosition(draggingCardId, 'right', index);
+              }
+              setDraggingCardId(null);
+              setDragTarget(null);
+              setDragInsertIndex(null);
+            }}
+            onDragLeave={(e) => {
+              const bounds = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              const { clientX: x, clientY: y } = e as unknown as MouseEvent;
+              if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) {
+                if (dragTarget === 'right') { setDragTarget(null); setDragInsertIndex(null); }
+              }
+            }}
+          >
             {renderCards('right')}
           </div>
         </aside>

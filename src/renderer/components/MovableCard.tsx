@@ -9,6 +9,8 @@ interface MovableCardProps {
   isCollapsed?: boolean;
   onToggleCollapse: (cardId: string) => void;
   className?: string;
+  onDragStartCard?: (cardId: string) => void;
+  onDragEndCard?: () => void;
 }
 
 export const MovableCard: React.FC<MovableCardProps> = ({
@@ -19,7 +21,9 @@ export const MovableCard: React.FC<MovableCardProps> = ({
   currentSide,
   isCollapsed = false,
   onToggleCollapse,
-  className = ''
+  className = '',
+  onDragStartCard,
+  onDragEndCard
 }) => {
   const [showMoveButtons, setShowMoveButtons] = useState(false);
 
@@ -30,7 +34,19 @@ export const MovableCard: React.FC<MovableCardProps> = ({
       onMouseLeave={() => setShowMoveButtons(false)}
     >
       <div className="sc-card">
-        <div className="sc-card__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--sc-space-3)' }}>
+        <div 
+          className="sc-card__header" 
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--sc-space-3)', cursor: 'grab' }}
+          draggable
+          onDragStart={(e) => {
+            try { e.dataTransfer?.setData('text/plain', id); } catch {}
+            e.dataTransfer!.effectAllowed = 'move';
+            onDragStartCard?.(id);
+          }}
+          onDragEnd={() => {
+            onDragEndCard?.();
+          }}
+        >
           <div className="sc-card__title" style={{ margin: 0 }}>{title}</div>
           <div style={{ display: 'flex', gap: 'var(--sc-space-1)', alignItems: 'center' }}>
             <button
