@@ -298,6 +298,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
               className="u-card"
               style={{
                 padding: 'var(--sc-space-3)',
+                paddingBottom: 'calc(var(--sc-space-3) + 28px)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 border: activeHunt?.id === hunt.id && !hunt.archived
@@ -341,13 +342,6 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                   <div className="sc-card__meta">
                     {hunt.targetSpecies} • {hunt.game} • {hunt.method}
                   </div>
-                  <div style={{ 
-                    fontSize: 'var(--sc-fs-sm)',
-                    fontVariantNumeric: 'tabular-nums',
-                    marginTop: '4px'
-                  }}>
-                    Count: {hunt.count.toLocaleString()}
-                  </div>
                   {hunt.phases.length > 0 && (
                     <div className="sc-tag" style={{ 
                       marginTop: '4px',
@@ -376,6 +370,23 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                     Delete
                   </button>
                 </div>
+              </div>
+              {/* Big bottom-left count */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 'var(--sc-space-3)',
+                  bottom: 'var(--sc-space-3)',
+                  fontSize: 'var(--sc-fs-xl)',
+                  fontWeight: 'var(--sc-fw-bold)',
+                  lineHeight: 'var(--sc-lh-tight)',
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '0.3px',
+                  zIndex: 1
+                }}
+                title={`Count: ${hunt.count.toLocaleString()}`}
+              >
+                {hunt.count.toLocaleString()}
               </div>
               <div className="u-col" style={{ alignItems: 'flex-end', gap: '2px', marginTop: '6px' }}>
                 <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
