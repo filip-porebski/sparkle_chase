@@ -11,6 +11,7 @@ interface MovableCardProps {
   className?: string;
   onDragStartCard?: (cardId: string) => void;
   onDragEndCard?: () => void;
+  headerActions?: React.ReactNode;
 }
 
 export const MovableCard: React.FC<MovableCardProps> = ({
@@ -23,7 +24,8 @@ export const MovableCard: React.FC<MovableCardProps> = ({
   onToggleCollapse,
   className = '',
   onDragStartCard,
-  onDragEndCard
+  onDragEndCard,
+  headerActions
 }) => {
   const [showMoveButtons, setShowMoveButtons] = useState(false);
 
@@ -49,7 +51,8 @@ export const MovableCard: React.FC<MovableCardProps> = ({
           }}
         >
           <div className="sc-card__title" style={{ margin: 0 }}>{title}</div>
-          <div style={{ display: 'flex', gap: 'var(--sc-space-1)', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: 'var(--sc-space-2)', alignItems: 'center' }}>
+            {headerActions}
             <button
               onClick={() => onToggleCollapse(id)}
               className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"

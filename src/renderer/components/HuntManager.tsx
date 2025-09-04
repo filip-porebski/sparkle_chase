@@ -10,6 +10,8 @@ interface HuntManagerProps {
   onCreateHunt: (huntData: HuntData) => void;
   onSelectHunt: (hunt: Hunt) => void;
   onDeleteHunt: (huntId: string) => void;
+  showCreateForm: boolean;
+  onToggleCreate: () => void;
 }
 
 export const HuntManager: React.FC<HuntManagerProps> = ({
@@ -17,9 +19,11 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   activeHunt,
   onCreateHunt,
   onSelectHunt,
-  onDeleteHunt
+  onDeleteHunt,
+  showCreateForm,
+  onToggleCreate
 }) => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  // create form visibility managed by parent
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
   const [formData, setFormData] = useState<HuntData>({
     name: '',
@@ -92,7 +96,7 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
         notes: ''
       });
       setSelectedPokemonId(null);
-      setShowCreateForm(false);
+      onToggleCreate();
     }
   };
 
@@ -129,12 +133,13 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
     <div className="u-col">
       <div className="u-row" style={{ justifyContent: 'flex-end', marginBottom: 'var(--sc-space-2)' }}>
         <button
-          onClick={() => setShowCreateForm(!showCreateForm)}
+          onClick={onToggleCreate}
           className={`sc-btn ${showCreateForm ? 'sc-btn--ghost' : 'sc-btn--primary'}`}
         >
           {showCreateForm ? 'Cancel' : 'New Hunt'}
         </button>
       </div>
+
 
       {showCreateForm && (
         <form onSubmit={handleSubmit} className="u-col" style={{ 
@@ -301,11 +306,11 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
                 paddingBottom: 'calc(var(--sc-space-3) + 28px)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
-                border: activeHunt?.id === hunt.id && !hunt.archived
+                border: activeHunt?.id === hunt.id
                   ? '2px solid var(--sc-brand)'
                   : '1px solid var(--sc-border)',
                 background: hunt.archived
-                  ? 'linear-gradient(90deg, color-mix(in oklab, var(--sc-success) 10%, transparent) 0%, transparent 60%), var(--sc-bg-elev-1)'
+                  ? 'linear-gradient(90deg, color-mix(in oklab, var(--sc-shiny) 12%, transparent) 0%, transparent 60%), var(--sc-bg-elev-1)'
                   : (activeHunt?.id === hunt.id
                       ? 'color-mix(in oklab, var(--sc-brand) 8%, var(--sc-bg-elev-1))'
                       : 'var(--sc-bg-elev-1)'),
@@ -314,17 +319,21 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
               }}
               onClick={() => onSelectHunt(hunt)}
               onMouseEnter={(e) => {
+                const isActive = activeHunt?.id === hunt.id;
                 if (hunt.archived) {
-                  e.currentTarget.style.background = 'linear-gradient(90deg, color-mix(in oklab, var(--sc-success) 16%, transparent) 0%, transparent 60%), var(--sc-bg-elev-2)';
-                } else if (activeHunt?.id !== hunt.id) {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, color-mix(in oklab, var(--sc-shiny) 18%, transparent) 0%, transparent 60%), var(--sc-bg-elev-2)';
+                  if (!isActive) e.currentTarget.style.borderColor = 'var(--sc-border-strong)';
+                } else if (!isActive) {
                   e.currentTarget.style.borderColor = 'var(--sc-border-strong)';
                   e.currentTarget.style.background = 'var(--sc-bg-elev-2)';
                 }
               }}
               onMouseLeave={(e) => {
+                const isActive = activeHunt?.id === hunt.id;
                 if (hunt.archived) {
-                  e.currentTarget.style.background = 'linear-gradient(90deg, color-mix(in oklab, var(--sc-success) 10%, transparent) 0%, transparent 60%), var(--sc-bg-elev-1)';
-                } else if (activeHunt?.id !== hunt.id) {
+                  e.currentTarget.style.background = 'linear-gradient(90deg, color-mix(in oklab, var(--sc-shiny) 12%, transparent) 0%, transparent 60%), var(--sc-bg-elev-1)';
+                  e.currentTarget.style.borderColor = isActive ? 'var(--sc-brand)' : 'var(--sc-border)';
+                } else if (!isActive) {
                   e.currentTarget.style.borderColor = 'var(--sc-border)';
                   e.currentTarget.style.background = 'var(--sc-bg-elev-1)';
                 }

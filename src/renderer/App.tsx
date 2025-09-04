@@ -19,6 +19,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [globalHotkeysEnabled, setGlobalHotkeysEnabled] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [showCreateHunt, setShowCreateHunt] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const sidebarRef = React.useRef<HTMLDivElement>(null);
@@ -265,6 +266,8 @@ function App() {
             onCreateHunt={handleCreateHunt}
             onSelectHunt={handleSelectHunt}
             onDeleteHunt={handleDeleteHunt}
+            showCreateForm={showCreateHunt}
+            onToggleCreate={() => setShowCreateHunt(prev => !prev)}
           />
         );
       case 'statistics':
