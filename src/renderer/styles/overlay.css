@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  padding: 10px;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overlay-content .target {
+  font-weight: bold;
+  color: #60a5fa;
+}
+
+.overlay-content .count {
+  font-size: 24px;
+  font-weight: bold;
+  color: #10b981;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.overlay-content .phase {
+  font-size: 12px;
+  color: #a78bfa;
+}
+
+.overlay-content .odds {
+  font-size: 11px;
+  color: #9ca3af;
+}
+

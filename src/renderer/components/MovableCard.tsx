@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 interface MovableCardProps {
   id: string;
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
   onMove: (cardId: string, targetSide: 'left' | 'right') => void;
   currentSide: 'left' | 'right';

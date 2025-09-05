@@ -1,4 +1,4 @@
-import { globalShortcut, app } from 'electron';
+import { globalShortcut } from 'electron';
 
 export class HotkeyManager {
   private globalHotkeysEnabled = false;
@@ -95,6 +95,8 @@ export class HotkeyManager {
   private async isInSafeMode(): Promise<boolean> {
     // For now, disable safe mode checking to avoid async issues
     // This can be re-enabled later with proper error handling
+    // Reference configured apps to satisfy strict TS noUnusedLocals when disabled
+    void this.safeModeApps;
     return false;
     
     /* 
@@ -113,53 +115,7 @@ export class HotkeyManager {
     */
   }
 
-  private async checkWindowsActiveWindow(): Promise<boolean> {
-    try {
-      const { exec } = require('child_process');
-      return new Promise((resolve) => {
-        exec('powershell "Get-Process | Where-Object {$_.MainWindowTitle -ne \"\"} | Select-Object ProcessName"', 
-          (error: any, stdout: string) => {
-            if (error) {
-              resolve(false);
-              return;
-            }
-            
-            const activeProcesses = stdout.toLowerCase();
-            const isSafeMode = this.safeModeApps.some(app => 
-              activeProcesses.includes(app.toLowerCase().replace('.exe', ''))
-            );
-            resolve(isSafeMode);
-          }
-        );
-      });
-    } catch {
-      return false;
-    }
-  }
-
-  private async checkMacActiveWindow(): Promise<boolean> {
-    try {
-      const { exec } = require('child_process');
-      return new Promise((resolve) => {
-        exec('osascript -e "tell application \\"System Events\\" to get name of first application process whose frontmost is true"',
-          (error: any, stdout: string) => {
-            if (error) {
-              resolve(false);
-              return;
-            }
-            
-            const activeApp = stdout.trim().toLowerCase();
-            const isSafeMode = this.safeModeApps.some(app => 
-              activeApp.includes(app.toLowerCase().replace('.exe', ''))
-            );
-            resolve(isSafeMode);
-          }
-        );
-      });
-    } catch {
-      return false;
-    }
-  }
+  // Platform-specific active window checks can be reintroduced with robust error handling
 
   setSafeModeApps(apps: string[]): void {
     this.safeModeApps = apps;

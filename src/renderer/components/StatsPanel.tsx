@@ -77,8 +77,11 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
 
       {/* Milestones */}
       <div style={{ borderTop: '1px solid var(--sc-border)', paddingTop: 'var(--sc-space-4)' }}>
-        <div style={{ fontSize: 'var(--sc-fs-md)', fontWeight: 'var(--sc-fw-semibold)', marginBottom: 'var(--sc-space-2)' }}>
-          Odds Milestones
+        <div style={{ fontSize: 'var(--sc-fs-md)', fontWeight: 'var(--sc-fw-semibold)', marginBottom: 'var(--sc-space-2)', display:'flex', alignItems:'center', gap:'8px' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M4 12h16M4 8h12M4 16h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          <span>Odds Milestones</span>
         </div>
         <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
           <div className="u-row" style={{ justifyContent: 'space-between' }}>
@@ -98,8 +101,11 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
 
       {/* Compact Distribution Strip */}
       <div style={{ borderTop: '1px solid var(--sc-border)', paddingTop: 'var(--sc-space-4)' }}>
-        <div style={{ fontSize: 'var(--sc-fs-md)', fontWeight: 'var(--sc-fw-semibold)', marginBottom: 'var(--sc-space-2)' }}>
-          First‑Shiny Timeline
+        <div style={{ fontSize: 'var(--sc-fs-md)', fontWeight: 'var(--sc-fw-semibold)', marginBottom: 'var(--sc-space-2)', display:'flex', alignItems:'center', gap:'8px' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M4 6h16M4 12h10M4 18h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          <span>First‑Shiny Timeline</span>
         </div>
         {q99 > 0 && (
           <div className="u-col" style={{ gap: '8px' }}>
@@ -130,6 +136,12 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
       {/* Hunt Info */}
       <div style={{ borderTop: '1px solid var(--sc-border)', paddingTop: 'var(--sc-space-4)' }}>
           <div className="u-col" style={{ gap: '2px' }}>
+            <div style={{ fontSize: 'var(--sc-fs-md)', fontWeight: 'var(--sc-fw-semibold)', marginBottom: 'var(--sc-space-2)', display:'flex', alignItems:'center', gap:'8px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <path d="M12 7l5 5-5 5-5-5 5-5z" stroke="currentColor" strokeWidth="1.5"/>
+              </svg>
+              <span>Hunt Info</span>
+            </div>
             <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
               Created: {settings ? formatDate(hunt.createdAt, settings) : new Date(hunt.createdAt).toLocaleDateString()}
             </div>

@@ -13,8 +13,7 @@ contextBridge.exposeInMainWorld('overlayAPI', {
   stopDrag: () => ipcRenderer.invoke('overlay:stopDrag'),
 
   // Toggle click-through mode
-  toggleClickThrough: () => ipcRenderer.invoke('overlay:toggleClickThrough')
-  ,
+  toggleClickThrough: () => ipcRenderer.invoke('overlay:toggleClickThrough'),
   getSettings: () => ipcRenderer.invoke('settings:get')
 });
 

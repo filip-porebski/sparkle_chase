@@ -2,10 +2,11 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { app } from 'electron';
 import { Hunt, Phase, Settings, HuntData } from '../../shared/types';
+import { formatNumber } from '../../shared/format';
 import { CrashRecovery } from '../utils/CrashRecovery';
 
 export class DataManager {
-  private dataDir: string;
+  private dataDir: string = '';
   private huntsDir: string;
   private configDir: string;
   private snapshotsDir: string;
@@ -13,16 +14,18 @@ export class DataManager {
   private crashRecovery: CrashRecovery;
 
   constructor() {
-    // Use 'out' folder in the application directory instead of system user data
-    const appDir = path.dirname(app.getAppPath());
-    this.dataDir = path.join(appDir, 'out');
-    this.huntsDir = path.join(this.dataDir, 'hunts');
-    this.configDir = path.join(this.dataDir, 'config');
-    this.snapshotsDir = path.join(this.dataDir, 'snapshots');
-    this.crashRecovery = new CrashRecovery(this.dataDir);
+    // Directories are resolved during initialize based on settings/detection
+    this.huntsDir = '';
+    this.configDir = '';
+    this.snapshotsDir = '';
+    this.crashRecovery = new CrashRecovery('');
   }
 
+
   async initialize(): Promise<void> {
+    // Resolve storage root
+    await this.resolveStorageRoot();
+
     // Create directories if they don't exist
     await this.ensureDirectories();
     
@@ -34,6 +37,39 @@ export class DataManager {
     
     // Load settings
     await this.loadSettings();
+    // Persist detected mode for visibility
+    if (!this.settings?.storageMode) {
+      await this.updateSettings({ storageMode: this.isPortablePath(this.dataDir) ? 'portable' : 'userData' });
+    }
+  }
+
+  private async resolveStorageRoot(): Promise<void> {
+    const appDir = path.dirname(app.getAppPath());
+    const portableDir = path.join(appDir, 'out');
+    const userDir = app.getPath('userData');
+
+    const portableSettings = path.join(portableDir, 'config', 'settings.json');
+    const userSettings = path.join(userDir, 'config', 'settings.json');
+    const envPortable = process.env.SPARKLECHASE_PORTABLE === '1' || process.env.SPARKLECHASE_PORTABLE === 'true';
+
+    let usePortable = envPortable;
+    if (!usePortable) {
+      try { await fs.access(portableSettings); usePortable = true; } catch {}
+    }
+    if (!usePortable) {
+      try { await fs.access(userSettings); usePortable = false; } catch {}
+    }
+
+    this.dataDir = usePortable ? portableDir : userDir;
+    this.huntsDir = path.join(this.dataDir, 'hunts');
+    this.configDir = path.join(this.dataDir, 'config');
+    this.snapshotsDir = path.join(this.dataDir, 'snapshots');
+    this.crashRecovery = new CrashRecovery(this.dataDir);
+  }
+
+  private isPortablePath(p: string): boolean {
+    const appDir = path.dirname(app.getAppPath());
+    return p.startsWith(path.join(appDir, 'out'));
   }
 
   private async ensureDirectories(): Promise<void> {
@@ -65,10 +101,9 @@ export class DataManager {
     const inferTime12h = (() => {
       try {
         const dtf = new Intl.DateTimeFormat(undefined, { hour: 'numeric' });
-        // @ts-ignore
-        return dtf.resolvedOptions && dtf.resolvedOptions().hour12 !== undefined
-          ? dtf.resolvedOptions().hour12
-          : /[AP]M/i.test(new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).format(new Date()));
+        const opts = (dtf as any)?.resolvedOptions?.();
+        if (opts && typeof opts.hour12 === 'boolean') return opts.hour12 as boolean;
+        return /[AP]M/i.test(new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).format(new Date()));
       } catch { return false; }
     })();
 
@@ -113,7 +148,7 @@ export class DataManager {
       },
       hotkeys: {
         increment: 'Space',
-        decrement: 'CommandOrControl+Z',
+        decrement: 'Backspace',
         phase: 'CommandOrControl+P',
         toggleGlobal: 'CommandOrControl+Shift+G',
         quickSwitch: 'CommandOrControl+K'
@@ -134,7 +169,31 @@ export class DataManager {
   }
 
   async updateSettings(updates: Partial<Settings>): Promise<Settings> {
-    this.settings = { ...this.settings!, ...updates };
+    // Handle storage mode migration if requested
+    const currentMode = this.settings?.storageMode || (this.isPortablePath(this.dataDir) ? 'portable' : 'userData');
+    const nextMode = updates.storageMode || currentMode;
+
+    if (nextMode !== currentMode) {
+      const appDir = path.dirname(app.getAppPath());
+      const targetRoot = nextMode === 'portable' ? path.join(appDir, 'out') : app.getPath('userData');
+      await fs.mkdir(targetRoot, { recursive: true });
+      // Copy content into target (Node 18+ has fs.cp)
+      try {
+        await fs.cp(this.dataDir, targetRoot, { recursive: true, force: true });
+      } catch (err) {
+        console.error('Storage migration failed:', err);
+        throw err;
+      }
+      // Switch internal pointers
+      this.dataDir = targetRoot;
+      this.huntsDir = path.join(this.dataDir, 'hunts');
+      this.configDir = path.join(this.dataDir, 'config');
+      this.snapshotsDir = path.join(this.dataDir, 'snapshots');
+      this.crashRecovery = new CrashRecovery(this.dataDir);
+    }
+
+    this.settings = { ...this.settings!, ...updates, storageMode: nextMode };
+    await this.ensureDirectories();
     await this.saveSettings();
     return this.settings;
   }
@@ -379,7 +438,7 @@ export class DataManager {
         },
         {
           name: 'odds.txt',
-          content: `1 in ${hunt.baseOdds.denominator.toLocaleString()}`
+          content: `1 in ${formatNumber(hunt.baseOdds.denominator, this.settings)}`
         }
       ];
 

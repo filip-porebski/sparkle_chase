@@ -11,6 +11,7 @@ import { CloudSyncCard } from './components/CloudSyncCard';
 import { MovableCard } from './components/MovableCard';
 import { useCardLayout } from './hooks/useCardLayout';
 import './styles/sparklechase.css';
+import { AtroposHover } from './components/AtroposHover';
 
 function App() {
   const [hunts, setHunts] = useState<Hunt[]>([]);
@@ -29,6 +30,16 @@ function App() {
   const [dragTarget, setDragTarget] = useState<'left' | 'right' | null>(null);
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
   const [showQuickSwitch, setShowQuickSwitch] = useState(false);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  
+  // Navigate to home (no hunt selected)
+  const goHome = () => {
+    setPhaseDialogMode(null);
+    setShowCreateHunt(false);
+    setActiveHunt(null);
+    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    sidebarRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   
   // Card layout management
   const { 
@@ -92,10 +103,14 @@ function App() {
         window.electronAPI.listHunts(),
         window.electronAPI.getSettings()
       ]);
+      const mergedCloud = {
+        provider: rawSettings?.cloudSync?.provider ?? 'none',
+        status: rawSettings?.cloudSync?.status ?? 'disconnected',
+        note: rawSettings?.cloudSync?.note ?? 'Design preview only (not yet functional).'
+      } as Settings['cloudSync'];
       const settingsData = {
-        cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).' },
         ...rawSettings,
-        cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).', ...(rawSettings?.cloudSync || {}) }
+        cloudSync: mergedCloud
       } as Settings;
 
       setHunts(huntsList);
@@ -225,7 +240,6 @@ function App() {
     setActiveHunt(hunt);
     // Update overlay if visible
     window.electronAPI.isOverlayVisible().then((visible) => {
-      setOverlayVisible(visible);
       if (visible) window.electronAPI.updateOverlayNow(hunt);
     });
   };
@@ -378,6 +392,17 @@ function App() {
         items.push(<div key={`ph-${index}`} className="sc-insert-placeholder" />);
       }
 
+      // Prepare icon titles
+      const titleNode = (
+        cardConfig.id === 'hunts' ? (
+          <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M3 5h6l2 2h10v11a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5"/></svg>Hunts</>
+        ) : cardConfig.id === 'statistics' ? (
+          <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M4 20V10m6 10V4m6 16v-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>Statistics</>
+        ) : cardConfig.id === 'cloudsync' ? (
+          <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M7 18h10a4 4 0 000-8 5 5 0 00-9.5-2A4 4 0 007 18z" stroke="currentColor" strokeWidth="1.5"/></svg>Cloud Sync</>
+        ) : (cardConfig.title)
+      );
+
       items.push(
         <div
           key={cardConfig.id}
@@ -394,7 +419,7 @@ function App() {
         >
           <MovableCard
             id={cardConfig.id}
-            title={cardConfig.title}
+            title={titleNode}
             currentSide={side}
             isCollapsed={card.isCollapsed}
             onMove={moveCard}
@@ -429,9 +454,21 @@ function App() {
     <div className="sc-app">
       {/* Header */}
       <header className={`sc-header ${navScrolled ? 'sc-header--solid' : 'sc-header--clear'}`}>
-        <div className="sc-title">
-          <span className="sparkle">✦</span>SparkleChase
-        </div>
+        <AtroposHover>
+          <div
+            className="sc-title"
+          role="button"
+          tabIndex={0}
+          onClick={goHome}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
+          }}
+          aria-label="Go to home"
+          style={{ cursor: 'pointer' }}
+          >
+            <span className="sparkle">✦</span>SparkleChase
+          </div>
+        </AtroposHover>
         <div className="actions">
           {/* Global Hotkeys Status */}
           <div className={`sc-status ${globalHotkeysEnabled ? 'sc-status--active' : 'sc-status--inactive'}`}>
@@ -551,16 +588,44 @@ function App() {
         </aside>
       </main>
 
-      {/* Floating theme toggle (bottom-right, to the right of Diagnostics) */}
-      <button
-        onClick={toggleTheme}
-        className="sc-btn sc-btn--ghost"
-        style={{ position: 'fixed', bottom: 'var(--sc-space-4)', right: 'var(--sc-space-4)', zIndex: 101 }}
-        title="Toggle theme"
-        aria-label="Toggle theme"
+      {/* Utility Dock (bottom-right) */}
+      <div
+        className="sc-utility-dock"
+        style={{ position: 'fixed', right: 'var(--sc-space-4)', bottom: 'var(--sc-space-4)', zIndex: 110 }}
+        aria-label="Quick utilities"
       >
-        {theme === 'dark' ? '☀️' : '🌙'}
-      </button>
+        <button
+          className="sc-icon-btn"
+          onClick={() => setShowDiagnostics(true)}
+          title="Diagnostics"
+          aria-label="Open diagnostics"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M9 14.2354V17.0001C9 19.7615 11.2386 22.0001 14 22.0001H14.8824C16.7691 22.0001 18.3595 20.7311 18.8465 19.0001" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M5.42857 3H5.3369C5.02404 3 4.86761 3 4.73574 3.01166C3.28763 3.13972 2.13972 4.28763 2.01166 5.73574C2 5.86761 2 6.02404 2 6.3369V7.23529C2 11.1013 5.13401 14.2353 9 14.2353C12.7082 14.2353 15.7143 11.2292 15.7143 7.521V6.3369C15.7143 6.02404 15.7143 5.86761 15.7026 5.73574C15.5746 4.28763 14.4267 3.13972 12.9785 3.01166C12.8467 3 12.6902 3 12.3774 3H12.2857" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle cx="19" cy="16" r="3" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M12 2V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M6 2V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        </button>
+        <button
+          className="sc-icon-btn"
+          onClick={toggleTheme}
+          title="Toggle theme"
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+              <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M4.22 19.78l1.42-1.42m12.72-12.72l1.42-1.42" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          )}
+        </button>
+      </div>
 
       {/* Dialogs */}
       {phaseDialogMode && activeHunt && (
@@ -580,8 +645,8 @@ function App() {
         />
       )}
 
-      {/* Diagnostics Panel */}
-      <DiagnosticsPanel />
+      {/* Diagnostics Panel (controlled) */}
+      <DiagnosticsPanel isOpen={showDiagnostics} onSetOpen={setShowDiagnostics} />
 
       {/* Quick Switch Modal */}
       {showQuickSwitch && (

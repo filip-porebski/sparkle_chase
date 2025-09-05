@@ -50,6 +50,7 @@ export interface Settings {
   dateFormat: 'DD.MM.YYYY' | 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'DD-MMM-YYYY';
   timeFormat: '12h' | '24h';
   numberSeparator: 'comma' | 'dot' | 'thin';
+  storageMode?: 'portable' | 'userData';
   cloudSync: {
     provider: 'none' | 'icloud' | 'googledrive' | 'dropbox' | 'onedrive';
     status?: 'disconnected' | 'connecting' | 'connected' | 'error';

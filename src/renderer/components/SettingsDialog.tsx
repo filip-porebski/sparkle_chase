@@ -81,10 +81,45 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
         <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>Settings</div>
         
         <div className="u-col" style={{ overflowY: 'auto' }}>
-          {/* Cloud Sync moved into its own card. */}
+          {/* Storage Mode */}
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 11h18" stroke="currentColor" strokeWidth="1.5"/><circle cx="8" cy="14.5" r="1" fill="currentColor"/></svg>
+              </span>
+              Storage Mode
+            </label>
+            <div className="u-row" style={{ gap: 'var(--sc-space-2)', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className={`cloud-pill ${ (localSettings.storageMode || 'portable') === 'portable' ? 'cloud-pill--active' : ''}`}
+                onClick={() => setLocalSettings(prev => ({ ...prev, storageMode: 'portable' }))}
+                title="Keep data next to the app (out/)"
+              >
+                Portable
+              </button>
+              <button
+                type="button"
+                className={`cloud-pill ${ (localSettings.storageMode || 'portable') === 'userData' ? 'cloud-pill--active' : ''}`}
+                onClick={() => setLocalSettings(prev => ({ ...prev, storageMode: 'userData' }))}
+                title="Use OS user data folder"
+              >
+                User Data
+              </button>
+            </div>
+            <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: '6px' }}>
+              Portable keeps files in the app's <code>out/</code> folder. User Data uses the OS-standard app data location.
+            </div>
+          </div>
+        {/* Cloud Sync moved into its own card. */}
           {/* Date & Time */}
-          <div>
-            <label className="sc-label">Date & Time</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M8 3v4M16 3v4M3 10h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </span>
+              Date & Time
+            </label>
             <div className="u-row" style={{ gap: 'var(--sc-space-3)' }}>
               <div style={{ flex: 1 }}>
                 <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Date Format</label>
@@ -115,8 +150,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </div>
 
           {/* Number Formatting */}
-          <div>
-            <label className="sc-label">Number Formatting</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h10M4 12h6M4 17h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </span>
+              Number Formatting
+            </label>
             <div className="u-row" style={{ gap: 'var(--sc-space-3)' }}>
               <div style={{ flex: 1 }}>
                 <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Thousands Separator</label>
@@ -127,14 +167,19 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                 >
                   <option value="comma">1,234</option>
                   <option value="dot">1.234</option>
-                  <option value="thin">1 234 (thin space)</option>
+                  <option value="thin">1 234 (thin space)</option>
                 </select>
               </div>
             </div>
           </div>
           {/* Theme */}
-          <div>
-            <label className="sc-label">Theme</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" strokeWidth="1.5" fill="none"/></svg>
+              </span>
+              Theme
+            </label>
             <select
               value={localSettings.theme}
               onChange={(e) => setLocalSettings(prev => ({ 
@@ -149,8 +194,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </div>
 
           {/* Global Hotkeys */}
-          <div>
-            <label className="sc-label">Global Hotkeys</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="7" width="18" height="10" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M7 10h2M11 10h2M15 10h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </span>
+              Global Hotkeys
+            </label>
             <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
               <button
                 onClick={toggleGlobalHotkeys}
@@ -169,8 +219,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </div>
 
           {/* Hotkey Configuration */}
-          <div>
-            <label className="sc-label">Hotkey Bindings</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 8h10a2 2 0 012 2v4a2 2 0 01-2 2H7a2 2 0 01-2-2v-4a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5"/><path d="M9 12h2M13 12h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </span>
+              Hotkey Bindings
+            </label>
             <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
               <div className="u-row">
                 <div style={{ flex: 1 }}>
@@ -297,8 +352,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </div>
 
           {/* OBS Text Files */}
-          <div>
-            <label className="sc-label">OBS Text Files Output</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 19.5V5a2 2 0 012-2h7l5 5v11.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 013 19.5z" stroke="currentColor" strokeWidth="1.5"/><path d="M12 3v5h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </span>
+              OBS Text Files Output
+            </label>
             <div className="u-row">
               <input
                 type="text"
@@ -324,8 +384,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </div>
 
           {/* Overlay Settings */}
-          <div>
-            <label className="sc-label">Overlay Settings</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M6 9h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </span>
+              Overlay Settings
+            </label>
             <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
               <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
                 <input
@@ -372,8 +437,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </div>
 
           {/* Safe Mode Apps */}
-          <div>
-            <label className="sc-label">Safe Mode Apps</label>
+          <div className="sc-settings-section">
+            <label className="sc-label">
+              <span className="sc-label-icon" aria-hidden>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l7 4v5c0 5-3.5 8.5-7 9-3.5-.5-7-4-7-9V7l7-4z" stroke="currentColor" strokeWidth="1.5"/></svg>
+              </span>
+              Safe Mode Apps
+            </label>
             <textarea
               value={localSettings.safeModeApps.join('\n')}
               onChange={(e) => setLocalSettings(prev => ({

@@ -11,8 +11,15 @@ interface DiagnosticsResult {
   }>;
 }
 
-export const DiagnosticsPanel: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface Props {
+  isOpen?: boolean;
+  onSetOpen?: (open: boolean) => void;
+}
+
+export const DiagnosticsPanel: React.FC<Props> = ({ isOpen: controlledOpen, onSetOpen }) => {
+  const isControlled = typeof controlledOpen === 'boolean' && typeof onSetOpen === 'function';
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = isControlled ? (controlledOpen as boolean) : internalOpen;
   const [testing, setTesting] = useState(false);
   const [result, setResult] = useState<DiagnosticsResult | null>(null);
   const [dataDir, setDataDir] = useState<string>('');
@@ -63,10 +70,22 @@ export const DiagnosticsPanel: React.FC = () => {
     }
   };
 
+  const close = () => (isControlled ? onSetOpen?.(false) : setInternalOpen(false));
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen]);
+
   if (!isOpen) {
+    if (isControlled) return null;
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => (isControlled ? onSetOpen?.(true) : setInternalOpen(true))}
         className="sc-btn sc-btn--ghost"
         style={{
           position: 'fixed',
@@ -82,12 +101,12 @@ export const DiagnosticsPanel: React.FC = () => {
   }
 
   return (
-    <div className="sc-modal-backdrop">
-      <div className="sc-modal" style={{ maxHeight: '82vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="sc-modal-backdrop" onClick={close}>
+      <div className="sc-modal" style={{ maxHeight: '82vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
         <div className="u-row" style={{ justifyContent: 'space-between', marginBottom: 'var(--sc-space-4)', alignItems: 'center' }}>
           <div className="sc-card__title" style={{ margin: 0 }}>System Diagnostics</div>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={close}
             className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"
             aria-label="Close"
             title="Close"
