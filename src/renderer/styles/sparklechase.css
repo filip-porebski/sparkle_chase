@@ -128,12 +128,17 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   position: relative;
   overflow: hidden;
   will-change: background-size;
-  transition: background-size .6s cubic-bezier(.25, .9, .3, 1), border-color .3s ease;
+  transition: background-size .6s cubic-bezier(.25, .9, .3, 1), border-color .3s ease, color .3s ease;
 }
 .sc-btn--primary:hover {
   background-size: 100% 100%, 100% 100%;
   border-color: color-mix(in oklab, var(--sc-accent) 50%, var(--sc-brand) 50%);
   box-shadow: none;
+}
+
+/* Improve contrast in light theme: make text dark on bright hover */
+:root[data-theme="light"] .sc-btn--primary:hover {
+  color: var(--sc-text);
 }
 
 @media (prefers-reduced-motion: reduce) {
