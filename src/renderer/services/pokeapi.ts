@@ -45,9 +45,9 @@ class PokeAPIService {
       // Fetch all Pokemon (up to 1010 for now, covers all current Pokemon)
       const response = await fetch(`${POKEAPI_BASE_URL}/pokemon?limit=1010`);
       const data = await response.json();
-      
-      this.pokemonListCache = data.results;
-      return this.pokemonListCache.map(p => this.formatPokemonName(p.name));
+      const list: PokemonListItem[] = data.results;
+      this.pokemonListCache = list;
+      return list.map(p => this.formatPokemonName(p.name));
     } catch (error) {
       console.error('Failed to fetch Pokemon list:', error);
       return [];

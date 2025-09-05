@@ -79,7 +79,7 @@ export const QuickSwitch: React.FC<QuickSwitchProps> = ({ hunts, onSelect, onClo
                   transition: 'background .15s ease'
                 }}
                    onClick={() => { onSelect(h); onClose(); }}
-                   onMouseEnter={(e) => { setHighlight(idx); }}
+                   onMouseEnter={() => { setHighlight(idx); }}
                    onMouseOver={(e) => { e.currentTarget.style.background = 'var(--sc-bg-elev-2)'; }}
                    onMouseOut={(e) => { if (idx !== highlight) e.currentTarget.style.background = 'var(--sc-bg-elev-1)'; }}>
                 <div className="u-row" style={{ justifyContent: 'space-between' }}>

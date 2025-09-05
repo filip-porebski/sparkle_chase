@@ -10,7 +10,7 @@ interface PhaseDialogProps {
 
 export const PhaseDialog: React.FC<PhaseDialogProps> = ({ mode, targetSpecies, onPhase, onClose }) => {
   const [species, setSpecies] = useState(() => mode === 'shiny' ? (targetSpecies || '') : '');
-  const [isTarget, setIsTarget] = useState(mode === 'shiny');
+  const isTarget = mode === 'shiny';
   const [notes, setNotes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {

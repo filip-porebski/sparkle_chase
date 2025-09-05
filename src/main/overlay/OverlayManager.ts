@@ -5,7 +5,6 @@ import { Hunt } from '../../shared/types';
 export class OverlayManager {
   private overlayWindow: BrowserWindow | null = null;
   private isVisible = false;
-  private isDragging = false;
   private clickThrough = true;
 
   constructor() {
@@ -90,40 +89,17 @@ export class OverlayManager {
 
     // Position overlay in top-right corner
     const primaryDisplay = screen.getPrimaryDisplay();
-    const { width, height } = primaryDisplay.workAreaSize;
+    const { width } = primaryDisplay.workAreaSize;
     
     this.overlayWindow.setPosition(width - 320, 20);
 
-    // Make overlay draggable when not in click-through mode
-    this.setupDragHandlers();
+    // Drag behavior is controlled by the overlay content via IPC
   }
 
   private sendUpdate(hunt: Hunt): void {
     if (this.overlayWindow && this.isVisible && hunt) {
       this.overlayWindow.webContents.send('overlay:update', hunt);
     }
-  }
-
-  private setupDragHandlers(): void {
-    if (!this.overlayWindow) return;
-
-    let isDragging = false;
-    let dragOffset = { x: 0, y: 0 };
-
-    this.overlayWindow.webContents.on('before-input-event', (event, input) => {
-      if (input.type === 'mouseDown' && input.button === 'left' && !this.clickThrough) {
-        isDragging = true;
-        const bounds = this.overlayWindow!.getBounds();
-        dragOffset.x = input.x;
-        dragOffset.y = input.y;
-      }
-    });
-
-    this.overlayWindow.on('move', () => {
-      if (isDragging && !this.clickThrough) {
-        // Allow dragging
-      }
-    });
   }
 
   private updateClickThrough(): void {
@@ -133,14 +109,12 @@ export class OverlayManager {
   }
 
   private startDrag(): void {
-    this.isDragging = true;
     if (this.overlayWindow) {
       this.overlayWindow.setIgnoreMouseEvents(false);
     }
   }
 
   private stopDrag(): void {
-    this.isDragging = false;
     this.updateClickThrough();
   }
 

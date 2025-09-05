@@ -4,6 +4,7 @@ import { DataManager } from './data/DataManager';
 import { HotkeyManager } from './hotkeys/HotkeyManager';
 import { OverlayManager } from './overlay/OverlayManager';
 import { Settings } from '../shared/types';
+import { acceleratorFromInput } from './utils/accelerators';
 
 class ShinyCounterApp {
   private mainWindow: BrowserWindow | null = null;
@@ -125,7 +126,7 @@ class ShinyCounterApp {
             const dec = settings.hotkeys.decrement || 'CommandOrControl+Z';
             const ph = settings.hotkeys.phase || 'CommandOrControl+P';
 
-            const accel = this.acceleratorFromInput(input);
+            const accel = acceleratorFromInput(input);
             if (accel === inc) {
               this.mainWindow?.webContents.send('hotkey:increment');
               event.preventDefault();
@@ -158,7 +159,7 @@ class ShinyCounterApp {
 
         // Global toggle hotkey works regardless of global hotkey state
         const toggleAccel = (this.currentSettings?.hotkeys.toggleGlobal) || 'CommandOrControl+Shift+G';
-        if (this.acceleratorFromInput(input) === toggleAccel) {
+        if (acceleratorFromInput(input) === toggleAccel) {
           const enabled = this.hotkeyManager.toggleGlobal();
           this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
           event.preventDefault();
@@ -167,19 +168,7 @@ class ShinyCounterApp {
     });
   }
 
-  // Convert before-input-event payload into an Accelerator-like string consistent with SettingsDialog
-  private acceleratorFromInput(input: Electron.Input): string {
-    const parts: string[] = [];
-    if (input.meta || input.control) parts.push('CommandOrControl');
-    if (input.alt) parts.push('Alt');
-    if (input.shift) parts.push('Shift');
-
-    let key = input.key;
-    if (key === ' ') key = 'Space';
-    if (key && key.length === 1) key = key.toUpperCase();
-    parts.push(key);
-    return parts.join('+');
-  }
+  // Use shared accelerator converter
 
   private setupIpcHandlers() {
     // Hunt management
@@ -211,19 +200,19 @@ class ShinyCounterApp {
     // Counter operations
     ipcMain.handle('counter:increment', async (_, huntId) => {
       const hunt = await this.dataManager.incrementCounter(huntId);
-      this.overlayManager.updateOverlay(hunt);
+      if (hunt) this.overlayManager.updateOverlay(hunt);
       return hunt;
     });
 
     ipcMain.handle('counter:decrement', async (_, huntId) => {
       const hunt = await this.dataManager.decrementCounter(huntId);
-      this.overlayManager.updateOverlay(hunt);
+      if (hunt) this.overlayManager.updateOverlay(hunt);
       return hunt;
     });
 
     ipcMain.handle('counter:setCount', async (_, huntId, count) => {
       const hunt = await this.dataManager.setCounter(huntId, count);
-      this.overlayManager.updateOverlay(hunt);
+      if (hunt) this.overlayManager.updateOverlay(hunt);
       return hunt;
     });
 
@@ -233,7 +222,7 @@ class ShinyCounterApp {
     });
     ipcMain.handle('phase:delete', async (_, huntId, phaseId) => {
       const hunt = await this.dataManager.removePhase(huntId, phaseId);
-      this.overlayManager.updateOverlay(hunt as any);
+      if (hunt) this.overlayManager.updateOverlay(hunt);
       return hunt;
     });
 

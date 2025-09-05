@@ -85,10 +85,12 @@ src/
 
 ## Data Storage
 
-Hunt data is stored locally in JSON files in the application directory:
-- **All platforms**: `{application-directory}/out/`
+SparkleChase supports two storage modes:
 
-This ensures all configuration and output files are kept together with the program, making it portable and self-contained.
+- Portable (default): `{application-directory}/out/` — keeps configuration and output files next to the app, making it portable and self‑contained.
+- User Data (OS standard): stores files under the OS app data directory (e.g. `%APPDATA%/SparkleChase`, `~/Library/Application Support/SparkleChase`).
+
+You can switch modes in Settings → Storage Mode. On change, data migrates automatically.
 
 ### File Structure
 ```
@@ -100,6 +102,8 @@ out/
 └── snapshots/
     └── {timestamp}-{huntId}.json
 ```
+
+In User Data mode the same structure is used under the OS app data folder.
 
 ## Hotkeys
 

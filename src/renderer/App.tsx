@@ -92,10 +92,14 @@ function App() {
         window.electronAPI.listHunts(),
         window.electronAPI.getSettings()
       ]);
+      const mergedCloud = {
+        provider: rawSettings?.cloudSync?.provider ?? 'none',
+        status: rawSettings?.cloudSync?.status ?? 'disconnected',
+        note: rawSettings?.cloudSync?.note ?? 'Design preview only (not yet functional).'
+      } as Settings['cloudSync'];
       const settingsData = {
-        cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).' },
         ...rawSettings,
-        cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).', ...(rawSettings?.cloudSync || {}) }
+        cloudSync: mergedCloud
       } as Settings;
 
       setHunts(huntsList);
@@ -225,7 +229,6 @@ function App() {
     setActiveHunt(hunt);
     // Update overlay if visible
     window.electronAPI.isOverlayVisible().then((visible) => {
-      setOverlayVisible(visible);
       if (visible) window.electronAPI.updateOverlayNow(hunt);
     });
   };

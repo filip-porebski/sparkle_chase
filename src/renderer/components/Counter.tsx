@@ -343,9 +343,9 @@ export const Counter: React.FC<CounterProps> = ({
                 height: `${p.size}px`,
                 background: `oklch(65% 0.12 ${p.hue})`,
                 boxShadow: `0 0 ${Math.max(4, p.size * 1.8)}px color-mix(in oklab, var(--sc-brand) 60%, transparent)`,
-                // @ts-ignore: CSS var for animation drift
-                '--dx': `${p.dx}px`
-              } as any}
+                // Custom CSS var for animation drift
+                ['--dx' as any]: `${p.dx}px`
+              } as React.CSSProperties}
             />
           ))}
         </div>

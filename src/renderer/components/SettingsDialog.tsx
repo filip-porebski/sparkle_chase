@@ -81,7 +81,33 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
         <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>Settings</div>
         
         <div className="u-col" style={{ overflowY: 'auto' }}>
-          {/* Cloud Sync moved into its own card. */}
+          {/* Storage Mode */}
+          <div>
+            <label className="sc-label">Storage Mode</label>
+            <div className="u-row" style={{ gap: 'var(--sc-space-4)' }}>
+              <label className="u-row" style={{ gap: '6px' }}>
+                <input
+                  type="radio"
+                  name="storage-mode"
+                  checked={(localSettings.storageMode || 'portable') === 'portable'}
+                  onChange={() => setLocalSettings(prev => ({ ...prev, storageMode: 'portable' }))}
+                  style={{ accentColor: 'var(--sc-brand)' }}
+                />
+                <span className="u-muted" style={{ fontSize: 'var(--sc-fs-sm)' }}>Portable (app folder/out)</span>
+              </label>
+              <label className="u-row" style={{ gap: '6px' }}>
+                <input
+                  type="radio"
+                  name="storage-mode"
+                  checked={(localSettings.storageMode || 'portable') === 'userData'}
+                  onChange={() => setLocalSettings(prev => ({ ...prev, storageMode: 'userData' }))}
+                  style={{ accentColor: 'var(--sc-brand)' }}
+                />
+                <span className="u-muted" style={{ fontSize: 'var(--sc-fs-sm)' }}>User Data (OS standard)</span>
+              </label>
+            </div>
+          </div>
+        {/* Cloud Sync moved into its own card. */}
           {/* Date & Time */}
           <div>
             <label className="sc-label">Date & Time</label>
@@ -127,7 +153,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                 >
                   <option value="comma">1,234</option>
                   <option value="dot">1.234</option>
-                  <option value="thin">1 234 (thin space)</option>
+                  <option value="thin">1 234 (thin space)</option>
                 </select>
               </div>
             </div>
