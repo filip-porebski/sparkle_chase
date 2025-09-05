@@ -178,7 +178,8 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 
 /* Cards */
 .sc-card { background: var(--sc-bg-elev-1); border:1px solid var(--sc-border); border-radius:var(--sc-radius-xl); padding:var(--sc-space-5); box-shadow: var(--sc-shadow); }
-.sc-card__title { font-size: var(--sc-fs-lg); font-weight: var(--sc-fw-semibold); margin-bottom: var(--sc-space-3); }
+.sc-card__title { font-size: var(--sc-fs-lg); font-weight: var(--sc-fw-semibold); margin-bottom: var(--sc-space-3); display: inline-flex; align-items: center; gap: 8px; }
+.sc-card__title svg { color: var(--sc-text-subtle); }
 .sc-card__meta { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); }
 
 /* Hero counter emphasis */

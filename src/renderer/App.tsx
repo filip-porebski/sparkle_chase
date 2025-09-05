@@ -392,6 +392,17 @@ function App() {
         items.push(<div key={`ph-${index}`} className="sc-insert-placeholder" />);
       }
 
+      // Prepare icon titles
+      const titleNode = (
+        cardConfig.id === 'hunts' ? (
+          <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M3 5h6l2 2h10v11a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5"/></svg>Hunts</>
+        ) : cardConfig.id === 'statistics' ? (
+          <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M4 20V10m6 10V4m6 16v-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>Statistics</>
+        ) : cardConfig.id === 'cloudsync' ? (
+          <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M7 18h10a4 4 0 000-8 5 5 0 00-9.5-2A4 4 0 007 18z" stroke="currentColor" strokeWidth="1.5"/></svg>Cloud Sync</>
+        ) : (cardConfig.title)
+      );
+
       items.push(
         <div
           key={cardConfig.id}
@@ -408,7 +419,7 @@ function App() {
         >
           <MovableCard
             id={cardConfig.id}
-            title={cardConfig.title}
+            title={titleNode}
             currentSide={side}
             isCollapsed={card.isCollapsed}
             onMove={moveCard}
