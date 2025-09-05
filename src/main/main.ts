@@ -1,6 +1,7 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, dialog, Menu, shell } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, dialog, Menu, shell, nativeImage } from 'electron';
 // auto-updater is loaded dynamically to avoid crashing when not installed in dev
 import * as path from 'path';
+import * as fs from 'fs';
 import { DataManager } from './data/DataManager';
 import { HotkeyManager } from './hotkeys/HotkeyManager';
 import { OverlayManager } from './overlay/OverlayManager';
@@ -23,6 +24,13 @@ class ShinyCounterApp {
   }
 
   async initialize() {
+    // Ensure the app name is SparkleChase in dev and prod (menus, dock hover on macOS)
+    try { app.setName('SparkleChase'); } catch {}
+    try {
+      app.setAboutPanelOptions({ applicationName: 'SparkleChase' });
+    } catch {}
+    // Improve Windows identity (notifications, taskbar grouping)
+    try { app.setAppUserModelId('com.sparklechase.app'); } catch {}
     await app.whenReady();
     
     // Initialize data manager
@@ -31,6 +39,40 @@ class ShinyCounterApp {
     // Harden app menu in production
     if (process.env.NODE_ENV !== 'development') {
       try { Menu.setApplicationMenu(null); } catch {}
+    } else {
+      // In development, create a minimal app menu labeled SparkleChase
+      try {
+        const template: Electron.MenuItemConstructorOptions[] = [
+          {
+            label: 'SparkleChase',
+            submenu: [
+              { label: 'About SparkleChase', click: () => { try { app.showAboutPanel(); } catch {} } },
+              { type: 'separator' },
+              { role: 'hide' },
+              { role: 'hideOthers' },
+              { role: 'unhide' },
+              { type: 'separator' },
+              { role: 'quit', label: 'Quit SparkleChase' }
+            ]
+          },
+          {
+            label: 'Edit',
+            submenu: [
+              { role: 'undo' }, { role: 'redo' }, { type: 'separator' },
+              { role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }
+            ]
+          },
+          {
+            label: 'View',
+            submenu: [
+              { role: 'reload' }, { role: 'toggleDevTools' }, { type: 'separator' },
+              { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' }, { type: 'separator' },
+              { role: 'togglefullscreen' }
+            ]
+          }
+        ];
+        Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+      } catch {}
     }
 
     // Create splash first (skip in dev if desired)
@@ -96,7 +138,52 @@ class ShinyCounterApp {
     }
   }
 
+  private getIconPath(): string | null {
+    // Prefer packaged resources, then local resources, then renderer assets
+    const candidates = [
+      // When packaged, place icons under resourcesPath/resources/icon.png
+      path.join(process.resourcesPath || '', 'resources', 'icon.png'),
+      // When running from source
+      path.join(__dirname, '../../resources/icon.png'),
+      path.join(__dirname, '../../resources/icon@256.png'),
+      path.join(__dirname, '../../resources/icon@128.png')
+    ];
+    for (const p of candidates) {
+      try { if (p && fs.existsSync(p)) return p; } catch {}
+    }
+    return null;
+  }
+
+  private getIconNativeImage(): Electron.NativeImage | null {
+    // Try bitmap first
+    const p = this.getIconPath();
+    if (p) {
+      try {
+        const img = nativeImage.createFromPath(p);
+        if (!img.isEmpty()) return img;
+      } catch {}
+    }
+    // Fallback to bundled SVG in dev
+    const svgCandidates = [
+      path.join(__dirname, '../../public/sparkle.svg'),
+      path.join(process.cwd(), 'public/sparkle.svg')
+    ];
+    for (const svgPath of svgCandidates) {
+      try {
+        if (fs.existsSync(svgPath)) {
+          const svg = fs.readFileSync(svgPath, 'utf8');
+          const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+          const img = nativeImage.createFromDataURL(dataUrl);
+          if (!img.isEmpty()) return img;
+        }
+      } catch {}
+    }
+    return null;
+  }
+
   private createMainWindow(_show: boolean = false) {
+    const iconPath = this.getIconPath();
+    const iconNative = this.getIconNativeImage();
     this.mainWindow = new BrowserWindow({
       width: 1200,
       height: 800,
@@ -110,7 +197,10 @@ class ShinyCounterApp {
         spellcheck: false
       },
       titleBarStyle: 'default',
-      show: false
+      show: false,
+      title: 'SparkleChase',
+      // Used on Windows/Linux; ignored on macOS where the app bundle icon is used
+      icon: (iconPath || iconNative || undefined) as any
     });
 
     // Load the app
@@ -122,6 +212,13 @@ class ShinyCounterApp {
     }
 
     this.mainWindow.once('ready-to-show', async () => {
+      // Set dock icon on macOS during development if present
+      if (process.platform === 'darwin') {
+        const devIcon = this.getIconNativeImage();
+        if (devIcon) {
+          try { app.dock.setIcon(devIcon); } catch {}
+        }
+      }
       // Wait for splash timing and (in prod) updater check
       if (process.env.NODE_ENV === 'development') {
         await new Promise((r) => setTimeout(r, 1200));
