@@ -374,7 +374,12 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 }
 
 /* Cloud sync pills */
-.cloud-pill { border-radius: 999px; background: var(--sc-bg-elev-2); border:1px solid var(--sc-border); }
+.cloud-pill { 
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 10px; border-radius: 999px; 
+  background: var(--sc-bg-elev-2); border:1px solid var(--sc-border);
+  font-size: var(--sc-fs-sm); line-height: 1; white-space: nowrap;
+}
 .cloud-pill:hover { background: color-mix(in oklab, var(--sc-bg-elev-2) 70%, var(--sc-brand) 10%); }
 .cloud-pill--active { background: color-mix(in oklab, var(--sc-brand) 14%, var(--sc-bg-elev-1)); border-color: var(--sc-brand); box-shadow: 0 0 0 2px color-mix(in oklab, var(--sc-brand) 18%, transparent); }
 

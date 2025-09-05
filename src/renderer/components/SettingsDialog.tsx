@@ -85,31 +85,30 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           <div className="sc-settings-section">
             <label className="sc-label">
               <span className="sc-label-icon" aria-hidden>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="6" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M3 11h18" stroke="currentColor" strokeWidth="1.5"/><circle cx="8" cy="14.5" r="1" fill="currentColor"/></svg>
               </span>
               Storage Mode
             </label>
-            <div className="u-row" style={{ gap: 'var(--sc-space-4)' }}>
-              <label className="u-row" style={{ gap: '6px' }}>
-                <input
-                  type="radio"
-                  name="storage-mode"
-                  checked={(localSettings.storageMode || 'portable') === 'portable'}
-                  onChange={() => setLocalSettings(prev => ({ ...prev, storageMode: 'portable' }))}
-                  style={{ accentColor: 'var(--sc-brand)' }}
-                />
-                <span className="u-muted" style={{ fontSize: 'var(--sc-fs-sm)' }}>Portable (app folder/out)</span>
-              </label>
-              <label className="u-row" style={{ gap: '6px' }}>
-                <input
-                  type="radio"
-                  name="storage-mode"
-                  checked={(localSettings.storageMode || 'portable') === 'userData'}
-                  onChange={() => setLocalSettings(prev => ({ ...prev, storageMode: 'userData' }))}
-                  style={{ accentColor: 'var(--sc-brand)' }}
-                />
-                <span className="u-muted" style={{ fontSize: 'var(--sc-fs-sm)' }}>User Data (OS standard)</span>
-              </label>
+            <div className="u-row" style={{ gap: 'var(--sc-space-2)', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className={`cloud-pill ${ (localSettings.storageMode || 'portable') === 'portable' ? 'cloud-pill--active' : ''}`}
+                onClick={() => setLocalSettings(prev => ({ ...prev, storageMode: 'portable' }))}
+                title="Keep data next to the app (out/)"
+              >
+                Portable
+              </button>
+              <button
+                type="button"
+                className={`cloud-pill ${ (localSettings.storageMode || 'portable') === 'userData' ? 'cloud-pill--active' : ''}`}
+                onClick={() => setLocalSettings(prev => ({ ...prev, storageMode: 'userData' }))}
+                title="Use OS user data folder"
+              >
+                User Data
+              </button>
+            </div>
+            <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)', marginTop: '6px' }}>
+              Portable keeps files in the app's <code>out/</code> folder. User Data uses the OS-standard app data location.
             </div>
           </div>
         {/* Cloud Sync moved into its own card. */}
