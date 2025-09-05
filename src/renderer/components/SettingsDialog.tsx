@@ -81,6 +81,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
         <div className="sc-card__title" style={{ marginBottom: 'var(--sc-space-4)' }}>Settings</div>
         
         <div className="u-col" style={{ overflowY: 'auto' }}>
+          {/* Cloud Sync moved into its own card. */}
           {/* Date & Time */}
           <div>
             <label className="sc-label">Date & Time</label>

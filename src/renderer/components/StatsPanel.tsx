@@ -82,15 +82,15 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ hunt, settings }) => {
         </div>
         <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
           <div className="u-row" style={{ justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 'var(--sc-fs-sm)' }}>50% chance by</span>
+            <span className="u-subtle" style={{ fontSize: 'var(--sc-fs-sm)' }}>50% chance by</span>
             <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(q50, settings)} encounters</span>
           </div>
           <div className="u-row" style={{ justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 'var(--sc-fs-sm)' }}>90% chance by</span>
+            <span className="u-subtle" style={{ fontSize: 'var(--sc-fs-sm)' }}>90% chance by</span>
             <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(q90, settings)} encounters</span>
           </div>
           <div className="u-row" style={{ justifyContent: 'space-between' }}>
-            <span style={{ fontSize: 'var(--sc-fs-sm)' }}>99% chance by</span>
+            <span className="u-subtle" style={{ fontSize: 'var(--sc-fs-sm)' }}>99% chance by</span>
             <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formatNumber(q99, settings)} encounters</span>
           </div>
         </div>

@@ -24,6 +24,14 @@ const DEFAULT_CARDS: CardConfig[] = [
     order: 0
   },
   {
+    id: 'cloudsync',
+    title: 'Cloud Sync',
+    component: null as any,
+    side: 'right',
+    isCollapsed: false,
+    order: 1
+  },
+  {
     id: 'statistics',
     title: 'Statistics',
     component: null as any, // Will be set when used

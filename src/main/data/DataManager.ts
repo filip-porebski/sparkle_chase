@@ -104,6 +104,7 @@ export class DataManager {
       dateFormat: inferDate as any,
       timeFormat: inferTime12h ? '12h' : '24h',
       numberSeparator: sep as any,
+      cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).'},
       overlay: {
         variant: 'badge',
         clickThrough: true,
