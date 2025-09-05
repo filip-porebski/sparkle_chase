@@ -110,7 +110,7 @@ In User Data mode the same structure is used under the OS app data folder.
 | Action | Default Binding | Description |
 |--------|----------------|-------------|
 | Increment | Space | Add +1 to counter |
-| Decrement | Ctrl/Cmd+Z | Subtract -1 from counter |
+| Decrement | Backspace | Subtract -1 from counter |
 | Phase | Ctrl/Cmd+P | Open phase dialog |
 | Toggle Global | Ctrl/Cmd+Shift+G | Enable/disable global hotkeys |
 

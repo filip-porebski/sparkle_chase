@@ -123,7 +123,7 @@ class ShinyCounterApp {
           const settings = this.currentSettings;
           if (settings) {
             const inc = settings.hotkeys.increment || 'Space';
-            const dec = settings.hotkeys.decrement || 'CommandOrControl+Z';
+            const dec = settings.hotkeys.decrement || 'Backspace';
             const ph = settings.hotkeys.phase || 'CommandOrControl+P';
 
             const accel = acceleratorFromInput(input);
@@ -320,7 +320,7 @@ class ShinyCounterApp {
       this.mainWindow?.webContents.send('hotkey:increment');
     });
 
-    this.hotkeyManager.registerHotkey(settings.hotkeys.decrement || 'CommandOrControl+Z', () => {
+    this.hotkeyManager.registerHotkey(settings.hotkeys.decrement || 'Backspace', () => {
       if (this.mainWindow?.isFocused() && this.typingActive) return;
       this.mainWindow?.webContents.send('hotkey:decrement');
     });

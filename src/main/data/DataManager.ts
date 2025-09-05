@@ -148,7 +148,7 @@ export class DataManager {
       },
       hotkeys: {
         increment: 'Space',
-        decrement: 'CommandOrControl+Z',
+        decrement: 'Backspace',
         phase: 'CommandOrControl+P',
         toggleGlobal: 'CommandOrControl+Shift+G',
         quickSwitch: 'CommandOrControl+K'
