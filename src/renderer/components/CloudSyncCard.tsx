@@ -9,7 +9,6 @@ interface CloudSyncCardProps {
 export const CloudSyncCard: React.FC<CloudSyncCardProps> = ({ settings, onUpdate }) => {
   const provider = settings.cloudSync?.provider || 'none';
   const status = settings.cloudSync?.status || 'disconnected';
-  const note = settings.cloudSync?.note || 'Design preview only — not yet functional.';
 
   const setProvider = (p: Settings['cloudSync']['provider']) => {
     onUpdate({ cloudSync: { ...settings.cloudSync, provider: p } });
@@ -33,15 +32,12 @@ export const CloudSyncCard: React.FC<CloudSyncCardProps> = ({ settings, onUpdate
 
   return (
     <div className="u-col" style={{ gap: 'var(--sc-space-4)' }}>
-      {/* Status row under the card header (MovableCard shows the header already) */}
-      <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-sm)' }}>Keep your stream labels synced</div>
-        <span className="u-badge" style={badgeStyle}>{status}</span>
-      </div>
-
       {/* Vertical provider picker */}
       <div className="u-col" style={{ gap: 'var(--sc-space-2)' }}>
-        <label className="sc-label">Provider</label>
+        <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--sc-space-4)' }}>
+          <label className="sc-label" style={{ margin: 0 }}>Provider</label>
+          <span className="u-badge" style={badgeStyle}>{status}</span>
+        </div>
         <div className="u-row" style={{ gap: 'var(--sc-space-2)', flexWrap: 'wrap' }}>
           {providers.map(opt => (
             <button key={opt.key}
@@ -55,9 +51,8 @@ export const CloudSyncCard: React.FC<CloudSyncCardProps> = ({ settings, onUpdate
       </div>
 
       <div className="u-col" style={{ gap: '6px' }}>
-        <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>{note}</div>
         <div className="u-subtle" style={{ fontSize: 'var(--sc-fs-xs)' }}>
-          Will mirror output files (count.txt, target.txt, phase.txt) to/from the selected provider and resolve newest timestamps.
+          Will sync hunt information.
         </div>
       </div>
 
