@@ -100,15 +100,45 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   height:40px; padding:0 16px; border-radius: var(--sc-radius-lg);
   border:1px solid var(--sc-border); background:var(--sc-bg-elev-2);
   color: var(--sc-text); cursor:pointer; user-select:none;
-  transition: transform .04s ease, background .15s ease, border-color .15s ease;
+  transition: transform .04s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
   font-size: var(--sc-fs-sm);
   font-weight: var(--sc-fw-medium);
 }
-.sc-btn:hover { background: color-mix(in oklab, var(--sc-bg-elev-2) 70%, var(--sc-brand) 30%); border-color: var(--sc-border-strong); }
-.sc-btn:active { transform: translateY(1px) scale(0.998); }
+.sc-btn:hover { background: color-mix(in oklab, var(--sc-bg-elev-2) 88%, var(--sc-brand) 12%); border-color: var(--sc-border-strong); box-shadow: none; }
+.sc-btn:active { transform: translateY(1px) scale(0.998); box-shadow: none; }
 .sc-btn[aria-disabled="true"] { opacity:.6; pointer-events:none; }
 
-.sc-btn--primary { background: var(--sc-brand); border-color: var(--sc-brand-strong); color:#fff; }
+.sc-btn--primary {
+  /* Bottom-up fill overlay (first layer) over base gradient (second layer) */
+  background:
+    /* Fill (matches final hover colors) */
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--sc-brand) 94%, white 6%) 0%,
+      color-mix(in oklab, var(--sc-accent) 65%, var(--sc-brand) 35%) 100%
+    ) no-repeat,
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--sc-brand) 90%, white 10%) 0%,
+      color-mix(in oklab, var(--sc-brand) 80%, var(--sc-accent) 20%) 100%
+    ) no-repeat;
+  background-size: 100% 0%, 100% 100%;
+  background-position: bottom left, top left;
+  border-color: color-mix(in oklab, var(--sc-brand-strong) 80%, black 20%);
+  color:#fff;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 22%, transparent);
+  position: relative;
+  overflow: hidden;
+  will-change: background-size;
+  transition: background-size .6s cubic-bezier(.25, .9, .3, 1), border-color .3s ease;
+}
+.sc-btn--primary:hover {
+  background-size: 100% 100%, 100% 100%;
+  border-color: color-mix(in oklab, var(--sc-accent) 50%, var(--sc-brand) 50%);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-btn--primary { transition: none; }
+}
 .sc-btn--ghost { background: transparent; }
 .sc-btn--danger { background: var(--sc-danger); color:#fff; border-color: color-mix(in oklab, var(--sc-danger) 70%, black 30%); }
 /* Additional button variants */
@@ -214,8 +244,12 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 }
 .sc-count {
   font-size: var(--sc-fs-2xl); font-weight: var(--sc-fw-bold); line-height: var(--sc-lh-tight);
-  font-variant-numeric: tabular-nums; letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.5px; transition: color .15s ease;
 }
+.sc-edit-icon { color: var(--sc-text-subtle); opacity: 0; transition: opacity .15s ease, color .15s ease; display: inline-flex; align-items: center; cursor: pointer; }
+.sc-edit-icon:hover { color: #fff; }
+.sc-count-wrap:hover .sc-edit-icon { opacity: .85; }
+.sc-count-wrap:hover .sc-count { color: var(--sc-brand); }
 .sc-odds { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); }
 .sc-since { font-size: var(--sc-fs-sm); color: var(--sc-text-subtle); }
 
