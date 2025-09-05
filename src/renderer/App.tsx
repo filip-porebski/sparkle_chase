@@ -31,6 +31,15 @@ function App() {
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
   const [showQuickSwitch, setShowQuickSwitch] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const activeTip: 'newHunt' | 'counter' | 'settings' | 'overlay' | null = React.useMemo(() => {
+    if (!settings) return null;
+    const t = settings.tooltips || {} as any;
+    if (!t.shownNewHunt && hunts.length === 0) return 'newHunt';
+    if (!t.shownCounter && hunts.length > 0 && !!activeHunt) return 'counter';
+    if (!t.shownSettings) return 'settings';
+    if (!t.shownOverlay) return 'overlay';
+    return null;
+  }, [settings, hunts, activeHunt]);
   
   // Navigate to home (no hunt selected)
   const goHome = () => {
@@ -108,9 +117,11 @@ function App() {
         status: rawSettings?.cloudSync?.status ?? 'disconnected',
         note: rawSettings?.cloudSync?.note ?? 'Design preview only (not yet functional).'
       } as Settings['cloudSync'];
+      const defaultTooltips = { shownNewHunt: false, shownCounter: false, shownSettings: false, shownOverlay: false } as Settings['tooltips'];
       const settingsData = {
         ...rawSettings,
-        cloudSync: mergedCloud
+        cloudSync: mergedCloud,
+        tooltips: { ...defaultTooltips, ...(rawSettings?.tooltips || {}) }
       } as Settings;
 
       setHunts(huntsList);
@@ -357,6 +368,7 @@ function App() {
             onLockHunt={handleLockHunt}
             settings={settings || undefined}
             onOpenQuickSwitch={() => setShowQuickSwitch(true)}
+            onUpdateSettings={handleUpdateSettings}
           />
         );
       case 'statistics':
@@ -475,19 +487,57 @@ function App() {
             <span>Global Hotkeys: {globalHotkeysEnabled ? 'ON' : 'OFF'}</span>
           </div>
           
-          <button
-            onClick={() => window.electronAPI.toggleOverlay()}
-            className="sc-btn"
-          >
-            Overlay
-          </button>
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => window.electronAPI.toggleOverlay()}
+              className="sc-btn"
+            >
+              Overlay
+            </button>
+            {activeTip === 'overlay' && (
+              <div style={{ position:'absolute', top:'110%', right:0 }}>
+                <div className="sc-tip__wrap">
+                  <div className="sc-tip__content">
+                    <span className="sc-tip__text">Show an on-top overlay for streaming</span>
+                    <button
+                      onClick={() => settings && handleUpdateSettings({ tooltips: { ...settings.tooltips, shownOverlay: true } })}
+                      className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon sc-tip__close"
+                      aria-label="Dismiss"
+                      title="Dismiss"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
           
-          <button
-            onClick={() => setShowSettingsDialog(true)}
-            className="sc-btn"
-          >
-            Settings
-          </button>
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowSettingsDialog(true)}
+              className="sc-btn"
+            >
+              Settings
+            </button>
+            {activeTip === 'settings' && (
+              <div style={{ position:'absolute', top:'110%', right:0 }}>
+                <div className="sc-tip__wrap">
+                  <div className="sc-tip__content">
+                    <span className="sc-tip__text">Configure hotkeys, theme and more</span>
+                    <button
+                      onClick={() => settings && handleUpdateSettings({ tooltips: { ...settings.tooltips, shownSettings: true } })}
+                      className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon sc-tip__close"
+                      aria-label="Dismiss"
+                      title="Dismiss"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 

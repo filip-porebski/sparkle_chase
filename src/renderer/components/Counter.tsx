@@ -14,6 +14,8 @@ interface CounterProps {
   onLogShiny: () => void;
   onHuntUpdated: (hunt: Hunt) => void;
   settings?: Settings;
+  showCounterTip?: boolean;
+  onDismissCounterTip?: () => void;
 }
 
 export const Counter: React.FC<CounterProps> = ({
@@ -24,7 +26,9 @@ export const Counter: React.FC<CounterProps> = ({
   onLogPhase,
   onLogShiny,
   onHuntUpdated,
-  settings
+  settings,
+  showCounterTip,
+  onDismissCounterTip
 }) => {
   const [editingCount, setEditingCount] = useState(false);
   const [editValue, setEditValue] = useState(hunt.count.toString());
@@ -167,7 +171,7 @@ export const Counter: React.FC<CounterProps> = ({
                 </div>
                 <div className="sc-count-label">Encounters</div>
               </div>
-              <div className="sc-counter-side">
+              <div className="sc-counter-side" style={{ position: 'relative' }}>
                 <div className="sc-counter-primary">
                   <button
                     onClick={() => !hunt.archived && onIncrement()}
@@ -178,6 +182,23 @@ export const Counter: React.FC<CounterProps> = ({
                     +1
                   </button>
                 </div>
+                {showCounterTip && (
+                  <div style={{ position:'absolute', top:'-6px', left:'50%', transform:'translate(-50%, -100%)' }}>
+                    <div className="sc-tip__wrap">
+                      <div className="sc-tip__content">
+                        <span className="sc-tip__text">Press Space or click +1 to increment</span>
+                        <button
+                          onClick={() => onDismissCounterTip && onDismissCounterTip()}
+                          className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon sc-tip__close"
+                          aria-label="Dismiss"
+                          title="Dismiss"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="sc-counter-actions">
                   <button
                     onClick={() => !hunt.archived && onDecrement()}

@@ -18,6 +18,8 @@ interface HuntManagerProps {
   onLockHunt: (huntId: string) => void;
   settings?: Settings;
   onOpenQuickSwitch: () => void;
+  onUpdateSettings: (updates: Partial<Settings>) => void;
+  activeTip?: 'newHunt' | 'counter' | 'settings' | 'overlay' | null;
 }
 
 export const HuntManager: React.FC<HuntManagerProps> = ({
@@ -31,7 +33,9 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   onUnlockHunt,
   onLockHunt,
   settings,
-  onOpenQuickSwitch
+  onOpenQuickSwitch,
+  onUpdateSettings,
+  activeTip
 }) => {
   // create form visibility managed by parent
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null);
@@ -154,10 +158,11 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
   return (
     <div className="u-col">
       <div className="u-row" style={{ justifyContent: 'flex-end', marginBottom: 'var(--sc-space-2)' }}>
-        <button
-          onClick={onToggleCreate}
-          className={`sc-btn ${showCreateForm ? 'sc-btn--ghost' : 'sc-btn--primary'}`}
-        >
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={onToggleCreate}
+            className={`sc-btn ${showCreateForm ? 'sc-btn--ghost' : 'sc-btn--primary'}`}
+          >
           {showCreateForm ? 'Cancel' : (
             <span style={{ display:'inline-flex', alignItems:'center', gap:'8px' }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
@@ -167,7 +172,25 @@ export const HuntManager: React.FC<HuntManagerProps> = ({
               <span>New Hunt</span>
             </span>
           )}
-        </button>
+          </button>
+          {activeTip === 'newHunt' && settings && (
+            <div style={{ position:'absolute', top:'110%', left:0 }}>
+              <div className="sc-tip__wrap">
+                <div className="sc-tip__content">
+                  <span className="sc-tip__text">Start by creating your first hunt</span>
+                  <button
+                    onClick={() => onUpdateSettings({ tooltips: { ...settings!.tooltips, shownNewHunt: true } })}
+                    className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon sc-tip__close"
+                    aria-label="Dismiss"
+                    title="Dismiss"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         <button
           onClick={() => setShowFilter(prev => !prev)}
           className={`sc-btn ${showFilter ? 'sc-btn--ghost' : ''}`}

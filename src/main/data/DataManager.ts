@@ -139,6 +139,7 @@ export class DataManager {
       dateFormat: inferDate as any,
       timeFormat: inferTime12h ? '12h' : '24h',
       numberSeparator: sep as any,
+      tooltips: { shownNewHunt: false, shownCounter: false, shownSettings: false, shownOverlay: false },
       cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).'},
       overlay: {
         variant: 'badge',

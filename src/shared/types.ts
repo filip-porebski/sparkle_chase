@@ -51,6 +51,12 @@ export interface Settings {
   timeFormat: '12h' | '24h';
   numberSeparator: 'comma' | 'dot' | 'thin';
   storageMode?: 'portable' | 'userData';
+  tooltips?: {
+    shownNewHunt?: boolean;
+    shownCounter?: boolean;
+    shownSettings?: boolean;
+    shownOverlay?: boolean;
+  };
   cloudSync: {
     provider: 'none' | 'icloud' | 'googledrive' | 'dropbox' | 'onedrive';
     status?: 'disconnected' | 'connecting' | 'connected' | 'error';
