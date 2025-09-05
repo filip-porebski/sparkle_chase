@@ -15,6 +15,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
   const [localSettings, setLocalSettings] = useState<Settings>(settings);
   const [captureTarget, setCaptureTarget] = useState<keyof Settings['hotkeys'] | null>(null);
   const capturing = useMemo(() => captureTarget !== null, [captureTarget]);
+  const [appVersion, setAppVersion] = useState<string>("");
 
   // Keep local copy in sync if settings prop changes (e.g., theme toggle elsewhere)
   useEffect(() => setLocalSettings(settings), [settings]);
@@ -57,6 +58,11 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
       window.electronAPI.setTypingActive(false);
     };
   }, [captureTarget]);
+
+  // Load app version for footer display
+  useEffect(() => {
+    window.electronAPI.getAppVersion?.().then(v => setAppVersion(v)).catch(() => {});
+  }, []);
 
   const handleSave = () => {
     onUpdate(localSettings);
@@ -461,25 +467,22 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
           </div>
         </div>
 
-        <div className="u-row" style={{ 
-          gap: 'var(--sc-space-3)', 
-          paddingTop: 'var(--sc-space-5)', 
-          borderTop: '1px solid var(--sc-border)' 
-        }}>
-          <button
-            onClick={handleSave}
-            className="sc-btn sc-btn--primary"
-            style={{ flex: 1 }}
-          >
-            Save Settings
-          </button>
-          <button
-            onClick={onClose}
-            className="sc-btn sc-btn--ghost"
-            style={{ flex: 1 }}
-          >
-            Cancel
-          </button>
+        <div className="u-row" style={{ justifyContent:'space-between', alignItems:'center', paddingTop: 'var(--sc-space-5)', borderTop: '1px solid var(--sc-border)' }}>
+          <span className="u-subtle" style={{ fontSize: '10px' }}>{appVersion ? `v${appVersion}` : ''}</span>
+          <div className="u-row" style={{ gap: 'var(--sc-space-3)' }}>
+            <button
+              onClick={handleSave}
+              className="sc-btn sc-btn--primary"
+            >
+              Save Settings
+            </button>
+            <button
+              onClick={onClose}
+              className="sc-btn sc-btn--ghost"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </div>

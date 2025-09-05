@@ -90,6 +90,9 @@ jspm_packages/
 tmp/
 temp/
 
+# Local release script with token
+scripts/release_with_token.sh
+
 # Runtime data
 pids
 *.pid

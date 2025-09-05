@@ -99,6 +99,7 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+
   // Update header style on scroll inside content or sidebar
   const updateNavScrolled = () => {
     const c = contentRef.current?.scrollTop || 0;

@@ -129,3 +129,47 @@ MIT License - see LICENSE file for details.
 ## Support
 
 For issues and feature requests, please use the GitHub issue tracker.
+
+## Releases & Updates
+
+### Versioning
+- Bump versions using npm’s version scripts (these create a tag):
+  - `npm run version:patch`
+  - `npm run version:minor`
+  - `npm run version:major`
+
+### Building and publishing releases
+- Configure your repository details in `package.json` (`repository.url`, `homepage`).
+- Option A (recommended, local helper script):
+  1. Copy the example script and put your token inside:
+     ```bash
+     cp scripts/release_with_token.example.sh scripts/release_with_token.sh
+     # edit scripts/release_with_token.sh and set GH_TOKEN_VALUE
+     ```
+  2. Run a release (bump version automatically and publish):
+     ```bash
+     bash scripts/release_with_token.sh patch   # or minor / major / none
+     ```
+
+- Option B (manual env var):
+  1. Set `GH_TOKEN` in your environment (a GitHub token with `repo` scope).
+  2. Run a multi‑platform release build and publish to GitHub Releases:
+
+```bash
+# Install dependencies
+npm ci
+
+# Build & publish for macOS, Windows, and Linux
+# (Cross‑platform builds require proper host tools: e.g., Windows signing on Windows,
+#  macOS notarization on macOS, Wine for building Windows targets on macOS/Linux.)
+GH_TOKEN=your_token npm run release
+```
+
+electron‑builder will create artifacts and publish them to GitHub Releases in your repository.
+
+### Auto‑update on startup
+- The app uses `electron-updater` with the `github` provider (via `electron-builder` config) to check for updates on startup and notify the user when a new version is available.
+- No external hosting is required; GitHub Releases is sufficient.
+- Behavior:
+  - On launch, the app calls `autoUpdater.checkForUpdatesAndNotify()`.
+  - When an update is downloaded, the app prompts to restart and applies the update.

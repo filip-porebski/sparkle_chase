@@ -1,4 +1,5 @@
 import { app, BrowserWindow, globalShortcut, ipcMain, dialog, Menu, shell } from 'electron';
+// auto-updater is loaded dynamically to avoid crashing when not installed in dev
 import * as path from 'path';
 import { DataManager } from './data/DataManager';
 import { HotkeyManager } from './hotkeys/HotkeyManager';
@@ -8,6 +9,7 @@ import { acceleratorFromInput } from './utils/accelerators';
 
 class ShinyCounterApp {
   private mainWindow: BrowserWindow | null = null;
+  private splashWindow: BrowserWindow | null = null;
   private dataManager: DataManager;
   private hotkeyManager: HotkeyManager;
   private overlayManager: OverlayManager;
@@ -31,14 +33,21 @@ class ShinyCounterApp {
       try { Menu.setApplicationMenu(null); } catch {}
     }
 
-    // Create main window
-    this.createMainWindow();
+    // Create splash first (skip in dev if desired)
+    // Always show splash (dev + prod). In dev, it's a fixed short delay.
+    this.createSplashWindow();
+    this.createMainWindow(false);
     
     // Setup IPC handlers
     this.setupIpcHandlers();
     
     // Setup hotkeys
     this.setupHotkeys();
+
+    // Check for updates (skip in development)
+    if (process.env.NODE_ENV !== 'development') {
+      this.setupAutoUpdater();
+    }
 
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) {
@@ -57,7 +66,37 @@ class ShinyCounterApp {
     });
   }
 
-  private createMainWindow() {
+  private setupAutoUpdater() {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { autoUpdater } = require('electron-updater');
+      autoUpdater.autoDownload = true;
+      autoUpdater.autoInstallOnAppQuit = true;
+      autoUpdater.on('update-available', () => {
+        this.mainWindow?.webContents.send('update:available');
+      });
+      autoUpdater.on('update-downloaded', async () => {
+        const res = await dialog.showMessageBox(this.mainWindow!, {
+          type: 'info',
+          buttons: ['Restart Now', 'Later'],
+          defaultId: 0,
+          cancelId: 1,
+          message: 'An update has been downloaded',
+          detail: 'Restart the app to apply the update.'
+        });
+        if (res.response === 0) {
+          autoUpdater.quitAndInstall();
+        }
+      });
+      // Kick off update check
+      autoUpdater.checkForUpdatesAndNotify().catch(() => {});
+    } catch (e) {
+      // Swallow update errors to avoid disrupting startup
+      console.error('AutoUpdater init failed', e);
+    }
+  }
+
+  private createMainWindow(_show: boolean = false) {
     this.mainWindow = new BrowserWindow({
       width: 1200,
       height: 800,
@@ -82,8 +121,16 @@ class ShinyCounterApp {
       this.mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
     }
 
-    this.mainWindow.once('ready-to-show', () => {
+    this.mainWindow.once('ready-to-show', async () => {
+      // Wait for splash timing and (in prod) updater check
+      if (process.env.NODE_ENV === 'development') {
+        await new Promise((r) => setTimeout(r, 1200));
+      } else {
+        await this.finishSplash();
+      }
       this.mainWindow?.show();
+      this.splashWindow?.close();
+      this.splashWindow = null;
     });
 
     this.mainWindow.on('closed', () => {
@@ -104,6 +151,39 @@ class ShinyCounterApp {
       try { shell.openExternal(url); } catch {}
       return { action: 'deny' };
     });
+  }
+
+  private createSplashWindow() {
+    this.splashWindow = new BrowserWindow({
+      width: 420,
+      height: 240,
+      frame: false,
+      transparent: true,
+      resizable: false,
+      movable: true,
+      alwaysOnTop: true,
+      show: true,
+      webPreferences: { nodeIntegration: false, contextIsolation: true, devTools: false }
+    });
+
+    if (process.env.NODE_ENV === 'development') {
+      this.splashWindow.loadURL('http://localhost:5173/splash.html');
+    } else {
+      this.splashWindow.loadFile(path.join(__dirname, '../renderer/splash.html'));
+    }
+  }
+
+  private async finishSplash() {
+    // Ensure splash stays at least for a short time
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 1200));
+    const updater = (async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const { autoUpdater } = require('electron-updater');
+        await autoUpdater.checkForUpdatesAndNotify();
+      } catch {}
+    })();
+    await Promise.race([Promise.all([minDelay, updater])]);
   }
 
   private setupLocalHotkeys() {
@@ -300,6 +380,11 @@ class ShinyCounterApp {
 
     ipcMain.handle('diagnostic:validateOBSFolder', async (_, folderPath) => {
       return await this.dataManager.validateOBSFolder(folderPath);
+    });
+
+    // App
+    ipcMain.handle('app:getVersion', async () => {
+      return app.getVersion();
     });
   }
 

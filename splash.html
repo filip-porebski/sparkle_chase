@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SparkleChase — Loading</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:;">
+    <style>
+      :root { color-scheme: dark; }
+      html, body { height: 100%; }
+      body {
+        margin: 0; background: #11111A; color: #E6E6F0; font: 500 16px/1.4 Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        display: flex; align-items: center; justify-content: center; overflow: hidden;
+      }
+      .logo {
+        display: inline-flex; align-items: center; gap: 12px; font-size: 22px; letter-spacing: .3px;
+        padding: 18px 22px; border-radius: 18px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+        box-shadow: 0 8px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+        animation: bounce 1.4s ease-in-out infinite;
+      }
+      .sparkle { color: #7E5BEF; font-size: 24px; }
+      @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+      .sub { margin-top: 12px; text-align:center; color: #B7B7C8; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="logo"><span class="sparkle">✦</span><span>SparkleChase</span></div>
+      <div class="sub">Checking for updates…</div>
+    </div>
+  </body>
+</html>
+

@@ -48,6 +48,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getDataDirectory: () => ipcRenderer.invoke('diagnostic:getDataDirectory') as Promise<string>,
   validateOBSFolder: (folderPath: string) => ipcRenderer.invoke('diagnostic:validateOBSFolder', folderPath) as Promise<{ valid: boolean; error?: string }>,
 
+  // App
+  getAppVersion: () => ipcRenderer.invoke('app:getVersion') as Promise<string>,
+
   // Event listeners
   onHotkeyIncrement: (callback: () => void) => {
     ipcRenderer.on('hotkey:increment', callback);
@@ -96,6 +99,7 @@ export interface ElectronAPI {
   createEmergencyBackup: () => Promise<string | null>;
   getDataDirectory: () => Promise<string>;
   validateOBSFolder: (folderPath: string) => Promise<{ valid: boolean; error?: string }>;
+  getAppVersion: () => Promise<string>;
   onHotkeyIncrement: (callback: () => void) => () => void;
   onHotkeyDecrement: (callback: () => void) => () => void;
   onHotkeyPhase: (callback: () => void) => () => void;
