@@ -283,6 +283,27 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   box-shadow: var(--sc-shadow);
 }
 
+/* Utility Dock */
+.sc-utility-dock {
+  display: inline-flex; gap: 8px; align-items: center;
+  background: var(--sc-bg-elev-2);
+  border: 1px solid var(--sc-border);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: var(--sc-shadow);
+}
+.sc-icon-btn {
+  width: 34px; height: 34px; min-width: 34px; min-height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--sc-bg-elev-1);
+  border: 1px solid var(--sc-border);
+  border-radius: 10px; color: var(--sc-text-subtle);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.sc-icon-btn:hover { background: color-mix(in oklab, var(--sc-bg-elev-1) 75%, var(--sc-brand) 25%); color: #fff; border-color: var(--sc-border-strong); }
+.sc-icon-btn:active { transform: translateY(1px); }
+
 /* Modals */
 .sc-modal-backdrop{ position:fixed; inset:0; background:var(--sc-bg-overlay); z-index: 1000; }
 .sc-modal {
