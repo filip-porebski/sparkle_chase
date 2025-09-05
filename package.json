@@ -1,6 +1,6 @@
 {
   "name": "sparklechase",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SparkleChase - A crisp, streamer-friendly shiny hunting counter",
   "main": "dist/main/main.js",
   "scripts": {
@@ -19,7 +19,13 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "type-check": "tsc --noEmit"
   },
-  "keywords": ["pokemon", "shiny", "counter", "electron", "gaming"],
+  "keywords": [
+    "pokemon",
+    "shiny",
+    "counter",
+    "electron",
+    "gaming"
+  ],
   "author": "Shiny Counter Team",
   "license": "MIT",
   "repository": {
