@@ -7,6 +7,7 @@ import { SettingsDialog } from './components/SettingsDialog';
 import { StatsPanel } from './components/StatsPanel';
 import { DiagnosticsPanel } from './components/DiagnosticsPanel';
 import { QuickSwitch } from './components/QuickSwitch';
+import { CloudSyncCard } from './components/CloudSyncCard';
 import { MovableCard } from './components/MovableCard';
 import { useCardLayout } from './hooks/useCardLayout';
 import './styles/sparklechase.css';
@@ -87,11 +88,16 @@ function App() {
 
   const loadInitialData = async () => {
     try {
-      const [huntsList, settingsData] = await Promise.all([
+      const [huntsList, rawSettings] = await Promise.all([
         window.electronAPI.listHunts(),
         window.electronAPI.getSettings()
       ]);
-      
+      const settingsData = {
+        cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).' },
+        ...rawSettings,
+        cloudSync: { provider: 'none', status: 'disconnected', note: 'Design preview only (not yet functional).', ...(rawSettings?.cloudSync || {}) }
+      } as Settings;
+
       setHunts(huntsList);
       setSettings(settingsData);
       setGlobalHotkeysEnabled(!!settingsData?.globalHotkeysEnabled);
@@ -349,6 +355,10 @@ function App() {
             No active hunt selected
           </div>
         );
+      case 'cloudsync':
+        return settings ? (
+          <CloudSyncCard settings={settings} onUpdate={handleUpdateSettings} />
+        ) : null;
       default:
         return null;
     }
