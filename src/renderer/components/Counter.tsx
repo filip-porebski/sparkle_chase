@@ -141,93 +141,75 @@ export const Counter: React.FC<CounterProps> = ({
             </div>
           </div>
         ) : (
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-            <div
-              className={`sc-count-wrap`}
-              style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
-              onClick={() => {
-                setEditingCount(true);
-                setEditValue(hunt.count.toString());
-              }}
-            >
-              <div
-                className={`sc-count sc-count--halo ${flash ? 'is-flash' : ''}`}
-                style={{ cursor: 'pointer', textAlign: 'center' }}
-              >
-                <AnimatedCount value={hunt.count} separator={settings?.numberSeparator || 'comma'} />
+          <>
+            <div className="sc-counter-area">
+              <div className="sc-counter-main">
+                <div
+                  className={`sc-count-wrap`}
+                  style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                  onClick={() => {
+                    setEditingCount(true);
+                    setEditValue(hunt.count.toString());
+                  }}
+                >
+                  <div
+                    className={`sc-count sc-count--halo ${flash ? 'is-flash' : ''}`}
+                    style={{ cursor: 'pointer', textAlign: 'center' }}
+                  >
+                    <AnimatedCount value={hunt.count} separator={settings?.numberSeparator || 'comma'} />
+                  </div>
+                  <span className="sc-edit-icon" aria-hidden="true" title="Edit count" style={{ marginLeft: '8px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                </div>
+                <div className="sc-count-label">Encounters</div>
               </div>
-              {/* subtle edit icon on hover */}
-              <span className="sc-edit-icon" aria-hidden="true" title="Edit count" style={{ marginLeft: '8px' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M21.2799 6.40005L11.7399 15.94C10.7899 16.89 7.96987 17.33 7.33987 16.7C6.70987 16.07 7.13987 13.25 8.08987 12.3L17.6399 2.75002C17.8754 2.49308 18.1605 2.28654 18.4781 2.14284C18.7956 1.99914 19.139 1.92124 19.4875 1.9139C19.8359 1.90657 20.1823 1.96991 20.5056 2.10012C20.8289 2.23033 21.1225 2.42473 21.3686 2.67153C21.6147 2.91833 21.8083 3.21243 21.9376 3.53609C22.0669 3.85976 22.1294 4.20626 22.1211 4.55471C22.1128 4.90316 22.0339 5.24635 21.8894 5.5635C21.7448 5.88065 21.5375 6.16524 21.2799 6.40005V6.40005Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M11 4H6C4.93913 4 3.92178 4.42142 3.17163 5.17157C2.42149 5.92172 2 6.93913 2 8V18C2 19.0609 2.42149 20.0783 3.17163 20.8284C3.92178 21.5786 4.93913 22 6 22H17C19.21 22 20 20.2 20 18V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </span>
+              <div className="sc-counter-side">
+                <div className="sc-counter-primary">
+                  <button
+                    onClick={() => !hunt.archived && onIncrement()}
+                    className={`sc-btn sc-btn--giant ${hunt.archived ? '' : 'sc-btn--primary'}`}
+                    aria-disabled={hunt.archived}
+                    style={{ opacity: hunt.archived ? 0.5 : 1, pointerEvents: hunt.archived ? 'none' : 'auto' }}
+                  >
+                    +1
+                  </button>
+                </div>
+                <div className="sc-counter-actions">
+                  <button
+                    onClick={() => !hunt.archived && onDecrement()}
+                    className="sc-btn sc-btn--quiet"
+                    aria-disabled={hunt.count === 0}
+                    style={{ opacity: hunt.count === 0 || hunt.archived ? 0.6 : 1 }}
+                  >
+                    −1
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (hunt.archived) return;
+                      onIncrement();
+                      setTimeout(onIncrement, 50);
+                    }}
+                    className="sc-btn sc-btn--quiet"
+                  >
+                    +2
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (hunt.archived) return;
+                      for (let i = 0; i < 5; i++) setTimeout(onIncrement, i * 50);
+                    }}
+                    className="sc-btn sc-btn--quiet"
+                  >
+                    +5
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
-        
-        {!editingCount && (
-          <div className="u-col" style={{ gap: 'var(--sc-space-3)' }}>
-            {/* Main +1 Button */}
-            <button
-              onClick={() => !hunt.archived && onIncrement()}
-              className={`sc-btn sc-btn--giant ${hunt.archived ? '' : 'sc-btn--primary'}`}
-              aria-disabled={hunt.archived}
-              style={{ opacity: hunt.archived ? 0.5 : 1, pointerEvents: hunt.archived ? 'none' : 'auto' }}
-            >
-              +1
-            </button>
-            
-            {/* Quick Actions Row */}
-            <div className="u-row" style={{ gap: 'var(--sc-space-2)' }}>
-              <button
-                onClick={() => !hunt.archived && onDecrement()}
-                className="sc-btn"
-                aria-disabled={hunt.count === 0}
-                style={{ 
-                  opacity: hunt.count === 0 || hunt.archived ? 0.6 : 1,
-                  flex: 1,
-                  background: 'var(--sc-danger)',
-                  borderColor: 'color-mix(in oklab, var(--sc-danger) 70%, black 30%)',
-                  color: '#fff'
-                }}
-              >
-                −1
-              </button>
-              <button
-                onClick={() => {
-                  if (hunt.archived) return;
-                  onIncrement();
-                  setTimeout(onIncrement, 50);
-                }}
-                className="sc-btn"
-                style={{ 
-                  flex: 1,
-                  background: 'var(--sc-success)',
-                  borderColor: 'color-mix(in oklab, var(--sc-success) 70%, black 30%)',
-                  color: '#fff'
-                }}
-              >
-                +2
-              </button>
-              <button
-                onClick={() => {
-                  if (hunt.archived) return;
-                  for (let i = 0; i < 5; i++) setTimeout(onIncrement, i * 50);
-                }}
-                className="sc-btn"
-                style={{ 
-                  flex: 1,
-                  background: 'var(--sc-accent)',
-                  borderColor: 'color-mix(in oklab, var(--sc-accent) 70%, black 30%)',
-                  color: '#fff'
-                }}
-              >
-                +5
-              </button>
-            </div>
-          </div>
+          </>
         )}
       </div>
 

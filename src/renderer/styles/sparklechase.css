@@ -264,6 +264,35 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 .sc-odds { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); }
 .sc-since { font-size: var(--sc-fs-sm); color: var(--sc-text-subtle); }
 
+/* Unified meta row under counter */
+.sc-meta-row { display:flex; justify-content:space-between; align-items:center; gap: var(--sc-space-4); margin-bottom: var(--sc-space-4); }
+.sc-meta-item { font-size: var(--sc-fs-sm); color: var(--sc-text-subtle); }
+
+/* Accent button variant for quick actions */
+.sc-btn--accent { background: var(--sc-accent); color:#fff; border-color: color-mix(in oklab, var(--sc-accent) 70%, black 30%); }
+.sc-btn--accent:hover { background: color-mix(in oklab, var(--sc-accent) 85%, black 15%); border-color: color-mix(in oklab, var(--sc-accent) 70%, black 30%); }
+
+/* Quiet text-only button (no background/border) */
+.sc-btn--quiet { 
+  height: 32px; padding: 0 8px; 
+  background: transparent !important; border: none !important; box-shadow: none !important;
+  color: var(--sc-text-subtle);
+}
+.sc-btn--quiet:hover { background: transparent !important; color: var(--sc-text); border: none !important; }
+.sc-counter-actions .sc-btn--quiet { font-size: var(--sc-fs-sm); }
+
+/* Redesigned counter middle */
+.sc-counter-area { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--sc-space-5); width: 100%; margin-bottom: var(--sc-space-4); }
+.sc-counter-main { display: flex; flex-direction: column; align-items: center; gap: var(--sc-space-1); }
+.sc-count-label { font-size: var(--sc-fs-xs); color: var(--sc-text-subtle); }
+.sc-counter-side { display:flex; flex-direction: column; align-items: center; gap: var(--sc-space-2); }
+.sc-counter-primary { display:flex; align-items:center; justify-content:center; }
+.sc-counter-primary .sc-btn--giant { width: 120px; }
+.sc-counter-actions { display:flex; gap: var(--sc-space-1); justify-content:space-between; width: 120px; }
+@media (max-width: 768px) {
+  .sc-counter-area { grid-template-columns: 1fr; }
+}
+
 /* Phase Log */
 .sc-phases { display:flex; flex-direction:column; gap: var(--sc-space-2); }
 .sc-phase {
