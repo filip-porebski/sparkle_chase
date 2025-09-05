@@ -1,0 +1,44 @@
+name: Release Linux x64
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  linux-x64:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      # electron-builder reads GH_TOKEN; use GITHUB_TOKEN provided by Actions
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build renderer and main
+        run: npm run build
+
+      - name: Build and publish Linux x64 AppImage
+        run: npx electron-builder --linux AppImage --x64 --publish always
+
+      - name: Upload release artifacts (for debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64-release
+          path: release/**
+
