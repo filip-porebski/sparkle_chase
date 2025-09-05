@@ -11,6 +11,7 @@ import { CloudSyncCard } from './components/CloudSyncCard';
 import { MovableCard } from './components/MovableCard';
 import { useCardLayout } from './hooks/useCardLayout';
 import './styles/sparklechase.css';
+import { AtroposHover } from './components/AtroposHover';
 
 function App() {
   const [hunts, setHunts] = useState<Hunt[]>([]);
@@ -29,6 +30,15 @@ function App() {
   const [dragTarget, setDragTarget] = useState<'left' | 'right' | null>(null);
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
   const [showQuickSwitch, setShowQuickSwitch] = useState(false);
+  
+  // Navigate to home (no hunt selected)
+  const goHome = () => {
+    setPhaseDialogMode(null);
+    setShowCreateHunt(false);
+    setActiveHunt(null);
+    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    sidebarRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   
   // Card layout management
   const { 
@@ -432,9 +442,21 @@ function App() {
     <div className="sc-app">
       {/* Header */}
       <header className={`sc-header ${navScrolled ? 'sc-header--solid' : 'sc-header--clear'}`}>
-        <div className="sc-title">
-          <span className="sparkle">✦</span>SparkleChase
-        </div>
+        <AtroposHover>
+          <div
+            className="sc-title"
+          role="button"
+          tabIndex={0}
+          onClick={goHome}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goHome(); }
+          }}
+          aria-label="Go to home"
+          style={{ cursor: 'pointer' }}
+          >
+            <span className="sparkle">✦</span>SparkleChase
+          </div>
+        </AtroposHover>
         <div className="actions">
           {/* Global Hotkeys Status */}
           <div className={`sc-status ${globalHotkeysEnabled ? 'sc-status--active' : 'sc-status--inactive'}`}>
