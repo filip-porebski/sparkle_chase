@@ -159,6 +159,11 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 }
 .sc-input:focus { border-color: var(--sc-brand); box-shadow: 0 0 0 3px color-mix(in oklab, var(--sc-brand) 32%, transparent); }
 .sc-label { font-size: var(--sc-fs-sm); color: var(--sc-text-muted); margin-bottom: 6px; display: block; }
+.sc-label .sc-label-icon { display: inline-flex; margin-right: 8px; color: var(--sc-text-subtle); vertical-align: middle; }
+
+/* Settings sections */
+.sc-settings-section { padding: var(--sc-space-5) 0; border-top: 1px solid var(--sc-border); }
+.sc-settings-section:first-child { border-top: none; padding-top: 0; }
 
 /* Select/Tabs/Tags */
 .sc-tag { display:inline-flex; align-items:center; gap:8px; padding:4px 10px; border-radius:999px; border:1px solid var(--sc-border); background:var(--sc-bg-elev-2); font-size: var(--sc-fs-sm); }
