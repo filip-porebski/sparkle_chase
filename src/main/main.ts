@@ -11,6 +11,7 @@ class ShinyCounterApp {
   private hotkeyManager: HotkeyManager;
   private overlayManager: OverlayManager;
   private typingActive: boolean = false;
+  private currentSettings: Settings | null = null;
 
   constructor() {
     this.dataManager = new DataManager();
@@ -118,26 +119,28 @@ class ShinyCounterApp {
         if (!globalEnabled) {
           // If user is typing in an input/textarea/contentEditable, do not intercept
           if (this.typingActive) return;
-          switch (input.key) {
-            case ' ': // Space key (single space character)
-            case 'Space': // Some systems might use 'Space'
-              if (!input.meta && !input.control && !input.alt && !input.shift) {
-                this.mainWindow?.webContents.send('hotkey:increment');
-                event.preventDefault();
-              }
-              break;
-            case 'z':
-              if ((input.meta || input.control) && !input.alt && !input.shift) {
-                this.mainWindow?.webContents.send('hotkey:decrement');
-                event.preventDefault();
-              }
-              break;
-            case 'p':
-              if ((input.meta || input.control) && !input.alt && !input.shift) {
-                this.mainWindow?.webContents.send('hotkey:phase');
-                event.preventDefault();
-              }
-              break;
+          const settings = this.currentSettings;
+          if (settings) {
+            const inc = settings.hotkeys.increment || 'Space';
+            const dec = settings.hotkeys.decrement || 'CommandOrControl+Z';
+            const ph = settings.hotkeys.phase || 'CommandOrControl+P';
+
+            const accel = this.acceleratorFromInput(input);
+            if (accel === inc) {
+              this.mainWindow?.webContents.send('hotkey:increment');
+              event.preventDefault();
+              return;
+            }
+            if (accel === dec) {
+              this.mainWindow?.webContents.send('hotkey:decrement');
+              event.preventDefault();
+              return;
+            }
+            if (accel === ph) {
+              this.mainWindow?.webContents.send('hotkey:phase');
+              event.preventDefault();
+              return;
+            }
           }
         }
         
@@ -154,13 +157,28 @@ class ShinyCounterApp {
         }
 
         // Global toggle hotkey works regardless of global hotkey state
-        if (input.key === 'g' && (input.meta || input.control) && input.shift && !input.alt) {
+        const toggleAccel = (this.currentSettings?.hotkeys.toggleGlobal) || 'CommandOrControl+Shift+G';
+        if (this.acceleratorFromInput(input) === toggleAccel) {
           const enabled = this.hotkeyManager.toggleGlobal();
           this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
           event.preventDefault();
         }
       }
     });
+  }
+
+  // Convert before-input-event payload into an Accelerator-like string consistent with SettingsDialog
+  private acceleratorFromInput(input: Electron.Input): string {
+    const parts: string[] = [];
+    if (input.meta || input.control) parts.push('CommandOrControl');
+    if (input.alt) parts.push('Alt');
+    if (input.shift) parts.push('Shift');
+
+    let key = input.key;
+    if (key === ' ') key = 'Space';
+    if (key && key.length === 1) key = key.toUpperCase();
+    parts.push(key);
+    return parts.join('+');
   }
 
   private setupIpcHandlers() {
@@ -226,6 +244,7 @@ class ShinyCounterApp {
 
     ipcMain.handle('settings:update', async (_, updates) => {
       const updated = await this.dataManager.updateSettings(updates);
+      this.currentSettings = updated;
       await this.configureHotkeys(updated);
       return updated;
     });
@@ -297,6 +316,7 @@ class ShinyCounterApp {
 
   private async setupHotkeys() {
     const settings = await this.dataManager.getSettings();
+    this.currentSettings = settings;
     await this.configureHotkeys(settings);
   }
 
