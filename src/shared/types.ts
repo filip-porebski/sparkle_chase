@@ -68,6 +68,15 @@ export interface Settings {
     alwaysOnTop: boolean;
     enabled: boolean;
   };
+  // UI layout persistence (cards positions and collapse states)
+  layout?: {
+    cards: Array<{
+      id: string;
+      side: 'left' | 'right';
+      order: number;
+      isCollapsed: boolean;
+    }>;
+  };
   hotkeys: {
     increment: string;
     decrement: string;

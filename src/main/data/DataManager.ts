@@ -147,6 +147,13 @@ export class DataManager {
         alwaysOnTop: true,
         enabled: false
       },
+      layout: {
+        cards: [
+          { id: 'statistics', side: 'left', order: 0, isCollapsed: false },
+          { id: 'hunts', side: 'right', order: 0, isCollapsed: false },
+          { id: 'cloudsync', side: 'right', order: 1, isCollapsed: false }
+        ]
+      },
       hotkeys: {
         increment: 'Space',
         decrement: 'Backspace',

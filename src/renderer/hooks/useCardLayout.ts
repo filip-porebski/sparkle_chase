@@ -46,6 +46,34 @@ export const useCardLayout = () => {
     cards: DEFAULT_CARDS
   });
 
+  // Replace current layout with a saved one (keeps unknown cards at defaults)
+  const setFromSaved = useCallback((saved: Array<{ id: string; side: 'left' | 'right'; order: number; isCollapsed: boolean }>) => {
+    setCardLayout(() => {
+      const byId = new Map(DEFAULT_CARDS.map(c => [c.id, c] as const));
+
+      // Start from saved items (so we preserve unknown/future cards automatically)
+      const merged: CardConfig[] = saved.map(s => {
+        const base = byId.get(s.id) || ({
+          id: s.id,
+          title: s.id,
+          component: null as any,
+          props: undefined,
+          side: 'left' as const,
+          isCollapsed: false,
+          order: 0
+        } as CardConfig);
+        return { ...base, side: s.side, order: s.order, isCollapsed: s.isCollapsed };
+      });
+
+      // Append any defaults not present in saved
+      DEFAULT_CARDS.forEach(def => {
+        if (!merged.find(m => m.id === def.id)) merged.push(def);
+      });
+
+      return { cards: merged };
+    });
+  }, []);
+
   const moveCard = useCallback((cardId: string, targetSide: 'left' | 'right') => {
     setCardLayout(prev => ({
       ...prev,
@@ -127,6 +155,7 @@ export const useCardLayout = () => {
 
   return {
     cardLayout,
+    setFromSaved,
     moveCard,
     moveCardToPosition,
     toggleCardCollapse,

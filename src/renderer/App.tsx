@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Hunt, Settings } from '../shared/types';
 import { HuntManager } from './components/HuntManager';
 import { Counter } from './components/Counter';
@@ -53,12 +53,15 @@ function App() {
   
   // Card layout management
   const { 
+    setFromSaved,
     moveCard, 
     moveCardToPosition,
     toggleCardCollapse, 
     getCardsByPosition, 
-    getCard 
+    getCard,
+    cardLayout
   } = useCardLayout();
+  const lastSavedLayoutRef = useRef<string>("");
 
   useEffect(() => {
     loadInitialData();
@@ -129,6 +132,11 @@ function App() {
       setHunts(huntsList);
       setSettings(settingsData);
       setGlobalHotkeysEnabled(!!settingsData?.globalHotkeysEnabled);
+      // Hydrate card layout from settings if present
+      if (settingsData.layout?.cards) {
+        setFromSaved(settingsData.layout.cards);
+        lastSavedLayoutRef.current = JSON.stringify(settingsData.layout.cards);
+      }
       
       // Set the first hunt as active if available
       if (huntsList.length > 0) {
@@ -140,6 +148,20 @@ function App() {
       setLoading(false);
     }
   };
+
+  // Persist card layout when it changes
+  useEffect(() => {
+    if (!settings) return;
+    const simplified = cardLayout.cards.map(c => ({ id: c.id, side: c.side, order: c.order, isCollapsed: c.isCollapsed }));
+    const payload = JSON.stringify(simplified);
+    if (payload === lastSavedLayoutRef.current) return;
+    lastSavedLayoutRef.current = payload;
+    // Debounce a little to batch rapid reorders
+    const t = setTimeout(() => {
+      window.electronAPI.updateSettings({ layout: { cards: simplified } }).catch(() => {});
+    }, 200);
+    return () => clearTimeout(t);
+  }, [cardLayout, settings]);
 
   const setupHotkeys = () => {
     const unsubscribeIncrement = window.electronAPI.onHotkeyIncrement(() => {
