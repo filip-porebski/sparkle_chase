@@ -1,6 +1,6 @@
 {
   "name": "sparklechase",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "SparkleChase - A crisp, streamer-friendly shiny hunting counter",
   "main": "dist/main/main.js",
   "scripts": {
