@@ -26,6 +26,25 @@ if [[ -z "${GH_TOKEN}" || "${GH_TOKEN}" == "REPLACE_WITH_YOUR_GITHUB_TOKEN" ]]; 
 fi
 export GH_TOKEN
 
+# Force electron-builder to use your personal token, not GitHub Actions token
+if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+  echo "[release] Unsetting GITHUB_TOKEN to avoid publishing as github-actions bot"
+  unset GITHUB_TOKEN
+fi
+
+# Informative: show which account this token belongs to (and guard against bots)
+if command -v curl >/dev/null 2>&1; then
+  owner_json=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" https://api.github.com/user || true)
+  owner_login=$(printf '%s' "${owner_json}" | sed -n 's/^[[:space:]]*"login": "\([^"]*\)",.*/\1/p' | head -n1)
+  if [[ -n "${owner_login}" ]]; then
+    echo "[release] Authenticated as: ${owner_login}"
+    if [[ "${owner_login}" == "github-actions" || "${owner_login}" == *"[bot]"* ]]; then
+      echo "[release] Token appears to be a bot token. Please use a Personal Access Token (classic) with repo scope to publish as your user."
+      exit 1
+    fi
+  fi
+fi
+
 # Optional version bump (default: patch)
 BUMP="${1:-patch}"
 if [[ "${BUMP}" != "none" ]]; then

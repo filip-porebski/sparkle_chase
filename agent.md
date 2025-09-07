@@ -175,7 +175,7 @@ All records include: `id`, `createdAt`, `updatedAt`, `appVersion`.
 {
   "theme": "dark",
   "overlay": {"variant": "badge", "clickThrough": true, "alwaysOnTop": true},
-  "hotkeys": {"increment": "Space", "decrement": "Ctrl+Z", "phase": "Ctrl+P", "toggleGlobal": "Ctrl+Shift+G"},
+  "hotkeys": {"increment": "Space", "decrement": "Backspace", "phase": "Ctrl+P", "toggleGlobal": "Ctrl+Shift+G", "quickSwitch": "Ctrl+K", "zenMode": "Ctrl+J"},
   "obsTextFolder": "C:/…/Overlays/ShinyCounter/",
   "safeModeApps": ["Photoshop.exe", "Premiere.exe"]
 }
@@ -269,3 +269,6 @@ All records include: `id`, `createdAt`, `updatedAt`, `appVersion`.
 - Externalize strings for future localization (EN first).  
 - Unit tests for math (odds), reducers, and persistence.  
 - Use Preload + IPC; never expose `fs` directly to the renderer.
+### Zen Mode
+- Toggle via the corner icon on the main counter card or hotkey (default Ctrl/Cmd+J).  
+- Expands the main card and hides the sidebar and auxiliary cards until toggled off.

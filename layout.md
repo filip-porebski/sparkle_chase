@@ -130,11 +130,21 @@ Weights:
 ## 5) Layout & Grids
 
 ### App Frame
-- **Header (48px):** app title, active hunt selector, global hotkey toggle.  
+- **Header (64px):** app title, active hunt selector, global hotkey toggle.  
 - **Main two-column:**  
   - **Left (Content):** Counter card, Odds, Phase log, Sessions (later).  
   - **Right (Sidebar):** Hunt meta, Quick Adjusters, Notes.  
 - **Footer (32px):** status (autosave, path), small tips.
+
+### Zen Mode
+- Trigger: corner icon on the main counter card or hotkey (default Ctrl/Cmd+J).
+- Behavior: the main card expands to fill the content area; the sidebar and additional cards are hidden.
+- CSS hooks:
+  - Root toggles class `.sc-app--zen`.
+  - `.sc-app--zen .sc-main { grid-template-columns: 1fr; }`
+  - `.sc-app--zen .sc-sidebar { display: none; }`
+  - `.sc-app--zen .sc-content .sc-cards-container { display: none; }`
+  - `.sc-card--hero` grows to `min-height: calc(100vh - var(--sc-header-h) - paddings)`.
 
 ### Counter Card Hierarchy (in Content column)
 - Top: Target species + game + method tag.  
@@ -212,10 +222,7 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
 
 ### Header
 ```css
-.sc-header {
-  height: 48px; display:flex; align-items:center; justify-content:space-between;
-  padding: 0 var(--sc-space-5); border-bottom:1px solid var(--sc-border); background:var(--sc-bg-elev-1);
-}
+.sc-header { height: var(--sc-header-h); /* 64px */ }
 .sc-title { font-weight: var(--sc-fw-semibold); letter-spacing: 0.2px; }
 .sc-title .sparkle { color: var(--sc-brand); margin-right: 8px; }
 .sc-header .actions { display:flex; gap: var(--sc-space-3); }
@@ -464,4 +471,3 @@ User accent override allowed via CSS variables: `--sc-brand`, `--sc-accent`.
 - [ ] Illustrations (sparkle background, optional)  
 - [ ] Sound SFX: shiny, phase, click  
 - [ ] OBS overlay templates (browser source + text source)
-

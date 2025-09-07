@@ -13,9 +13,12 @@ A cross-platform Electron app for tracking shiny Pokémon encounters during hunt
 - ✅ **Streamer I/O** - Text file output for OBS (count.txt, target.txt, phase.txt)
 - ✅ **Overlay window** - Always-on-top, click-through display
 - ✅ **Local file storage** - JSON-based data persistence with autosave
+- ✅ **Rebindable hotkeys with modifiers** — capture Ctrl/Cmd/Alt/Shift combos in Settings (press Escape to cancel)
+- ✅ **Quick Switcher** — quickly switch hunts (default: Ctrl/Cmd+K)
+- ✅ **Zen Mode** — maximize the main card and hide the sidebar; toggle via corner icon or hotkey
 
 ### Planned Features
-- **P1**: Multiple hunts, templates, rebindable hotkeys, session tracking
+- **P1**: Multiple hunts, templates, session tracking
 - **P2**: Charts, break nudges, gamepad support, accessibility improvements
 - **P3**: Cloud sync, Discord webhooks, advanced analytics
 
@@ -77,11 +80,19 @@ src/
 - Press Ctrl/Cmd+P hotkey
 - Enter the species found and any notes
 
+### Zen Mode
+- Click the expand/collapse icon at the top-right of the main card to enter/exit Zen Mode.
+- Default hotkey: Ctrl/Cmd+J (configurable in Settings → Hotkey Bindings).
+- In Zen Mode the main counter card fills the app; the sidebar and extra cards are hidden.
+
 ### Settings
 - Configure global hotkeys
+- Rebind hotkeys; modifiers (Ctrl/Cmd/Alt/Shift) are supported during capture
 - Set OBS text file output folder
 - Customize overlay appearance
 - Set theme (light/dark)
+- Choose storage mode (Portable vs. User Data)
+- Optional Quick Switcher hotkey (default Ctrl/Cmd+K)
 
 ## Data Storage
 
@@ -113,6 +124,12 @@ In User Data mode the same structure is used under the OS app data folder.
 | Decrement | Backspace | Subtract -1 from counter |
 | Phase | Ctrl/Cmd+P | Open phase dialog |
 | Toggle Global | Ctrl/Cmd+Shift+G | Enable/disable global hotkeys |
+| Quick Switch | Ctrl/Cmd+K | Open hunt switcher (app‑focused) |
+| Zen Mode | Ctrl/Cmd+J | Toggle Zen mode (local and global when enabled) |
+
+Notes:
+- Hotkeys are configurable in Settings → Hotkey Bindings. Modifier combos are supported. Press Escape to cancel during capture.
+- Global hotkeys apply when “Global Hotkeys” is enabled (toggled in Settings). Local hotkeys always work when the app is focused.
 
 ## License
 
