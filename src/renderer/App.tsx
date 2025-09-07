@@ -31,6 +31,7 @@ function App() {
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
   const [showQuickSwitch, setShowQuickSwitch] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [zenMode, setZenMode] = useState(false);
   const activeTip: 'newHunt' | 'counter' | 'settings' | 'overlay' | null = React.useMemo(() => {
     if (!settings) return null;
     const t = settings.tooltips || {} as any;
@@ -163,11 +164,16 @@ function App() {
       setGlobalHotkeysEnabled(enabled);
     });
 
+    const unsubscribeZen = window.electronAPI.onHotkeyZen(() => {
+      setZenMode((z) => !z);
+    });
+
     return () => {
       unsubscribeIncrement();
       unsubscribeDecrement();
       unsubscribePhase();
       unsubscribeGlobalToggle();
+      unsubscribeZen();
     };
   };
 
@@ -464,7 +470,7 @@ function App() {
   }
 
   return (
-    <div className="sc-app">
+    <div className={`sc-app ${zenMode ? 'sc-app--zen' : ''}`}>
       {/* Header */}
       <header className={`sc-header ${navScrolled ? 'sc-header--solid' : 'sc-header--clear'}`}>
         <AtroposHover>
@@ -563,6 +569,8 @@ function App() {
               onLogShiny={() => setPhaseDialogMode('shiny')}
               onHuntUpdated={(h) => { setActiveHunt(h); updateHuntInList(h); }}
               settings={settings || undefined}
+              zenEnabled={zenMode}
+              onToggleZen={() => setZenMode((z) => !z)}
             />
           ) : (
             <div className="sc-card" style={{ textAlign: 'center', padding: 'var(--sc-space-8)' }}>

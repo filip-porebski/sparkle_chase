@@ -391,6 +391,12 @@ hr { border: none; border-top: 1px solid var(--sc-border); }
   overflow-y: auto;
 }
 
+/* Zen Mode */
+.sc-app--zen .sc-main { grid-template-columns: 1fr; }
+.sc-app--zen .sc-sidebar { display: none; }
+.sc-app--zen .sc-content .sc-cards-container { display: none; }
+.sc-app--zen .sc-card--hero { min-height: calc(100vh - var(--sc-header-h) - var(--sc-space-5) - var(--sc-space-5)); }
+
 /* Status indicators */
 .sc-status {
   display: inline-flex;

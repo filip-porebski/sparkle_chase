@@ -302,6 +302,7 @@ class ShinyCounterApp {
             const inc = settings.hotkeys.increment || 'Space';
             const dec = settings.hotkeys.decrement || 'Backspace';
             const ph = settings.hotkeys.phase || 'CommandOrControl+P';
+            const zen = settings.hotkeys.zenMode || 'CommandOrControl+J';
 
             const accel = acceleratorFromInput(input);
             if (accel === inc) {
@@ -316,6 +317,11 @@ class ShinyCounterApp {
             }
             if (accel === ph) {
               this.mainWindow?.webContents.send('hotkey:phase');
+              event.preventDefault();
+              return;
+            }
+            if (accel === zen) {
+              this.mainWindow?.webContents.send('hotkey:zen');
               event.preventDefault();
               return;
             }
@@ -515,6 +521,11 @@ class ShinyCounterApp {
     this.hotkeyManager.registerHotkey(settings.hotkeys.toggleGlobal || 'CommandOrControl+Shift+G', () => {
       const enabled = this.hotkeyManager.toggleGlobal();
       this.mainWindow?.webContents.send('hotkey:globalToggled', enabled);
+    });
+
+    // Zen mode toggle
+    this.hotkeyManager.registerHotkey(settings.hotkeys.zenMode || 'CommandOrControl+J', () => {
+      this.mainWindow?.webContents.send('hotkey:zen');
     });
 
     // Enable global hotkeys if setting is enabled

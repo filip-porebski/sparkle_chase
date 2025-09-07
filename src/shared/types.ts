@@ -74,6 +74,7 @@ export interface Settings {
     phase: string;
     toggleGlobal: string;
     quickSwitch?: string;
+    zenMode?: string;
   };
   obsTextFolder: string;
   safeModeApps: string[];

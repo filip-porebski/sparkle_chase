@@ -64,6 +64,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('hotkey:phase', callback);
     return () => ipcRenderer.removeListener('hotkey:phase', callback);
   },
+  onHotkeyZen: (callback: () => void) => {
+    ipcRenderer.on('hotkey:zen', callback);
+    return () => ipcRenderer.removeListener('hotkey:zen', callback);
+  },
   onGlobalHotkeyToggled: (callback: (enabled: boolean) => void) => {
     const handler = (_: unknown, enabled: boolean) => callback(enabled);
     ipcRenderer.on('hotkey:globalToggled', handler);
@@ -103,6 +107,7 @@ export interface ElectronAPI {
   onHotkeyIncrement: (callback: () => void) => () => void;
   onHotkeyDecrement: (callback: () => void) => () => void;
   onHotkeyPhase: (callback: () => void) => () => void;
+  onHotkeyZen: (callback: () => void) => () => void;
   onGlobalHotkeyToggled: (callback: (enabled: boolean) => void) => () => void;
 }
 

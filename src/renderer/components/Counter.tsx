@@ -16,6 +16,8 @@ interface CounterProps {
   settings?: Settings;
   showCounterTip?: boolean;
   onDismissCounterTip?: () => void;
+  zenEnabled?: boolean;
+  onToggleZen?: () => void;
 }
 
 export const Counter: React.FC<CounterProps> = ({
@@ -28,7 +30,9 @@ export const Counter: React.FC<CounterProps> = ({
   onHuntUpdated,
   settings,
   showCounterTip,
-  onDismissCounterTip
+  onDismissCounterTip,
+  zenEnabled,
+  onToggleZen
 }) => {
   const [editingCount, setEditingCount] = useState(false);
   const [editValue, setEditValue] = useState(hunt.count.toString());
@@ -83,8 +87,34 @@ export const Counter: React.FC<CounterProps> = ({
 
   return (
     <div className="sc-card sc-card--hero" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+      {/* Zen mode toggle icon */}
+      <button
+        onClick={() => onToggleZen && onToggleZen()}
+        className="sc-btn sc-btn--ghost sc-btn--xs sc-btn--icon"
+        title={zenEnabled ? 'Exit Zen mode' : 'Enter Zen mode'}
+        aria-label={zenEnabled ? 'Exit Zen mode' : 'Enter Zen mode'}
+        style={{ position: 'absolute', right: '10px', top: '10px', height: '28px', padding: '0 8px' }}
+      >
+        {zenEnabled ? (
+          // Icon: collapse to corners
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M9 3H4v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M15 3h5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M9 21H4v-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M15 21h5v-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        ) : (
+          // Icon: expand to corners
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            <path d="M9 5H5v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M15 5h4v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M9 19H5v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M15 19h4v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        )}
+      </button>
       {/* Hunt Header */}
-      <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--sc-space-4)' }}>
+      <div className="u-row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 'var(--sc-space-3)', marginBottom: 'var(--sc-space-4)' }}>
         <div style={{ flex: 1 }}>
           <div className="sc-card__title">{hunt.targetSpecies}</div>
           <div className="sc-card__meta">{hunt.game} • {hunt.method}</div>

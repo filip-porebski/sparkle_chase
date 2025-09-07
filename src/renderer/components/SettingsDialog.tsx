@@ -30,6 +30,14 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
       e.preventDefault();
       e.stopPropagation();
 
+      // Allow cancel with Escape
+      if (e.key === 'Escape') {
+        setCaptureTarget(null);
+        window.electronAPI.setTypingActive(false);
+        return;
+      }
+
+      // Keep listening while only modifiers are pressed
       if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
 
       const parts: string[] = [];
@@ -48,11 +56,13 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
         hotkeys: { ...prev.hotkeys, [captureTarget]: accelerator }
       }));
 
+      // Finish capture
       setCaptureTarget(null);
       window.electronAPI.setTypingActive(false);
     };
 
-    window.addEventListener('keydown', handleKeyDown, { once: true });
+    // Do not use `once`; we need to ignore standalone modifier presses
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.electronAPI.setTypingActive(false);
@@ -353,6 +363,32 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({
                     </button>
                   </div>
                 </div>
+              </div>
+              <div className="u-row">
+                <div style={{ flex: 1 }}>
+                  <label className="sc-label" style={{ fontSize: 'var(--sc-fs-xs)', color: 'var(--sc-text-subtle)' }}>Zen Mode</label>
+                  <div className="u-row" style={{ gap: 'var(--sc-space-1)' }}>
+                    <input
+                      type="text"
+                      value={
+                        captureTarget === 'zenMode'
+                          ? 'Press shortcut...'
+                          : (localSettings.hotkeys.zenMode || 'CommandOrControl+J')
+                      }
+                      readOnly
+                      className="sc-input"
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={() => setCaptureTarget('zenMode')}
+                      className={`sc-btn ${capturing && captureTarget==='zenMode' ? 'sc-btn--primary' : 'sc-btn--ghost'}`}
+                      title="Register hotkey"
+                    >
+                      {capturing && captureTarget==='zenMode' ? 'Listening…' : '⌨️'}
+                    </button>
+                  </div>
+                </div>
+                <div style={{ flex: 1 }} />
               </div>
             </div>
           </div>

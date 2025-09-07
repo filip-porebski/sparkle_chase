@@ -152,7 +152,8 @@ export class DataManager {
         decrement: 'Backspace',
         phase: 'CommandOrControl+P',
         toggleGlobal: 'CommandOrControl+Shift+G',
-        quickSwitch: 'CommandOrControl+K'
+        quickSwitch: 'CommandOrControl+K',
+        zenMode: 'CommandOrControl+J'
       },
       obsTextFolder: '',
       safeModeApps: ['Photoshop.exe', 'Premiere.exe'],
