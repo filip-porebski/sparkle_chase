@@ -86,8 +86,8 @@ class ShinyCounterApp {
     // Setup hotkeys
     this.setupHotkeys();
 
-    // Check for updates (skip in development)
-    if (process.env.NODE_ENV !== 'development') {
+    // Check for updates only when packaged (avoid preview/unpacked loops)
+    if (app.isPackaged) {
       this.setupAutoUpdater();
     }
 
@@ -114,8 +114,16 @@ class ShinyCounterApp {
       const { autoUpdater } = require('electron-updater');
       autoUpdater.autoDownload = true;
       autoUpdater.autoInstallOnAppQuit = true;
+
+      autoUpdater.on('error', (err: any) => {
+        console.error('[Updater] Error:', err?.stack || err);
+      });
+
       autoUpdater.on('update-available', () => {
         this.mainWindow?.webContents.send('update:available');
+      });
+      autoUpdater.on('download-progress', (p: any) => {
+        try { this.mainWindow?.webContents.send('update:progress', p); } catch {}
       });
       autoUpdater.on('update-downloaded', async () => {
         const res = await dialog.showMessageBox(this.mainWindow!, {
@@ -127,11 +135,20 @@ class ShinyCounterApp {
           detail: 'Restart the app to apply the update.'
         });
         if (res.response === 0) {
-          autoUpdater.quitAndInstall();
+          try {
+            // Ensure all windows are closed and restart to install
+            autoUpdater.quitAndInstall(true, true);
+          } catch (e) {
+            console.error('[Updater] quitAndInstall failed:', e);
+            // Fallback: quit app (autoInstallOnAppQuit should install on supported targets)
+            try { app.quit(); } catch {}
+          }
         }
       });
       // Kick off update check
-      autoUpdater.checkForUpdatesAndNotify().catch(() => {});
+      autoUpdater.checkForUpdatesAndNotify().catch((e: any) => {
+        console.error('[Updater] checkForUpdatesAndNotify error:', e);
+      });
     } catch (e) {
       // Swallow update errors to avoid disrupting startup
       console.error('AutoUpdater init failed', e);
@@ -274,11 +291,14 @@ class ShinyCounterApp {
     // Ensure splash stays at least for a short time
     const minDelay = new Promise((resolve) => setTimeout(resolve, 1200));
     const updater = (async () => {
+      if (!app.isPackaged) return; // Skip updates in preview/unpacked
       try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { autoUpdater } = require('electron-updater');
         await autoUpdater.checkForUpdatesAndNotify();
-      } catch {}
+      } catch (e) {
+        console.error('[Updater] finishSplash check failed:', e);
+      }
     })();
     await Promise.race([Promise.all([minDelay, updater])]);
   }
